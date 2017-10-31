@@ -273,7 +273,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/30/介词才是逻辑的灵魂/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/31/编码器原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -292,7 +292,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/10/30/介词才是逻辑的灵魂/" itemprop="url">介词才是逻辑的灵魂</a></h1>
+                <a class="post-title-link" href="/2017/10/31/编码器原理/" itemprop="url">编码器原理</a></h1>
         
 
         <div class="post-meta">
@@ -304,8 +304,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-30T00:00:00+08:00">
-                2017-10-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-31T00:00:00+08:00">
+                2017-10-31
               </time>
             
 
@@ -327,8 +327,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
                   </a>
                 </span>
 
@@ -366,11 +366,13 @@
       
         
           
-            <h1 id="介词才是逻辑的灵魂"><a href="#介词才是逻辑的灵魂" class="headerlink" title="介词才是逻辑的灵魂"></a>介词才是逻辑的灵魂</h1><p>汉语：住在楼上的人需要提着桶去楼下打水。</p>
-<p>中式翻译：Those who <code>live</code>（住） upstairs have to <code>carry</code>（提） buckets  and <code>go</code>（去） downstairs to the tap to <code>get</code>（打） water.</p>
-<p>地道英文：Those <code>upstairs</code> have to carry buckets to the tap <code>downstairs for</code> water. </p>
-<p>比如：     Throw the book at him.</p>
-<p>​        Throw the book to him.</p>
+            <h1 id="编码器原理"><a href="#编码器原理" class="headerlink" title="编码器原理"></a>编码器原理</h1><h2 id="绝对值编码器"><a href="#绝对值编码器" class="headerlink" title="绝对值编码器"></a>绝对值编码器</h2><p><img src="http://oxehqp0gf.bkt.clouddn.com/201038151758818.gif" alt="绝对值编码器 (旋转型)"></p>
+<p>​    绝对编码器由机械位置决定的每个位置是唯一的，它无需记忆，无需找参考点，而且不用一直计数，什么时候需要知道位置，什么时候就去读取它的位置。并且没有累计误差，这样，编码器的抗干扰特性、数据的可靠性大大提高了。</p>
+<h2 id="增量编码器"><a href="#增量编码器" class="headerlink" title="增量编码器"></a>增量编码器</h2><p><img src="http://oxehqp0gf.bkt.clouddn.com/timg.jpg" alt="增量编码器"></p>
+<p>增量式编码器不能返回位置信息，它只能返回脉冲，告知自己是否在转，速度多少，以及正反转等信息。</p>
+<p>  编码器轴每旋转一圈，A相和B相都发出相同的脉冲个数，但是A相和B相之间存在一个90°（电气角的一周期为360°）的电气角相位差，可以根据这个相位差来判断编码器旋转的方向是正转还是反转，正转时，A相超前B相90°先进行相位输出，反转时，B相超前A相90°先进行相位输出(如下图所示)。</p>
+<p>编码器每旋转一圈，Z相只在一个固定的位置发一个脉冲，所以可以作为复位相或零位相来使用。</p>
+<p><img src="http://oxehqp0gf.bkt.clouddn.com/2533274790414004801.jpg" alt=""></p>
 
           
         
@@ -527,6 +529,152 @@
 <p>​    但问题是，人类毕竟得生活在真实的世界中，人类不可能靠数据生存，我们得靠能源和资源。可是回头看看，这些年针对现实世界的技术改进确实是慢了下来。</p>
 <p>​    美国早在很久以前半个世纪以前就登陆了月球，按说现在走出太阳系岂不是近在眼前的事，但是这并没有为什么呢？说到底还是因为化学燃料的火箭发动机不可能把人类送出更远了，而且成本也太高。</p>
 <p>​    我们现在是否会经历范式革命呢？就像中国文明，在宋代到清代的这几百年里面，里面具体的进步当然是有的，但是总体上他已经是一个走进了死胡同的文明。它在等待一次范式革命，但是如果没有1840年的西方炮舰，我们还觉得当在天朝上国一片繁荣呢。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/30/介词才是逻辑的灵魂/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/30/介词才是逻辑的灵魂/" itemprop="url">介词才是逻辑的灵魂</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-30T00:00:00+08:00">
+                2017-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/英语/" itemprop="url" rel="index">
+                    <span itemprop="name">英语</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="介词才是逻辑的灵魂"><a href="#介词才是逻辑的灵魂" class="headerlink" title="介词才是逻辑的灵魂"></a>介词才是逻辑的灵魂</h1><p>汉语：住在楼上的人需要提着桶去楼下打水。</p>
+<p>中式翻译：Those who <code>live</code>（住） upstairs have to <code>carry</code>（提） buckets  and <code>go</code>（去） downstairs to the tap to <code>get</code>（打） water.</p>
+<p>地道英文：Those <code>upstairs</code> have to carry buckets to the tap <code>downstairs for</code> water. </p>
+<p>比如：     Throw the book at him.</p>
+<p>​        Throw the book to him.</p>
 
           
         
@@ -980,158 +1128,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/11/AI会有什么目标？/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/11/AI会有什么目标？/" itemprop="url">AI会有什么目标？</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-11T00:00:00+08:00">
-                2017-10-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/杂谈/" itemprop="url" rel="index">
-                    <span itemprop="name">杂谈</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="AI会有什么目标？"><a href="#AI会有什么目标？" class="headerlink" title="AI会有什么目标？"></a>AI会有什么目标？</h1><blockquote>
-<p>本文摘自《精英日课》第二季018</p>
-</blockquote>
-<p>表面上看来，一开始我们让AI做事的时候，都给了它一个明确的目标，下期的AI就是要千方百计赢棋，打扫卫生的机器人，就是要把地给扫干净，非常简单，对吧？其实一点都不简单。</p>
-<p>问题在于等到AI，发展壮大以后，它会不会“创造性地”完成你的任务？</p>
-<p>比如我跟一个自动驾驶汽车说：“以最快的速度把我送到机场”，自动驾驶汽车，应该怎么理解我的命令？如果它太聪明的话，它会不会不计一切代价？我非干它会不会闯红灯？会不会违反交通规则，宁可跟别的车碰撞，到处抢路，把我送到机场。</p>
-<p>那你可以把命令改成“在不违反交通规则的情况下，尽快把我送到机场“，但是这还是有问题，如果送一个病危的人，也许违反交通规则，就是允许的，现在冒点险都是可以接受的，这一切都设计到一个度的把握，而AI必须精通人类社会的常识，才能找准这个度。</p>
-<p>如果AI发展到了可以自己升级自己了，给他设定目标系统就更麻烦。有人设想过一个可怕的场景，比如说你告诉AI</p>
-<p>，给我计算圆周率，结果越精确越好，你说完这句话就不管了，结果AI居然劫持了整个人类，造了一个非常厉害的系统，把整个太阳系变成了超级计算机，就是为了继续计算圆周率，而这种只不过是因为圆周率是个不管你调动多少资源都算不完的”超越数“。</p>
-<p>==你的初衷是要个更精确的圆周率，可是AI给了你整个太阳系。==</p>
-<p>这就引出了泰戈马克的关键一问：==如果人的初心都可以被忘记的话，你怎么能确保AI不忘初心呢？==</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/11/西门子840D备份/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1318,6 +1314,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/11/AI会有什么目标？/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/10/11/AI会有什么目标？/" itemprop="url">AI会有什么目标？</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-11T00:00:00+08:00">
+                2017-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/杂谈/" itemprop="url" rel="index">
+                    <span itemprop="name">杂谈</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="AI会有什么目标？"><a href="#AI会有什么目标？" class="headerlink" title="AI会有什么目标？"></a>AI会有什么目标？</h1><blockquote>
+<p>本文摘自《精英日课》第二季018</p>
+</blockquote>
+<p>表面上看来，一开始我们让AI做事的时候，都给了它一个明确的目标，下期的AI就是要千方百计赢棋，打扫卫生的机器人，就是要把地给扫干净，非常简单，对吧？其实一点都不简单。</p>
+<p>问题在于等到AI，发展壮大以后，它会不会“创造性地”完成你的任务？</p>
+<p>比如我跟一个自动驾驶汽车说：“以最快的速度把我送到机场”，自动驾驶汽车，应该怎么理解我的命令？如果它太聪明的话，它会不会不计一切代价？我非干它会不会闯红灯？会不会违反交通规则，宁可跟别的车碰撞，到处抢路，把我送到机场。</p>
+<p>那你可以把命令改成“在不违反交通规则的情况下，尽快把我送到机场“，但是这还是有问题，如果送一个病危的人，也许违反交通规则，就是允许的，现在冒点险都是可以接受的，这一切都设计到一个度的把握，而AI必须精通人类社会的常识，才能找准这个度。</p>
+<p>如果AI发展到了可以自己升级自己了，给他设定目标系统就更麻烦。有人设想过一个可怕的场景，比如说你告诉AI</p>
+<p>，给我计算圆周率，结果越精确越好，你说完这句话就不管了，结果AI居然劫持了整个人类，造了一个非常厉害的系统，把整个太阳系变成了超级计算机，就是为了继续计算圆周率，而这种只不过是因为圆周率是个不管你调动多少资源都算不完的”超越数“。</p>
+<p>==你的初衷是要个更精确的圆周率，可是AI给了你整个太阳系。==</p>
+<p>这就引出了泰戈马克的关键一问：==如果人的初心都可以被忘记的话，你怎么能确保AI不忘初心呢？==</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/09/价格区间/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1428,150 +1576,6 @@
 <li>10万是女性的爱马仕和男性的表或者是个入门车。</li>
 <li>几十万是升级的车，百万级的是房子或者进一步升级的车，千万级别的还是房子。</li>
 </ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/08/混合现实：把真实世界叠加进虚拟世界/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/10/08/混合现实：把真实世界叠加进虚拟世界/" itemprop="url">混合现实：把真实世界叠加进虚拟世界</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-08T00:00:00+08:00">
-                2017-10-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/杂谈/" itemprop="url" rel="index">
-                    <span itemprop="name">杂谈</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#混合现实：把真实世界叠加进虚拟世界#</p>
-<pre><code>本文摘自前哨王煜全第二季第一期
-</code></pre><p>在三大现实（VR，AR，MR）中，MR好像是知名度最低的。<br>混合现实相对于AR把虚拟的东西叠加到真实的世界，混合现实则是把真实的东西叠加到虚拟的世界。看起来差不多，但其实MR难度大多了。因为首先得把现实的东西虚拟化，也就是先得用摄像头捕捉画面，但我们都知道摄像头捕捉的画面都是二维的，也就是画面是扁平的，没有立体感，所以还得把二维的图像通过计算机形成三位的虚拟图像，这叫3D建模，只有这样虚拟化之后，才能把它很好的融合进虚拟的3D世界里面。<br>2017年6月6日，苹果召开了全球开发者大会。在这个大会里，有个不为大家所重视的东西。“增强现实平台”(ARkit)。在其演示的时候，明明只有个桌面，但在手机屏幕里，桌面上就出现了一个被子，一盏台灯。这个好像和Pokemon Go 没有什么区别。但很多人没有注意到，苹果在增强现实平台的展示中，随意挪动真实桌面上的虚拟台灯，虚拟茶杯，它们的影子其实也会随之变化，这就要求摄像头对真实的桌面进行实时的3D建模，说明苹果平台中已经具备摄像头的3D建模能力了。</p>
 
           
         
@@ -1974,7 +1978,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
