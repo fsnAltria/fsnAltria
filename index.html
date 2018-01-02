@@ -273,6 +273,170 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/28/可重入与线程安全/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/28/可重入与线程安全/" itemprop="url">可重入与线程安全</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T00:00:00+08:00">
+                2017-12-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="可重入与线程安全"><a href="#可重入与线程安全" class="headerlink" title="可重入与线程安全"></a>可重入与线程安全</h1><blockquote>
+<p>本文 摘自Qt官方文档</p>
+</blockquote>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li>A thread-safe function can be called simultaneously from multiple threads, even when the invocations use shared data, because all references to the shared data are serialized.</li>
+<li>A reentrant function can also be called simultaneously from multiple threads, but only if each invocation uses its own data.</li>
+</ul>
+<p>Hence, a thread-safe function is always reentrant, but a reentrant function is not always thread-safe.</p>
+<p>By extension, a class is said to be reentrant if its member functions can be called safely from multiple threads, as long as each thread uses a different instance of the class. The class is thread-safe if its member functions can be called safely from multiple threads, even if all the threads use the same instance of the class.</p>
+<h2 id="可重入"><a href="#可重入" class="headerlink" title="可重入"></a>可重入</h2><p>C++ classes are often reentrant, simply because they only access their own member data. Any thread can call a member function on an instance of a reentrant class, as long as no other thread can call a member function on the same instance of the class at the same time. For example, the Counter class below is reentrant:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class"> &#123;</span></div><div class="line"> <span class="keyword">public</span>:</div><div class="line">     Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; ++n; &#125;</div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; --n; &#125;</div><div class="line">     <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line"> <span class="keyword">private</span>:</div><div class="line">     <span class="keyword">int</span> n;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure>
+<p>The class isn’t thread-safe, because if multiple threads try to modify the data member n, the result is undefined. This is because the ++ and – operators aren’t always atomic. Indeed, they usually expand to three machine instructions:</p>
+<ol>
+<li>Load the variable’s value in a register.</li>
+<li>Increment or decrement the register’s value.</li>
+<li>Store the register’s value back into main memory.</li>
+</ol>
+<p>If thread A and thread B load the variable’s old value simultaneously, increment their register, and store it back, they end up overwriting each other, and the variable is incremented only once! </p>
+<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>Clearly, the access must be serialized: Thread A must perform steps 1, 2, 3 without interruption (atomically) before thread B can perform the same steps; or vice versa. An easy way to make the class thread-safe is to protect all access to the data members with a QMutex:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class">  &#123;</span></div><div class="line">  <span class="keyword">public</span>:</div><div class="line">      Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; ++n; &#125;</div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; --n; &#125;</div><div class="line">      <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line">  <span class="keyword">private</span>:</div><div class="line">      <span class="keyword">mutable</span> QMutex mutex;</div><div class="line">      <span class="keyword">int</span> n;</div><div class="line">  &#125;;</div></pre></td></tr></table></figure></p>
+<p>The QMutexLocker class automatically locks the mutex in its constructor and unlocks it when the destructor is invoked, at the end of the function. Locking the mutex ensures that access from different threads will be serialized. The mutex data member is declared with the mutable qualifier because we need to lock and unlock the mutex in value(), which is a const function. </p>
+<h2 id="个人简单概括"><a href="#个人简单概括" class="headerlink" title="个人简单概括"></a>个人简单概括</h2><p>我也上网看了很多博客，感觉网上关于这俩的说法都有些矛盾，这里就以Qt官方为准吧。</p>
+<p>可重入是针对类的两个实例，像全局变量这样的，会被调用两次因此结果不确定，对于两个实例自己的变量没事。</p>
+<p>线程安全是针对的类的一个实例，即即使是私有变量也可能被调两次，这样的需要“be serialized”.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/27/比较句/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -413,168 +577,6 @@
 <blockquote>
 <p>Life’s transition from the sea to the land was as ==much of== an evolutionary challenge as ==was== the genesis of life.</p>
 </blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/However的用法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/However的用法/" itemprop="url">However的用法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#However的用法</p>
-<blockquote>
-<p>本文摘自天天用英语</p>
-</blockquote>
-<h2 id="副词，-然而、不过、但是"><a href="#副词，-然而、不过、但是" class="headerlink" title="副词，  然而、不过、但是"></a>副词，  然而、不过、但是</h2><ul>
-<li>近义词nevertheless</li>
-<li>This is a cheap and simple process. However, there are dangers. 这是个花钱少而又简单的方法，不过有危险。</li>
-</ul>
-<h2 id="副词，-无论多大-好、严重等"><a href="#副词，-无论多大-好、严重等" class="headerlink" title="副词， 无论多大[好、严重等]"></a>副词， 无论多大[好、严重等]</h2><ul>
-<li>相当与No matter how</li>
-<li>You should report any incident, however minor it is. 任何事件你都应该汇报，不管它多小。</li>
-</ul>
-<h2 id="副词，-到底-如何？-表示惊讶"><a href="#副词，-到底-如何？-表示惊讶" class="headerlink" title="副词， (到底)如何？[表示惊讶]"></a>副词， (到底)如何？[表示惊讶]</h2><ul>
-<li>However did he get that job?他到底是怎样得到那份工作的？</li>
-</ul>
-<h2 id="conjunction-in-whatever-way-不管怎样，无论如何"><a href="#conjunction-in-whatever-way-不管怎样，无论如何" class="headerlink" title="conjunction.  in whatever way 不管怎样，无论如何"></a>conjunction.  in whatever way 不管怎样，无论如何</h2><ul>
-<li>You can do it however you like. 你可以按自己的意思去做。</li>
-</ul>
-<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
-<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
-<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
 
           
         
@@ -872,6 +874,168 @@
 <p>​    是否是真五轴，不是看五个轴是否联动，假五轴也可五轴联动。主轴要是有RTCP真五轴的算法。就是做分度加工，有ＲＴＣＰ功能的真五轴只要设置一个坐标系，只需要一次对刀设坐标。而假五轴则麻烦很多。</p>
 <p>​    拥有RTCP功能的数控系统，可以直接使用刀尖编程，无需考虑旋转轴中心距离。应用RTCP模式后，编程5坐标加工就可以直接针对刀具刀尖而不是旋转主轴头的中心，因此编程就会变得简单、高效很多。</p>
 <p>​    原文有图，满形象的。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/However的用法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/26/However的用法/" itemprop="url">However的用法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
+                2017-12-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/英语/" itemprop="url" rel="index">
+                    <span itemprop="name">英语</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#However的用法</p>
+<blockquote>
+<p>本文摘自天天用英语</p>
+</blockquote>
+<h2 id="副词，-然而、不过、但是"><a href="#副词，-然而、不过、但是" class="headerlink" title="副词，  然而、不过、但是"></a>副词，  然而、不过、但是</h2><ul>
+<li>近义词nevertheless</li>
+<li>This is a cheap and simple process. However, there are dangers. 这是个花钱少而又简单的方法，不过有危险。</li>
+</ul>
+<h2 id="副词，-无论多大-好、严重等"><a href="#副词，-无论多大-好、严重等" class="headerlink" title="副词， 无论多大[好、严重等]"></a>副词， 无论多大[好、严重等]</h2><ul>
+<li>相当与No matter how</li>
+<li>You should report any incident, however minor it is. 任何事件你都应该汇报，不管它多小。</li>
+</ul>
+<h2 id="副词，-到底-如何？-表示惊讶"><a href="#副词，-到底-如何？-表示惊讶" class="headerlink" title="副词， (到底)如何？[表示惊讶]"></a>副词， (到底)如何？[表示惊讶]</h2><ul>
+<li>However did he get that job?他到底是怎样得到那份工作的？</li>
+</ul>
+<h2 id="conjunction-in-whatever-way-不管怎样，无论如何"><a href="#conjunction-in-whatever-way-不管怎样，无论如何" class="headerlink" title="conjunction.  in whatever way 不管怎样，无论如何"></a>conjunction.  in whatever way 不管怎样，无论如何</h2><ul>
+<li>You can do it however you like. 你可以按自己的意思去做。</li>
+</ul>
+<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
+<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
+<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
 
           
         
@@ -1391,6 +1555,509 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/11/How-do-I-write-an-English-word-in-Japanese/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/11/How-do-I-write-an-English-word-in-Japanese/" itemprop="url">How do I write an English word in Japanese?</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-11T00:00:00+08:00">
+                2017-12-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/日语/" itemprop="url" rel="index">
+                    <span itemprop="name">日语</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="How-do-I-write-an-English-word-in-Japanese"><a href="#How-do-I-write-an-English-word-in-Japanese" class="headerlink" title="How do I write an English word in Japanese?"></a>How do I write an English word in Japanese?</h1><p>本文转自 <a href="http://www.sljfaq.org/afaq/english-in-japanese.html" target="_blank" rel="external">这里</a></p>
+<p>Katakana is phonetic, so a katakana transcription of an English word is based on how the word sounds, not how it is spelt.</p>
+<p>Transcribing an English word into Japanese depends on how the word is heard by native speakers. The rules are complex. Some Japanese versions of English words, such as guzzu for “goods”, are not intuitive to English speakers. Some Japanese representations are based on spelling as well as pronunciation. For example the Japanese <em>monkii</em> (モンキー) for English “monkey” would be <em>mankii</em> (マンキー) if the Japanese was based on the pronunciation, mʌŋki in International Phonetic Alphabet (IPA symbols), alone.</p>
+<h2 id="Rules-for-conversion"><a href="#Rules-for-conversion" class="headerlink" title="Rules for conversion"></a>Rules for conversion</h2><p>Plurals usually become singular, thus “pyjamas” becomes pajama, and “slippers” becomes suripaa. Thus in Japan shops sell “Book” and “CD” rather than “Books” and “CDs”. Sometimes singular also becomes plural, as in furūtsu for “fruit”.</p>
+<p>Words with existing gairaigo forms usually keep that form. For example, “black coffee” becomes burakku kōhii, even though kōhii for coffee originally comes from Dutch (see <a href="http://www.sljfaq.org/afaq/dutch.html" target="_blank" rel="external">Which Japanese words come from Dutch?</a>). Sometimes this doesn’t happen. “Beer garden” becomes <em>bia gāden</em> (ビアガーデン), although the Japanese word for beer is <em>biiru</em> (ビール), from Dutch (see <a href="http://www.sljfaq.org/afaq/dutch.html#dutch-biiru" target="_blank" rel="external">Which Japanese words come from Dutch?</a>).</p>
+<p>==Japanese has fewer vowels than English, only five, and thus multiple English vowels may turn into the same Japanese vowels. For example, both the English vowel æ in “thank” and the vowel ʌ in “cut” become the Japanese a vowel. Similarly, long vowels such as ɑː in “far” and ɜː in “fur” both become Japanese ā.==</p>
+<p>Japanese has tended to favour British pronunciations, with words like “vitamin”, becoming a British-sounding <em>bitamin</em> (ビタミン) rather than American-sounding <em>baitamin</em> (バイタミン). The vowels used in Japanese are usually taken from the British (southern English) pronunciation rather than the American. The rhotic “r” of some forms of English is almost never represented in Japanese, although there are some exceptions, such as <em>kariforunia</em> (カリフォルニア) for the American state of California.</p>
+<p>The following table outlines the rules for transcribing English sounds. The English sounds are represented in International Phonetic Alphabet (IPA) form.</p>
+<p>###Short vowels</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ɪ</td>
+<td style="text-align:center">イ, i</td>
+<td style="text-align:center">pit</td>
+<td style="text-align:center">ピット (pitto)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɛ</td>
+<td style="text-align:center">エ, e</td>
+<td style="text-align:center">pet</td>
+<td style="text-align:center">ペット (petto)</td>
+</tr>
+<tr>
+<td style="text-align:center">æ</td>
+<td style="text-align:center">ア, a</td>
+<td style="text-align:center">ham</td>
+<td style="text-align:center">ハム (hamu)</td>
+</tr>
+<tr>
+<td style="text-align:center">æ after k</td>
+<td style="text-align:center">キャ, kya</td>
+<td style="text-align:center">cap</td>
+<td style="text-align:center">キャップ (kyappu)</td>
+</tr>
+<tr>
+<td style="text-align:center">ʌ spelt with an “o”</td>
+<td style="text-align:center">オ, o (sometimes)</td>
+<td style="text-align:center">monkey, front, London</td>
+<td style="text-align:center">モンキー, フロント, ロンドン (monkii, furonto, rondon)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɒ</td>
+<td style="text-align:center">オ, o</td>
+<td style="text-align:center">socks</td>
+<td style="text-align:center">ソックス (sokkusu)</td>
+</tr>
+<tr>
+<td style="text-align:center">ʊ</td>
+<td style="text-align:center">ウ, u</td>
+<td style="text-align:center">book</td>
+<td style="text-align:center">ブック (bukku)</td>
+</tr>
+</tbody>
+</table>
+<p>###Schwa(weak vowel)</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th>Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">non-final ə</td>
+<td style="text-align:center">not fixed, based on spelling.</td>
+<td style="text-align:center">about, pilot, London</td>
+<td>アバウト, パイロット, ロンドン (abauto, pairotto, rondon)</td>
+</tr>
+<tr>
+<td style="text-align:center">final position ə</td>
+<td style="text-align:center">aa</td>
+<td style="text-align:center">carrier, hamburger</td>
+<td>キャリアー, ハンバーガー (kyariā, hambāgā)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Long-vowels"><a href="#Long-vowels" class="headerlink" title="Long vowels"></a>Long vowels</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ɑː</td>
+<td style="text-align:center">アー, ア aa, a</td>
+<td style="text-align:center">car</td>
+<td style="text-align:center">カー (kā)</td>
+</tr>
+<tr>
+<td style="text-align:center">iː</td>
+<td style="text-align:center">イー: ii</td>
+<td style="text-align:center">shield</td>
+<td style="text-align:center">シールド (shiirudo)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɔː</td>
+<td style="text-align:center">オー: oo</td>
+<td style="text-align:center">horse</td>
+<td style="text-align:center">ホース (hōsu)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɔː(同上)</td>
+<td style="text-align:center">oa</td>
+<td style="text-align:center">オア: door</td>
+<td style="text-align:center">ドア (doa)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɜː</td>
+<td style="text-align:center">アー: aa</td>
+<td style="text-align:center">bird</td>
+<td style="text-align:center">バード (bādo)</td>
+</tr>
+<tr>
+<td style="text-align:center">uː</td>
+<td style="text-align:center">ウー ū</td>
+<td style="text-align:center">shoe</td>
+<td style="text-align:center">シュー (shū)</td>
+</tr>
+<tr>
+<td style="text-align:center">juː</td>
+<td style="text-align:center">ュウ yū, see <a href="http://www.sljfaq.org/afaq/youon.html" target="_blank" rel="external">What is <em>yōon</em>?</a></td>
+<td style="text-align:center">cube</td>
+<td style="text-align:center">キューブ (kyūbu)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Diphthongs"><a href="#Diphthongs" class="headerlink" title="Diphthongs"></a>Diphthongs</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">eɪ</td>
+<td style="text-align:center">エイ, ei</td>
+<td style="text-align:center">day</td>
+<td style="text-align:center">デイ (dei)</td>
+</tr>
+<tr>
+<td style="text-align:center">aɪ</td>
+<td style="text-align:center">アイ, ai</td>
+<td style="text-align:center">my</td>
+<td style="text-align:center">マイ (mai)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɔɪ</td>
+<td style="text-align:center">オーイ, ōi</td>
+<td style="text-align:center">boy</td>
+<td style="text-align:center">ボーイ (bōi)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɔɪ(同上)</td>
+<td style="text-align:center">オイ, oi</td>
+<td style="text-align:center">toy</td>
+<td style="text-align:center">トイ (toi)</td>
+</tr>
+<tr>
+<td style="text-align:center">əʊ</td>
+<td style="text-align:center">オ, o</td>
+<td style="text-align:center">phone</td>
+<td style="text-align:center">フォン (fon)</td>
+</tr>
+<tr>
+<td style="text-align:center">əʊ(同上)</td>
+<td style="text-align:center">オー, ō</td>
+<td style="text-align:center">no</td>
+<td style="text-align:center">ノー (nō)</td>
+</tr>
+<tr>
+<td style="text-align:center">aʊ</td>
+<td style="text-align:center">アウ, au</td>
+<td style="text-align:center">now</td>
+<td style="text-align:center">ナウ (nau)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɪə</td>
+<td style="text-align:center">イア, ia</td>
+<td style="text-align:center">pierce</td>
+<td style="text-align:center">ピアス (piasu)</td>
+</tr>
+<tr>
+<td style="text-align:center">ɛə</td>
+<td style="text-align:center">エア, ea</td>
+<td style="text-align:center">hair</td>
+<td style="text-align:center">ヘア (hea)</td>
+</tr>
+<tr>
+<td style="text-align:center">ʊə</td>
+<td style="text-align:center">ウアー, uaa</td>
+<td style="text-align:center">tour</td>
+<td style="text-align:center">ツアー (tsuā)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Consonants"><a href="#Consonants" class="headerlink" title="Consonants"></a>Consonants</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">θ</td>
+<td style="text-align:center">シャ, シ, シュ, シェ, ショ s</td>
+<td style="text-align:center">think</td>
+<td style="text-align:center">シンク (shinku)</td>
+</tr>
+<tr>
+<td style="text-align:center">ð</td>
+<td style="text-align:center">z</td>
+<td style="text-align:center">the</td>
+<td style="text-align:center">ザ (za)</td>
+</tr>
+<tr>
+<td style="text-align:center">r</td>
+<td style="text-align:center">ラ, リ, ル, レ, ロ: r-kana</td>
+<td style="text-align:center">right</td>
+<td style="text-align:center">ライト (raito)</td>
+</tr>
+<tr>
+<td style="text-align:center">l</td>
+<td style="text-align:center">ラ, リ, ル, レ, ロ: r-kana</td>
+<td style="text-align:center">link</td>
+<td style="text-align:center">リンク (rinku)</td>
+</tr>
+<tr>
+<td style="text-align:center">ŋ spelt “ng”</td>
+<td style="text-align:center">ンガ, ンギ ng</td>
+<td style="text-align:center">singer</td>
+<td style="text-align:center">シンガー (shingā)</td>
+</tr>
+<tr>
+<td style="text-align:center">ŋ spelt “ng”(同上)</td>
+<td style="text-align:center">ン, n (occasionally)</td>
+<td style="text-align:center">Washington, surfing</td>
+<td style="text-align:center">ワシントン, サーフィン (washinton, sāfin)</td>
+</tr>
+<tr>
+<td style="text-align:center">ŋ spelt “nk” or “nc”</td>
+<td style="text-align:center">n</td>
+<td style="text-align:center">sink</td>
+<td style="text-align:center">シンク (shinku)</td>
+</tr>
+<tr>
+<td style="text-align:center">v</td>
+<td style="text-align:center">b</td>
+<td style="text-align:center">love</td>
+<td style="text-align:center">ラブ (rabu)</td>
+</tr>
+<tr>
+<td style="text-align:center">v(同上)</td>
+<td style="text-align:center">ヴァ, ヴィ, ヴ, ヴェ, ヴォ: v, written as ヴ (the u katakana) plus a small vowel</td>
+<td style="text-align:center">visual</td>
+<td style="text-align:center">ヴィジュアル (vijuaru)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Consonants-taking-small-vowel-kana"><a href="#Consonants-taking-small-vowel-kana" class="headerlink" title="Consonants taking small vowel kana"></a>Consonants taking small vowel kana</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">w</td>
+<td style="text-align:center">ウィ: u + small vowel kana</td>
+<td style="text-align:center">win</td>
+<td style="text-align:center">ウィン (win)</td>
+</tr>
+<tr>
+<td style="text-align:center">f</td>
+<td style="text-align:center">ファ, フィ, フ, フェ, フォ: hu + small vowel kana</td>
+<td style="text-align:center">fight</td>
+<td style="text-align:center">ファイト (faito)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Special-consonant-and-vowel-combinations"><a href="#Special-consonant-and-vowel-combinations" class="headerlink" title="Special consonant and vowel combinations"></a>Special consonant and vowel combinations</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ti, di</td>
+<td style="text-align:center">ティ, ディ (te or de + small i) (newer method)</td>
+<td style="text-align:center">Disney</td>
+<td style="text-align:center">ディズニー (dizunii)</td>
+</tr>
+<tr>
+<td style="text-align:center">ti, di(同上)</td>
+<td style="text-align:center">chi, ji (older method)</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">tu</td>
+<td style="text-align:center">トゥ: to + small u (newer method)</td>
+<td style="text-align:center">Tourette’s syndrome</td>
+<td style="text-align:center">トゥレットシンドローム (turettoshindorōmu)</td>
+</tr>
+<tr>
+<td style="text-align:center">tu(同上)</td>
+<td style="text-align:center">ツ: tsu</td>
+<td style="text-align:center">two</td>
+<td style="text-align:center">ツー (tsū)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Consonant-clusters"><a href="#Consonant-clusters" class="headerlink" title="Consonant clusters"></a>Consonant clusters</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">English sound (IPA)</th>
+<th style="text-align:center">Japanese</th>
+<th style="text-align:center">Examples</th>
+<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">dz</td>
+<td style="text-align:center">ッズ zzu</td>
+<td style="text-align:center">goods, kids</td>
+<td style="text-align:center">グッズ, キッズ (guzzu, kizzu)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Conversions-based-on-spelling-and-other-oddities"><a href="#Conversions-based-on-spelling-and-other-oddities" class="headerlink" title="Conversions based on spelling, and other oddities"></a>Conversions based on spelling, and other oddities</h2><p>==Although most of the conversion from an English word into Japanese is based on the pronunciation, in several cases the pronunciation is based on spelling. In particular the schwa sound, the “uh” at the end of “doctor”, has no near equivalent in Japanese and so is usually transcribed depending on the spelling of the vowel. Other cases where spelling takes precedence include the ʌ vowel, the “u” in “cup” and “hut”, which is usually a, but when spelt with an o becomes o. For example “monkey” is monkii rather than mankii. Japanese also lengthens n sounds, such as<em>Anna</em> (アンナ) for the English name Anna, when they are spelt with two ns.==</p>
+<p>==In some cases, a mis-reading of a word survives into Japanese. For example, the woodworking tool “router”, which should have become rautā, is known as a rūtā, based on the spelling.==</p>
+<p>==Japanese tends to shorten three-mora constructions ending in syllabic n (ん) into two moras. For example “stainless steel” becomes <em>sutenresu</em>(ステンレス) rather than <em>suteinresu</em> (ステインレス).==</p>
+<h2 id="Transcription-of-names"><a href="#Transcription-of-names" class="headerlink" title="Transcription of names"></a>Transcription of names</h2><p>In the case of people’s names, Japanese tends to transcribe into near-equivalent versions not based on the pronunciation. For example, the English name Sarah is often transcribed into <em>Sara</em> (サラ) rather than <em>Sērā</em> (セーラー). For example American politician Sarah Palin is known as <em>Sara Peirin</em> (サラ・ペイリン) in Japan. Naomi is transcribed into <em>Naomi</em> (ナオミ), a common Japanese female name with a similar romanized spelling but different pronunciation, rather than Nēomi, a much closer representation of the pronunciation. For example British model Naomi Campbell is known as <em>Naomi Kyamberu</em> (ナオミ・キャンベル) in Japan. Similarly, Thomas is transcribed as Tōmasu using a long first vowel, and even more extremely, Paul may be transcribed into Paoro.</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/11/「そうだ」、「ようだ」和「らしい」/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1594,330 +2261,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/02/强调句的用法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/02/强调句的用法/" itemprop="url">强调句的用法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-02T00:00:00+08:00">
-                2017-12-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="强调句的用法"><a href="#强调句的用法" class="headerlink" title="强调句的用法"></a>强调句的用法</h1><h2 id="用do放在谓语动词前强调动词"><a href="#用do放在谓语动词前强调动词" class="headerlink" title="用do放在谓语动词前强调动词"></a>用do放在谓语动词前强调动词</h2><blockquote>
-<ol>
-<li>主要用于陈述肯定句</li>
-<li>只能用于现在时和过去式（do,does,did），不能用于进行时和完成时（is doing，has done），由do体现时态变化，后面被强调的动词用原型</li>
-<li>do还可以用于祈使句中表示强调，如 Do remember to close the door</li>
-</ol>
-</blockquote>
-<h2 id="用what表强调"><a href="#用what表强调" class="headerlink" title="用what表强调"></a>用what表强调</h2><p>That is what I want.(=the thing that)</p>
-<h2 id="用only表强调"><a href="#用only表强调" class="headerlink" title="用only表强调"></a>用only表强调</h2><p>Only I kissed her last night. 昨天只有我我稳了她</p>
-<p>I only kissed her last night. 我昨天只吻了她</p>
-<h2 id="It-is-was-被强调成分-that-who"><a href="#It-is-was-被强调成分-that-who" class="headerlink" title="It is/was + 被强调成分 + that/who"></a>It is/was + 被强调成分 + that/who</h2><p>It is because he is ill that he  cannot come.</p>
-<h2 id="It-is-was-not-until-被强调成分-that"><a href="#It-is-was-not-until-被强调成分-that" class="headerlink" title="It is/was not until + 被强调成分 +that"></a>It is/was not until + 被强调成分 +that</h2><p>It was not until I met you that I knew what real happiness is.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/02/伴随状语/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/02/伴随状语/" itemprop="url">伴随状语</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-02T00:00:00+08:00">
-                2017-12-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#伴随状语#</p>
-<h2 id="使用分词形式"><a href="#使用分词形式" class="headerlink" title="使用分词形式"></a>使用分词形式</h2><ol>
-<li>The dog entered the room, ==following his master==.</li>
-<li>The master entered the room, ==followed by his dog==.</li>
-</ol>
-<h2 id="用with复合结构"><a href="#用with复合结构" class="headerlink" title="用with复合结构"></a>用with复合结构</h2><ol>
-<li>The little girls were playing in the snow ==with their hands frozen red==.</li>
-</ol>
-<h2 id="用独立主格结构"><a href="#用独立主格结构" class="headerlink" title="用独立主格结构"></a>用独立主格结构</h2><ol>
-<li>Last year I came here by climbing  over the wall, ==sword in hand==.</li>
-<li>The little boy goes to school, ==the little dog accompanying him every day==.</li>
-</ol>
-<h2 id="用形容词（短语）"><a href="#用形容词（短语）" class="headerlink" title="用形容词（短语）"></a>用形容词（短语）</h2><ol>
-<li>The kid went home, ==full of fear==.</li>
-<li>He sat there, ==silent==.</li>
-</ol>
-<h2 id="用名词"><a href="#用名词" class="headerlink" title="用名词"></a>用名词</h2><ol>
-<li>He went away ==a beggar== but returned ==a millionaire==.</li>
-<li>He had been twice the prime minister of the country, died ==a civilian==.</li>
-</ol>
-<h2 id="用介词短语"><a href="#用介词短语" class="headerlink" title="用介词短语"></a>用介词短语</h2><ol>
-<li>The girl came back to her mother ==in tears==.</li>
-<li>How can you ho to the wedding party ==in this ugly shirt==?</li>
-<li>I went home ==out of breath==.</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1963,7 +2311,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">42</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2015,7 +2363,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
