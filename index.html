@@ -273,6 +273,1399 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/西门子FETCH-WRITE service/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/西门子FETCH-WRITE service/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控-pvbrowser/" itemprop="url" rel="index">
+                    <span itemprop="name">工控 pvbrowser</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <pre><code>slave=0 adr=192.168.1.99 type=S7_1200 fetch_write=0 function=1 rack_slot=0
+</code></pre><p>在pvbrowser里设置与PLC连接的时候有一项fetch_write，下面具体看一下这一项</p>
+<p>##rlSiemensTcp源码</p>
+<pre><code>446   if((plc_type == S5 || plc_type == S7_300 || plc_type == S7_400) &amp;&amp; fetch_write == 1)
+ 447   {
+ 448     length = sizeof(ih) + sizeof(fh);
+ 449     ih.version  = 3;
+ 450     ih.reserved = 0;
+ 451     ih.length_high = length / 256;
+ 452     ih.length_low  = length &amp; 0x0ff;
+ 453     fh.ident[0]        = &apos;S&apos;;
+ 454     fh.ident[1]        = &apos;5&apos;;
+ 455     fh.header_len      = 16;
+ 456     fh.ident_op_code   = 1;
+ 457     fh.op_code_len     = 3;
+ 458     fh.op_code         = 5;
+ 459     fh.ident_org_block = 3;
+ 460     fh.len_org_block   = 8;
+ 461     fh.org_block       = (unsigned char) org;
+ 462     fh.dbnr            = (unsigned char) dbnr;
+ 463     fh.start_adr[0]    = (unsigned char) start_adr / 256;
+ 464     fh.start_adr[1]    = (unsigned char) start_adr &amp; 0x0ff;;
+ 465     fh.len[0]          = (unsigned char) len / 256;
+ 466     fh.len[1]          = (unsigned char) len &amp; 0x0ff;;
+ 467     fh.spare1          = 0x0ff;
+ 468     fh.spare1_len      = 2;
+ 469     unsigned char total_buf[sizeof(ih)+sizeof(fh)];
+ 470     memcpy(total_buf,             &amp;ih, sizeof(ih));
+ 471     memcpy(total_buf+sizeof(ih),  &amp;fh, sizeof(fh));
+ 472     ret = rlSocket::write(total_buf,   sizeof(ih)+sizeof(fh));
+ 473     rlDebugPrintf(&quot;fetch write ih ret=%d\n&quot;,ret);
+ 474     if(ret &lt; 0) return ret;  
+ 475     /*
+ 476     ret = rlSocket::write(&amp;ih,sizeof(ih));
+ 477     rlDebugPrintf(&quot;fetch write ih ret=%d\n&quot;,ret);
+ 478     if(ret &lt; 0) return ret;  
+ 479     ret = rlSocket::write(&amp;fh,sizeof(fh));
+ 480     rlDebugPrintf(&quot;fetch write fh ret=%d\n&quot;,ret);
+ 481     if(ret &lt; 0) return ret;
+ 482     */
+ 483     ret = rlSocket::read(&amp;ih,sizeof(ih),TIMEOUT);
+ 484     rlDebugPrintf(&quot;fetch read ih ret=%d\n&quot;,ret);
+ 485     if(ret &lt;= 0) return ret;
+ 486     ret = rlSocket::read(&amp;fa,sizeof(fa),TIMEOUT);
+ 487     rlDebugPrintf(&quot;fetch read fa ret=%d\n&quot;,ret);
+ 488     if(ret &lt;= 0) return ret;
+ 489     if(fa.error_block != 0) return -1;
+ 490     ret = rlSocket::read(buf,len_byte,TIMEOUT);
+ 491     rlDebugPrintf(&quot;fetch read buf ret=%d\n&quot;,ret);
+ 492     if(ret &lt;= 0) return ret;
+ 493   }
+</code></pre><p>###判断PLC系列</p>
+<pre><code>if((plc_type == S5 || plc_type == S7_300 || plc_type == S7_400) &amp;&amp; fetch_write == 1)
+</code></pre><p>首先判断PLC是不是S5，300和400系列。Fetch/Write只支持这些系列，对于像1200，200smart这些是不支持的。<br>并且，在300和400系列中，对于CP343-1，CP443-1是支持Fetch/Write的，对于内嵌Ethernet的CPU需要配置一下。如何配置请查看西门子官方文档《FETCH/WRITE service in an S7-300/400 CPU via the integrated Ethernet interface》.<br>如果不是这些系列的PLC或者fetch_write=0时，则是S7通讯.</p>
+<blockquote>
+<p>In today’s automation technology old systems are upgraded step by step from SIMATIC S5 to SIMATIC S7. However, the interfaces for the data exchange on the peer (for example, existing HMI systems) are to be kept. The FETCH/WRITE service is still very frequently used for the communication via Industrial Ethernet. The communication processors (CP343-1/CP443-1) of SIMATIC S7 support the services FETCH and WRITE for data exchange on the following protocols:</p>
+<ul>
+<li>TCP </li>
+<li>ISO-on-TCP </li>
+<li>ISO transport </li>
+</ul>
+<p>However, CPUs with integrated Industrial Ethernet interface are increasingly used in S7-300 and S7-400 stations to connect these to the Industrial Ethernet network and to exchange data with other nodes in the network. The FETCH/WRITE services have not been implemented here.</p>
+<p>The SIMATIC S7 supports the FETCH and WRITE services only passive via the TCP native and ISO-on-TCP protocol. Furthermore, the SIMATIC S7 CPUs with integrated Industrial Ethernet interface do not support the S5 compatible communication.</p>
+</blockquote>
+<p>###Structure FETCH/WRITE Header telegram<br> rlSiemensTcp有四个结构体WH,WA,IH,IA</p>
+<pre><code>182   typedef struct
+183   {
+184     unsigned char ident[2];
+185     unsigned char header_len;
+186     unsigned char ident_op_code;
+187     unsigned char op_code_len;
+188     unsigned char op_code;
+189     unsigned char ident_org_block;
+190     unsigned char len_org_block;
+191     unsigned char org_block;
+192     unsigned char dbnr;
+193     unsigned char start_adr[2];
+194     unsigned char len[2];
+195     unsigned char spare1;
+196     unsigned char spare1_len;
+197   }WH; // write header
+</code></pre><p><img src="http://oxehqp0gf.bkt.clouddn.com/WH.PNG" alt="Write Header"></p>
+<pre><code>198   typedef struct
+199   {
+200     unsigned char ident[2];
+201     unsigned char header_len;
+202     unsigned char ident_op_code;
+203     unsigned char op_code_len;
+204     unsigned char op_code;
+205     unsigned char ack_block;
+206     unsigned char ack_block_len;
+207     unsigned char error_block;
+208     unsigned char spare1;
+209     unsigned char spare1_len;
+210     unsigned char spare2[5];
+211   }WA; // write ack
+</code></pre><p><img src="http://oxehqp0gf.bkt.clouddn.com/WA.PNG" alt="Write Ack"></p>
+<pre><code>212   typedef struct
+213   {
+214     unsigned char ident[2];
+215     unsigned char header_len;
+216     unsigned char ident_op_code;
+217     unsigned char op_code_len;
+218     unsigned char op_code;
+219     unsigned char ident_org_block;
+220     unsigned char len_org_block;
+221     unsigned char org_block;
+222     unsigned char dbnr;
+223     unsigned char start_adr[2];
+224     unsigned char len[2];
+225     unsigned char spare1;
+226     unsigned char spare1_len;
+227   }FH; // fetch header
+</code></pre><p><img src="http://oxehqp0gf.bkt.clouddn.com/FH.PNG" alt="Fetch Header"></p>
+<pre><code>453     fh.ident[0]        = &apos;S&apos;;
+454     fh.ident[1]        = &apos;5&apos;;
+455     fh.header_len      = 16;
+456     fh.ident_op_code   = 1;
+457     fh.op_code_len     = 3;
+458     fh.op_code         = 5;
+459     fh.ident_org_block = 3;
+460     fh.len_org_block   = 8;
+461     fh.org_block       = (unsigned char) org;
+462     fh.dbnr            = (unsigned char) dbnr;
+463     fh.start_adr[0]    = (unsigned char) start_adr / 256;
+464     fh.start_adr[1]    = (unsigned char) start_adr &amp; 0x0ff;;
+465     fh.len[0]          = (unsigned char) len / 256;
+466     fh.len[1]          = (unsigned char) len &amp; 0x0ff;;
+467     fh.spare1          = 0x0ff;
+468     fh.spare1_len      = 2;
+</code></pre><p>这是rlSiemensTcp::fetch的部分内容，符合上图，这里构造好报头以后就可以通过Socket通讯连接了.</p>
+<pre><code>228   typedef struct
+229   {
+230     unsigned char ident[2];
+231     unsigned char header_len;
+232     unsigned char ident_op_code;
+233     unsigned char op_code_len;
+234     unsigned char op_code;
+235     unsigned char ack_block;
+236     unsigned char ack_block_len;
+237     unsigned char error_block;
+238     unsigned char spare1;
+239     unsigned char spare1_len;
+240     unsigned char spare2[5];
+241   }FA; // fetch ack
+</code></pre><p><img src="http://oxehqp0gf.bkt.clouddn.com/FA.PNG" alt="Fetch Ack"></p>
+<p>##Principle of the communication services FETCH and WRITE</p>
+<blockquote>
+<p>The FETCH and WRITE services are used for the data exchange by means of the following protocols:</p>
+<ul>
+<li>TCP  </li>
+<li>ISO-on-TCP (TCP with RFC1006)  </li>
+<li>ISO Transport protocol</li>
+</ul>
+<p>The SIMATIC S7 CPUs with integrated Industrial Ethernet interface do not support the ISO transport protocol. Here the FETCH and WRITE services for the data exchange are only supported via TCP and ISO-on-TCP protocol.</p>
+</blockquote>
+<p><img src="http://oxehqp0gf.bkt.clouddn.com/FetchWrite%20ISO.PNG" alt="Fetch/WriteのISO/OSI"></p>
+<p>###Fetch</p>
+<blockquote>
+<p>The FETCH/WRITE client actively establishes the communication<br>connection. It requests the data from the FETCH/WRITE server by means of a FETCH request. The server responds with a positive acknowledgement of the FETCH request and sends the requested data. Otherwise, the acknowledgement of the FETCH response is negative.</p>
+</blockquote>
+<p>###Write</p>
+<p>​    </p>
+<blockquote>
+<p>The FETCH/WRITE client sends a WRITE request with the data required in the FETCH/WRITE server. If the data has been successfully transmitted, the FETCH/WRITE server responds with a positive acknowledgement. Otherwise, the acknowledgement of the WRITE request is negative.</p>
+</blockquote>
+<p>###Summary<br><img src="http://oxehqp0gf.bkt.clouddn.com/FW%20Message%20structure.PNG" alt="FETCH/WRITE message structure"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/汇编程序的编译与连接/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/汇编程序的编译与连接/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="汇编程序的编译与连接"><a href="#汇编程序的编译与连接" class="headerlink" title="汇编程序的编译与连接"></a>汇编程序的编译与连接</h1><p>categories:IT</p>
+<hr>
+<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>汇编程序写好后，使用汇编语言编译程序对源程序文件中的源程序进行编译，产生目标文件；再用连接程序对目标文件进行连接，生产可在操作系统中直接运行的可执行文件。<br>可执行文件包含两部分：</p>
+<blockquote>
+<ol>
+<li>程序（从源程序汇编语言中翻译过来的机器码）和数据（源程序中定义的数据）</li>
+<li>相关的描述信息（比如，程序有多大，要占用多少内存等）。操作系统依据可执行文件的相关描述信息，将可执行文件中的机器码和数据加载入内存，并进行相关初始化（比如设置CS:IP指向第一条要执行的指令），然后由CPU执行程序。</li>
+</ol>
+</blockquote>
+<p>##编译<br>在编译过程中，我们提供一个输入，即源程序文件。最多可以得到三个输出：目标文件（.obj）,列表文件(.lst),交叉引用文件(.crf)。这三个文件中，交叉引用文件是我们最终要得到的结果，而另外两个只是中间结果，可以让编译器忽略对它们的生成。</p>
+<p>##连接<br>这里只简单的说一下连接的几个作用。</p>
+<ol>
+<li>当源程序很大时，可以将它分为几个源程序文件来编译，每个源程序编译成为目标文件后，再用连接程序将他们连接到一起，生成一个可执行文件；</li>
+<li>程序中调用来某个库文件中的子程序，需要将这个库文件和该程序生成的目标文件连接到一起，生成一个可执行文件；</li>
+<li>一个源程序编译后，得到了存有机器码的目标文件，目标文件中的有些内容还不能直接用来生成可执行文件，连接程序将这些内容处理为最终的可执行信息。所以，在只有一个源程序文件，而又不需要调用某个库中的子程序的情况下，也必须用连接程序对目标文件进行处理，生成可执行文件。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/寄存器（内存访问）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/寄存器（内存访问）/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>##DS和[address]<br>8086CPU中有一个DS寄存器,通常用来存放要访问数据的段地址。</p>
+<blockquote>
+<p>move al,[0]</p>
+</blockquote>
+<p>这里使用move指令将一个内存单元中的内容送入一个寄存器。[0]表示内存单元的偏移地址。只有偏移地址是不能定位一个内存单元的，那么内存的段地址是多少呢？指令执行时，CPU自动取ds中的数据为内存单元的段地址。<br>有一点需要注意的是，8086CPU不支持直接将数据送到段寄存器。所以<strong><em>move ds,1000H</em></strong>这条指令是非法的。应该这样：</p>
+<blockquote>
+<p>move bx,1000H<br>move ds,bx</p>
+</blockquote>
+<p>至于为什么8086CPU不支持直接将数据送到段寄存器?这属于8086CPU硬件设计的问题，只需要知道这一点就够了。</p>
+<p>##move,add,sub指令总结</p>
+<blockquote>
+<p>move 寄存器,数据<br>move 寄存器,寄存器<br>move 寄存器,内存单元<br>move 内存单元,寄存器<br>move 段寄存器,寄存器<br>move 寄存器,段寄存器<br>move 内存单元,段寄存器<br>move 段寄存器，内存单元</p>
+</blockquote>
+<p>add与sub指令与move一样，只是不能对段寄存器进行操作。因为段寄存器不能像通用寄存器那样进行运算，这是硬件限制。而move指令不涉及运算，只是传送指令。</p>
+<p>##栈<br>8086CPU的push和pop都是以字为单位进行的。</p>
+<p>###两个问题</p>
+<p>例如，我们可以把10000H-1000FH这段内存当做栈使用，但是至少有两个问题。</p>
+<ol>
+<li>CPU如何知道10000H-1000FH这段空间被当做栈使用？</li>
+<li>在进行push，pop操作的时候，必须知道栈顶单元，可是，如何知道？</li>
+</ol>
+<blockquote>
+<p>8086CPU中，有两个寄存器，段寄存器SS和寄存器SP。栈顶地址存放在SS中，偏移地址存放在SP中。任意时刻，SS:SP指向栈顶元素。</p>
+</blockquote>
+<p>###push与pop功能描述<br>这样，我们就可以完整的描述push和pop的功能了，如<strong><em>push ax</em></strong></p>
+<blockquote>
+<ol>
+<li>SP=SP-2，SS:SP指向当前栈顶前面的单元，以当前栈顶前面的单元为新的栈顶。</li>
+<li>将ax中的内容送入SS:SP指向内存单元处，SS:SP指向新栈顶。</li>
+</ol>
+</blockquote>
+<p>pop执行过程与push刚好相反，<strong><em>pop ax</em></strong></p>
+<blockquote>
+<ol>
+<li>将SS:SP指向的内存单元处的数据送入ax</li>
+<li>SP=SP+2，SS:SP指向当前栈顶下面的单元，以当前栈顶下面的单元为新的栈顶。</li>
+</ol>
+</blockquote>
+<p>push和pop都可以操作寄存器，段寄存器和内存单元。</p>
+<blockquote>
+<p>push 寄存器<br>push 段寄存器<br>push 内存单元</p>
+</blockquote>
+<p>###栈顶超界<br>8086帮助我们解决栈顶超界问题，自己使用时注意。既要防止入栈太多导致超界，也要防止栈空的时候出栈导致的超界。</p>
+<p>###栈为什么逆向生长<br><strong><em>这段内容摘自《Reverse Engineering for Beginners》，作者：Dennis Yurichev</em></strong></p>
+<p>The reason that the stack grows backward is probably historical. When the computers were big and occupied a whole room, it was easy to divide memory into two parts, one for the heap and one for the stack. Of course, it was unknown how big the heap and the stack would be during program execution, sothis solution was the simplest possible.<br>In [D. M. Ritchie and K. Thompson, The UNIX Time Sharing System, (1974)]we can read：</p>
+<blockquote>
+<p>The user-core part of an image is divided into three logical segments.<br>The program text segment begins at location 0 in the virtual address<br>space. During execution, this segment is write-protected and a single<br>copy of it is shared among all processes executing the same program.<br>At the first 8K byte boundary above the program text segment in the<br>virtual address space begins a nonshared, writable data segment, the<br>size of which may be extended by a system call. Starting at the<br>highest address in the virtual address space is a stack segment, which<br>automatically grows downward as the hardware’s stack pointer<br>fluctuates.</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/pvbrowser如何通过Siemens tcp连接PLC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/pvbrowser如何通过Siemens tcp连接PLC/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控-pvbrowser/" itemprop="url" rel="index">
+                    <span itemprop="name">工控 pvbrowser</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>pvbrowser是一款德国的基于Qt的开源组态软件。尽管市场中用的很少，我们还是可以通过看其源码学习很多东西。</p>
+<p>pvbrowser里有两种方式通过Simens tcp与PLC通讯:Daemon与pvbaddon.</p>
+<p>##Daemon</p>
+<p>###通过Daemon生成EXE文件<br>打开pvdevelop，选择<em>菜单栏-&gt;daemon-&gt;Siemens Tcp</em></p>
+<pre><code>shared_memory=C:\\automation\\shm\\siemens.shm
+mailbox=C:\\automation\\mbx\\siemens.mbx
+# type := S7_200 | S7_300 | S7_400 | S5 | S7_1200 | LOGO
+slave=0 adr=192.168.1.99 type=S7_1200 fetch_write=0 function=1 rack_slot=0
+idletime=50 milliseconds
+#eventlog host=localhost port=6000
+# ORG := ORG_DB | ORG_M | ORG_E | ORG_A | ORG_PEPA | ORG_Z | ORG_T
+# cycle := slave + org + dbnum + start + len
+cycle1 slave=0 org=ORG_E  dbnum=0 start=0 len=1
+cycle2 slave=0 org=ORG_A  dbnum=0 start=0 len=1
+</code></pre><p>这里面有以下几个需要注意的点:</p>
+<ol>
+<li>shared memory和mailbox的文件路径是需要自己建的，这个软件不会给你建。<br>Note that these directories must be created first by you. Note that the size of the shared memory must be equal in the daemon and in the pvserver.<br>2.关于 fetch_write的设定<br>fetch_write=1为fetch/write服务,fetch_write=0为S7连接。<br>(1) There is the old Fetch/Write protocol from the old S5 PLC<br>(fetch_write=1).Fetch/Write只支持S5和300，400系列.<br>(2) And there is the current Siemens PLC protocol introduced with the S7 series of PLC (fetch_write=0).</li>
+<li>FUNCTION    := optional parameter for PLC (1=PG,2=OP,3=Step7Basic)<br>经验证123均可连通。</li>
+<li>经验证，rack_slot这个值设随机值都能通</li>
+<li>ORG_E指的是Eingang(输入)，ORG_A指的是Ausgang(输出)，ORG_M是Merker(这个单词没查到，经验证是M区)，ORG_DB是Datenbaustein(DB区).此外还有ORG_PEPA指的是Peripheral(外围设备) Area R/W ，ORG_Z意思是Zaehler(计数器),ORG_T意思是Timer(计时器)<br>设置好以后点compile，然后点close.<br>这时，项目文件夹下会生成siemensdaemon.cpp,siemensdaemon.h,siemensdaemon.exe和siemensdaemon.mksimens四个文件<br>运行siemensdaemon.exe文件，数据就从PLC里面读取到共享内存里了(可能会遇到缺少*.dll文件，在pvbrowser安装目录里找到对应的文件放进项目文件即可)。<br>###如何进行调试<br>当我们遇到连接不通的时候怎么办呢，因为是pvbrowser是基于Qt的，我们可以通过Qt对其进行调试。</li>
+<li>新建空Qt控制台项目，添加Deamon生成的siemensdaemon.h和siemensdaemon.cpp文件。并将缺少的头文件放到目录里，这些头文件可以在pvb安装目录底下找到。</li>
+<li><p>在该项目的makefile里添加</p>
+<p> win32-g++ {<br> QMAKE_LFLAGS      += -static-libgcc<br> win32:LIBS        += $(PVBDIR)/win-mingw/bin/libserverlib.a<br> win32:LIBS        += $(PVBDIR)/win-mingw/bin/librllib.a<br> win32:LIBS        += -lws2_32 -ladvapi32 -lpthread<br> win32:INCLUDEPATH += $(PVBDIR)/pvserver<br> win32:INCLUDEPATH += $(PVBDIR)/rllib/lib<br> }</p>
+</li>
+</ol>
+<p>这样项目就建好了，可以进行更改调试。</p>
+<p>##pvbaddon<br>可以在pvbrowser下载pvbaddon<br>在pvbaddon\pvbaddon\daemons\siemenstcp\client\release目录下有siemenstcp_client.exe 文件，需要配合ini文件使用。<br>example.ini</p>
+<pre><code># ini file for siemenstcp_client
+#
+# DEBUG       := 1 | 0
+# SLAVE&lt;N&gt;    := IP,PLC_TYPE,FETCH_WRITE,FUNCTION,RACK_SLOT
+# PLC_TYPE    := ANY | S7_200 | S7_300 | S7_400 | S5 | S7_1200 | LOGO
+# FETCH_WRITE := 1 | 0 # default 1
+# FUNCTION    := optional parameter for PLC (1=PG,2=OP,3=Step7Basic)
+# RACK_SLOT   := optional parameter for PLC  Byte(upper_3_bit_is_rack / lower_5_bit_is_slot)
+# CYCLE&lt;N&gt;    := &lt;count&gt;,&lt;name&gt;
+# name        := byte&lt;ORG&gt;(slave,dbnum,adr)   | 
+#                float&lt;ORG&gt;(slave,dbnum,adr)  |
+#                dword&lt;ORG&gt;(slave,dbnum,adr)  |
+#                short&lt;ORG&gt;(slave,dbnum,adr)  |
+#                udword&lt;ORG&gt;(slave,dbnum,adr) |
+#                ushort&lt;ORG&gt;(slave,dbnum,adr)
+# ORG         := ORG_DB | ORG_M | ORG_E | ORG_A | ORG_PEPA | ORG_Z | ORG_T
+# HAVETO_SWAP := 1 | 0 # must be 1 on intel machines
+# CYCLETIME in milliseconds
+# SHARED_MEMORY_SIZE must be equal to SHARED_MEMORY_SIZE of pvserver
+# MAX_NAME_LENGTH is maximum length of variable name in shared memory 
+#
+
+[GLOBAL]
+DEBUG=1
+CYCLETIME=1000
+HAVETO_SWAP=1
+
+[SOCKET]
+NUM_SLAVES=1
+SLAVE1=192.168.1.101,ANY,0
+#SLAVE2=192.168.1.35,S7_200,0,1,2
+
+# You may also specify the TSAPs explicitly.
+# In that case the PLC_TYPE does not care. Use ANY.
+[SLAVE1_CONNECT_BLOCK]
+#S7-200
+CB13=&apos;M&apos; # remote TSAP        (not necessary to set explicitly)
+CB14=&apos;W&apos; # remote TSAP        (not necessary to set explicitly)
+CB17=&apos;M&apos; # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+CB18=&apos;W&apos; # local  TSAP slot 1 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+#S7-300
+#CB13=2 # remote TSAP        (not necessary to set explicitly)
+#CB14=1 # remote TSAP        (not necessary to set explicitly)
+#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+#CB18=2 # local  TSAP slot 2 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+#S7-400
+#CB13=2 # remote TSAP        (not necessary to set explicitly)
+#CB14=1 # remote TSAP        (not necessary to set explicitly)
+#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+#CB18=3 # local  TSAP slot 3 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+#S7-1200
+#CB13=2 # remote TSAP        (not necessary to set explicitly)
+#CB14=1 # remote TSAP        (not necessary to set explicitly)
+#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+#CB18=0 # local  TSAP slot 0 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+
+[RLLIB]
+MAX_NAME_LENGTH=30
+SHARED_MEMORY=/srv/automation/shm/siemenstcp1.shm
+SHARED_MEMORY_SIZE=65536
+MAILBOX=/srv/automation/mbx/siemenstcp1.mbx
+
+[CYCLES]
+NUM_CYCLES=4
+CYCLE1=10,byteORG_M(1,0,0)
+CYCLE2=4,byteORG_E(1,0,0)
+CYCLE3=4,byteORG_A(1,0,0)
+CYCLE4=4,byteORG_DB(1,1,0)
+#CYCLE2=1,byteORG_M(2,2,3)
+</code></pre><p>这里我没有做更改，更改的话与Deamon需要注意的地方相同。<br>打开cmd cd到该目录下运行</p>
+<pre><code>siemenstcp_client.exe example.ini
+</code></pre><p>数据就到mailbox里面了</p>
+<p>调试的话，里面有Qt项目文件可以直接打开</p>
+<p>这样PLC数据就读取到shared memory或mailbox里了，可以进行后期的上位编程。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/Kepware与 smart200建立连接的方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/Kepware与 smart200建立连接的方法/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>##建通道</p>
+<ol>
+<li>建立通道channel1</li>
+<li>选择设备驱动    设备驱动选择 siemens TCP/IP Ethernet</li>
+<li>选择本机网卡</li>
+<li>下一步直到完成<br>##建设备</li>
+<li>新建设备decice1.</li>
+<li><strong>选择设备 s7-200</strong></li>
+<li>输入smart 200PLC的地址</li>
+<li><strong>最重要的一步：修改参数，把两个4D57改成201</strong><br>##建变量<br>新建变量<br>运行测试</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/CPU寻址/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/CPU寻址/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>本文摘自《汇编原理（第二版）》，作者王爽</strong></p>
+<p>##CPU组成##<br>一个典型的CPU由运算器、控制器、寄存器等器件构成，这些器件靠内部总线相连。简单的讲，在CPU中：</p>
+<blockquote>
+<ul>
+<li>运算器进信息处理；</li>
+<li>寄存器进行信息存储；</li>
+<li>控制器控制各种器件进行工作；</li>
+<li>内部总线连接各种器件，在它们之间进行数据的传送。</li>
+</ul>
+</blockquote>
+<p>####通用寄存器####<br>8086CPU的所有寄存器都是16位的。AX、BX、CX、DX这4个寄存器通常用来存放一般性的数据，被称为通用寄存器。<br>8086CPU的上一代CPU中的寄存器都是8位的，为了保证兼容，使原来基于上代CPU编写的程序稍加修改就可以运行在8086之上，8086CPU的AX、BX、CX、DX这4个寄存器都可分为两个独立使用的8位寄存器来用：例如AX可分为AH和AL。<br>出于对兼容性的考虑，8086CPU可以一次性处理以下两种尺寸的数据：字节和字。</p>
+<blockquote>
+<p>将AX分为AH和AI使用时，CPU在执行指令的时候认为AH和AL是两个不相关的寄存器。不要错误的认为i，诸如add al,93H的指令产生的进位会存储在ah中，add al,93H进行的8位运算。</p>
+</blockquote>
+<p>##CPU如何在内部形成内存单元的物理地址<br>8086是16位结构的CPU，什么是16位结构的CPU呢？</p>
+<ol>
+<li>运算器一次最多可以处理16位的数据； </li>
+<li>存储器的最大宽度为16位；</li>
+<li>寄存器和运算器之间的通路为16位。</li>
+</ol>
+<p>这也就是说，在8086内部，能够一次性处理、传输、暂时存储的信息最大长度是16位的（是不是32位系统与64位系统也是这样，除了在内存上有差别还在性能上有差别？）。内存单元的地址在送上地址总线之前，必须在CPU中处理、传输、暂时存放，对于16位的CPU，能一次性处理、传输、暂存16位的地址。但是，8086有20位地址总线，怎么办？<br><strong><em>8086CPU采用一种在内部用两个16位地址合成（通过地址加法器）的方法来形成一个20位物理地址。</em></strong><br>当8086CPU要读写内存时：</p>
+<blockquote>
+<ol>
+<li>CPU中的相关部件提供两个16位的地址，一个成为段地址，另一个称为偏移地址；</li>
+<li>段地址和偏移地址通过内部总线送入一个成位地址加法器的部件；</li>
+<li>地址加法器将两个16位地址合成为一个20位的物理地址；</li>
+<li>地址加法器通过内部总线将20位物理地址送入输入输出控制电路；</li>
+<li>输入输出控制电路将20位物理地址送上地址总线；</li>
+<li>20位物理地址被地址总线传送到存储器。</li>
+</ol>
+</blockquote>
+<p>地址加法器采用<strong><em>物理地址=段地址×16+偏移地址</em></strong>的方式合成物理地址。<br>例如两个16位，1230和00C8，1230*16=12300（左移4位）。12300+00C8=123C8。</p>
+<p>##段的概念##<br>段地址包含着段的概念，其实不是内存分段，段的划分来自CPU，由于8086CPU用“<strong>基础地址（段地址*16）+偏移地址=物理地址</strong>”的方式给出的内存单元的物理地址，使得我们可以用分段的方式来管理内存。<br>对于同一地址比如10000H~100FFH的内存单元，可以有很多种表示方式</p>
+<ol>
+<li>基础地址为10000H，段地址为1000H，大小为100H；</li>
+<li>可以认为10000H~1007FH、10080H~100FFH内存单元组成两个段，它们的基础地址为：10000H和10080H，段地址为：1000H和1008H，大小都为80H。</li>
+</ol>
+<p>有两点需要注意：</p>
+<blockquote>
+<ul>
+<li>段地址*16必然是16的倍数，所以一个段的起始地址也一定是16的倍数；</li>
+<li>偏移地址为16位，16位地址的寻址能力为64KB，所以一个段的长度最大为64KB</li>
+</ul>
+</blockquote>
+<p>##段寄存器##<br>段地址在8086CPU的段寄存器中存放。8086CPU有4个段寄存器：CS、DS、SS、ES。<strong><em>其中CS用来存放指令的段地址。</em></strong></p>
+<p>##CS和IP##<br>CS和IP是8086CPU中最关键的寄存器，它们指示了CPU当前要读指令的地址。CS为代码段寄存器，IP为指令指针寄存器，即CS*16+IP。<br>8086CPU的工作过程：</p>
+<ol>
+<li>从CS：IP指向的内存单元读取指令，读取指令进入指令缓冲器；</li>
+<li>IP指向下一条指令；</li>
+<li>执行指令。（转到步骤1，重复这个过程）<blockquote>
+<p>8086机中，任意时刻，CPU将CS：IP指向的内容当作指令执行。<br>在内存中，指令和数据没有任何区别，都是二进制信息，CPU在工作的时候把有的信息看作指令，有的信息看作数据。现在，如果提出一个问题：CPU根据什么将内存中的信息看作指令？如何回答？我们可以说，CPU将CS：IP指向的内存单元中的内容看作指令。</p>
+</blockquote>
+</li>
+</ol>
+<p>注意move指令不能改变CS、IP寄存器中的内容。能够改变CS、IP的内容的指令被统称为转移指令。如jump指令。</p>
+<p>##这本书中的第二章实验1可以多看几遍##</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/CPU如何控制器件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/CPU如何控制器件/" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T20:23:37+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>##总线##<br>CPU想要进行数据的读写，必须和外部器件进行以下3类信息的交互。</p>
+<blockquote>
+<ul>
+<li>存储单元的地址（地址信息）</li>
+<li>器件的选择，读或写的命令（控制信息）</li>
+<li>读或写的数据（数据信息）</li>
+</ul>
+</blockquote>
+<p>通常将连接CPU和其他芯片的导线，称为总线。因此，总线从逻辑上分为3类，地址总线、控制总线和数据总线。<br>我们知道了CPU是如何进行数据读写的。可是，如何命令计算机进行数据的读写呢？<br>要让一个计算机或微处理器工作，应向它输入能够驱动它进行工作的电平信息（汇编指令，机器码）</p>
+<p>##接口卡##<br>计算机系统中，所有可用程序控制其工作的设备，必须收到CPU的控制。CPU对外部设备都不能直接控制，如显示器、音响、打印机等。直接控制这些设备进行工作的是插在扩展插槽上的接口卡。扩展插槽通过总线和CPU相连，所以接口卡也通过总线同CPU相连。CPU可以直接控制这些接口卡，从而实现CPU对外设的间接控制。简单的讲<strong><em>，就是CPU通过总线向接口卡发送命令，接口卡根据CPU的命令控制外设进行工作</em></strong>。</p>
+<p>##各类存储器芯片##<br>主要有RAM和ROM</p>
+<p>###随机存储器###<br>主随机存储器一般由两个位置上的RAM组成，装在主板上的RAM和插在扩展槽上的RAM。</p>
+<p>###装有BIOS的ROM###<br>BIOS是由主板和各类接口卡（如显卡、网卡等）厂商提供的软件系统，可以通过它利用该硬件设备进行最基本的输入输出。在主板和某些接口卡上茶有存储相应BIOS的ROM，例如，主板上的ROM中存储着主板的BIOS；显卡上的ROM中存储着显卡的BIOS；如果网卡上装有ROM，那么其中就可以存储网卡的BIOS。</p>
+<p>###接口卡上的RAM###<br>某些接口卡需要对大批量输入输出数据进行暂时存储，在其上装有RAM。最典型的是显存。显卡随时将显存中的数据向显示器输出。换句话说，我们将需要显示的内容写入显存，就会出现在显示器上。</p>
+<p>###内存地址空间###<br>上述的那些存储器，在物理上是独立的器件，但是在以下两点上相同。</p>
+<blockquote>
+<ul>
+<li>都和CPU的总线相连。</li>
+<li>CPU对他们进行读写的时候都通过控制线发出内存读写命令。</li>
+</ul>
+</blockquote>
+<p>这就是说，<strong><em>CPU在操纵它们的时候，把它们都当作内存来对待</em></strong>。<br>所有的物理存储器被看作一个由若干存储单元组成的逻辑存储器，每个物理存储器在这个逻辑存储器中占有一个地址段，即一段地址空间。CPU在这段地址空间中读写数据，实际上就是在对相对应的物理存储器中读写数据。<br>例如：</p>
+<blockquote>
+<p>地址0~7FFFH的32KB空间为主村级存储器地址空间；<br>地址8000H~9FFFH的8KB空间为显存地址空间；<br>地址A000H~FFFFH的24KB空间为各个ROM的地址空间。</p>
+</blockquote>
+<p>这样，CPU向内存地址为1000H的内存单元中写入数据，这个数据就被写入主随机存储器；CPU向内存地址为8000H的内存单元中写入数据，这个数据就被写入显存中，然后会被显卡输出到显示器上；CPU向内存地址为C00H的内存单元中写入数据的操作是没有结果的，因为是ROM。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/28/可重入与线程安全/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -761,1506 +2154,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/什么叫真五轴？什么叫假五轴？与三轴有什么区别？/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/什么叫真五轴？什么叫假五轴？与三轴有什么区别？/" itemprop="url">什么叫真五轴？什么叫假五轴？与三轴有什么区别？</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="什么叫真五轴？什么叫假五轴？与三轴有什么区别？"><a href="#什么叫真五轴？什么叫假五轴？与三轴有什么区别？" class="headerlink" title="什么叫真五轴？什么叫假五轴？与三轴有什么区别？"></a>什么叫真五轴？什么叫假五轴？与三轴有什么区别？</h2><blockquote>
-<p>本文转自<a href="http://mp.weixin.qq.com/s/5fnLs8P4B_S3_Ub9H9smBg" target="_blank" rel="external">这里</a></p>
-</blockquote>
-<p>​    真五轴就是有RTCP功能。能根据主轴的摆长及旋转台的机械坐标进行自动换算。在编制程序时，只需要考虑工件的坐标，不需要考虑主轴的摆长及旋转台的位置。</p>
-<p>​    是否是真五轴，不是看五个轴是否联动，假五轴也可五轴联动。主轴要是有RTCP真五轴的算法。就是做分度加工，有ＲＴＣＰ功能的真五轴只要设置一个坐标系，只需要一次对刀设坐标。而假五轴则麻烦很多。</p>
-<p>​    拥有RTCP功能的数控系统，可以直接使用刀尖编程，无需考虑旋转轴中心距离。应用RTCP模式后，编程5坐标加工就可以直接针对刀具刀尖而不是旋转主轴头的中心，因此编程就会变得简单、高效很多。</p>
-<p>​    原文有图，满形象的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/However的用法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/However的用法/" itemprop="url">However的用法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#However的用法</p>
-<blockquote>
-<p>本文摘自天天用英语</p>
-</blockquote>
-<h2 id="副词，-然而、不过、但是"><a href="#副词，-然而、不过、但是" class="headerlink" title="副词，  然而、不过、但是"></a>副词，  然而、不过、但是</h2><ul>
-<li>近义词nevertheless</li>
-<li>This is a cheap and simple process. However, there are dangers. 这是个花钱少而又简单的方法，不过有危险。</li>
-</ul>
-<h2 id="副词，-无论多大-好、严重等"><a href="#副词，-无论多大-好、严重等" class="headerlink" title="副词， 无论多大[好、严重等]"></a>副词， 无论多大[好、严重等]</h2><ul>
-<li>相当与No matter how</li>
-<li>You should report any incident, however minor it is. 任何事件你都应该汇报，不管它多小。</li>
-</ul>
-<h2 id="副词，-到底-如何？-表示惊讶"><a href="#副词，-到底-如何？-表示惊讶" class="headerlink" title="副词， (到底)如何？[表示惊讶]"></a>副词， (到底)如何？[表示惊讶]</h2><ul>
-<li>However did he get that job?他到底是怎样得到那份工作的？</li>
-</ul>
-<h2 id="conjunction-in-whatever-way-不管怎样，无论如何"><a href="#conjunction-in-whatever-way-不管怎样，无论如何" class="headerlink" title="conjunction.  in whatever way 不管怎样，无论如何"></a>conjunction.  in whatever way 不管怎样，无论如何</h2><ul>
-<li>You can do it however you like. 你可以按自己的意思去做。</li>
-</ul>
-<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
-<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
-<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/24/where从句的抽象含义/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/24/where从句的抽象含义/" itemprop="url">where从句的抽象含义</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-24T00:00:00+08:00">
-                2017-12-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="where从句的抽象含义"><a href="#where从句的抽象含义" class="headerlink" title="where从句的抽象含义"></a>where从句的抽象含义</h1><blockquote>
-<p>本文转自天天用英语第362期—到底是谁让你沦为铲屎官</p>
-</blockquote>
-<h2 id="where引导的地点状语从句"><a href="#where引导的地点状语从句" class="headerlink" title="where引导的地点状语从句"></a>where引导的地点状语从句</h2><ul>
-<li>where there is a will, there is a way.</li>
-<li>where we are met with cynicism, and doubt, and those who tell us that we can’t, we will respond with that timeless creed that sums up the spirit of a people:Yes, We Can.</li>
-</ul>
-<p>##where引导的定语从句</p>
-<ul>
-<li>So let us summon a new spirit of patriotism, of responsibility, where each of us resolves to pith in and work harder and look after not only ourselves, but each other.</li>
-</ul>
-<h2 id="where引导的名词性从句"><a href="#where引导的名词性从句" class="headerlink" title="where引导的名词性从句"></a>where引导的名词性从句</h2><ul>
-<li>You are saying that everyone should be equal, and this is where I disagree.</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/24/倒装句/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/24/倒装句/" itemprop="url">倒装句</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-24T00:00:00+08:00">
-                2017-12-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="倒装句"><a href="#倒装句" class="headerlink" title="倒装句"></a>倒装句</h1><h2 id="Only-状语或状语从句在句首，部分倒装"><a href="#Only-状语或状语从句在句首，部分倒装" class="headerlink" title="Only+状语或状语从句在句首，部分倒装"></a>Only+状语或状语从句在句首，部分倒装</h2><ul>
-<li>Only in this way can you solve the problem.</li>
-</ul>
-<h2 id="否定词在句首，部分倒装"><a href="#否定词在句首，部分倒装" class="headerlink" title="否定词在句首，部分倒装"></a>否定词在句首，部分倒装</h2><blockquote>
-<p>not, little, hardly, scarcely, no more, no longer, in no way, never, seldom, not only, no sooner</p>
-</blockquote>
-<ul>
-<li>No sooner had I got home than it began to rain.</li>
-<li>seldom do I stand up late after graduation.</li>
-</ul>
-<p>##SO/such…that在句首，部分倒装，强调so/such…that之间的部分</p>
-<ul>
-<li>So unreasonable was his price that nobody took the offer.</li>
-</ul>
-<h2 id="副词here-there开头，全部倒装"><a href="#副词here-there开头，全部倒装" class="headerlink" title="副词here,there开头，全部倒装"></a>副词here,there开头，全部倒装</h2><ul>
-<li>Here is the present you expected.</li>
-</ul>
-<h2 id="主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装"><a href="#主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装" class="headerlink" title="主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装"></a>主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装</h2><ul>
-<li>(介词短语开头的状语)On the ground lay some air conditioners which are to be shipped to other cities.</li>
-<li>(表语)Such would be our home in the future.</li>
-</ul>
-<h2 id="为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装"><a href="#为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装" class="headerlink" title="为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装"></a>为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装</h2><blockquote>
-<p>表示方向的副词: down, up, in, off, on ,away, etc.</p>
-<p>拟声词: bang, crack, etc</p>
-</blockquote>
-<ul>
-<li>Up went the rocket into the air.</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/14/It做形式主语/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/14/It做形式主语/" itemprop="url">It做形式主语</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T00:00:00+08:00">
-                2017-12-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="It做形式主语"><a href="#It做形式主语" class="headerlink" title="It做形式主语"></a>It做形式主语</h1><h2 id="It-be-形容词-to-do-doing-that"><a href="#It-be-形容词-to-do-doing-that" class="headerlink" title="It+be+形容词+to do/doing/that"></a>It+be+形容词+to do/doing/that</h2><p>It is very important to learn a foreign language.</p>
-<h2 id="It-be-名词词组-doing-that"><a href="#It-be-名词词组-doing-that" class="headerlink" title="It+be+名词词组+doing/that"></a>It+be+名词词组+doing/that</h2><p>It is no good telling lies.</p>
-<p>It is a pity that you didn’t go to see the film yesterday.</p>
-<h2 id="It-be-过去分词-that"><a href="#It-be-过去分词-that" class="headerlink" title="It+be+过去分词+that"></a>It+be+过去分词+that</h2><p>It was reported that more than 170 thousand people died in the 2004 tsunami.</p>
-<h2 id="It-seems-appears-happens-that"><a href="#It-seems-appears-happens-that" class="headerlink" title="It+seems/appears/happens+that"></a>It+seems/appears/happens+that</h2><p>It is appears that Tom might change his mind.</p>
-<h2 id="若句子为疑问句，则只能用it当形式主语"><a href="#若句子为疑问句，则只能用it当形式主语" class="headerlink" title="若句子为疑问句，则只能用it当形式主语"></a>若句子为疑问句，则只能用it当形式主语</h2><p>Does it matter much that they won’t come tomorrow.</p>
-<h2 id="It-takes-sb-some-time-to-do"><a href="#It-takes-sb-some-time-to-do" class="headerlink" title="It+takes+sb+some time+to do"></a>It+takes+sb+some time+to do</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/11/How-do-I-write-an-English-word-in-Japanese/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/11/How-do-I-write-an-English-word-in-Japanese/" itemprop="url">How do I write an English word in Japanese?</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-11T00:00:00+08:00">
-                2017-12-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/日语/" itemprop="url" rel="index">
-                    <span itemprop="name">日语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="How-do-I-write-an-English-word-in-Japanese"><a href="#How-do-I-write-an-English-word-in-Japanese" class="headerlink" title="How do I write an English word in Japanese?"></a>How do I write an English word in Japanese?</h1><p>本文转自 <a href="http://www.sljfaq.org/afaq/english-in-japanese.html" target="_blank" rel="external">这里</a></p>
-<p>Katakana is phonetic, so a katakana transcription of an English word is based on how the word sounds, not how it is spelt.</p>
-<p>Transcribing an English word into Japanese depends on how the word is heard by native speakers. The rules are complex. Some Japanese versions of English words, such as guzzu for “goods”, are not intuitive to English speakers. Some Japanese representations are based on spelling as well as pronunciation. For example the Japanese <em>monkii</em> (モンキー) for English “monkey” would be <em>mankii</em> (マンキー) if the Japanese was based on the pronunciation, mʌŋki in International Phonetic Alphabet (IPA symbols), alone.</p>
-<h2 id="Rules-for-conversion"><a href="#Rules-for-conversion" class="headerlink" title="Rules for conversion"></a>Rules for conversion</h2><p>Plurals usually become singular, thus “pyjamas” becomes pajama, and “slippers” becomes suripaa. Thus in Japan shops sell “Book” and “CD” rather than “Books” and “CDs”. Sometimes singular also becomes plural, as in furūtsu for “fruit”.</p>
-<p>Words with existing gairaigo forms usually keep that form. For example, “black coffee” becomes burakku kōhii, even though kōhii for coffee originally comes from Dutch (see <a href="http://www.sljfaq.org/afaq/dutch.html" target="_blank" rel="external">Which Japanese words come from Dutch?</a>). Sometimes this doesn’t happen. “Beer garden” becomes <em>bia gāden</em> (ビアガーデン), although the Japanese word for beer is <em>biiru</em> (ビール), from Dutch (see <a href="http://www.sljfaq.org/afaq/dutch.html#dutch-biiru" target="_blank" rel="external">Which Japanese words come from Dutch?</a>).</p>
-<p>==Japanese has fewer vowels than English, only five, and thus multiple English vowels may turn into the same Japanese vowels. For example, both the English vowel æ in “thank” and the vowel ʌ in “cut” become the Japanese a vowel. Similarly, long vowels such as ɑː in “far” and ɜː in “fur” both become Japanese ā.==</p>
-<p>Japanese has tended to favour British pronunciations, with words like “vitamin”, becoming a British-sounding <em>bitamin</em> (ビタミン) rather than American-sounding <em>baitamin</em> (バイタミン). The vowels used in Japanese are usually taken from the British (southern English) pronunciation rather than the American. The rhotic “r” of some forms of English is almost never represented in Japanese, although there are some exceptions, such as <em>kariforunia</em> (カリフォルニア) for the American state of California.</p>
-<p>The following table outlines the rules for transcribing English sounds. The English sounds are represented in International Phonetic Alphabet (IPA) form.</p>
-<p>###Short vowels</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">ɪ</td>
-<td style="text-align:center">イ, i</td>
-<td style="text-align:center">pit</td>
-<td style="text-align:center">ピット (pitto)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɛ</td>
-<td style="text-align:center">エ, e</td>
-<td style="text-align:center">pet</td>
-<td style="text-align:center">ペット (petto)</td>
-</tr>
-<tr>
-<td style="text-align:center">æ</td>
-<td style="text-align:center">ア, a</td>
-<td style="text-align:center">ham</td>
-<td style="text-align:center">ハム (hamu)</td>
-</tr>
-<tr>
-<td style="text-align:center">æ after k</td>
-<td style="text-align:center">キャ, kya</td>
-<td style="text-align:center">cap</td>
-<td style="text-align:center">キャップ (kyappu)</td>
-</tr>
-<tr>
-<td style="text-align:center">ʌ spelt with an “o”</td>
-<td style="text-align:center">オ, o (sometimes)</td>
-<td style="text-align:center">monkey, front, London</td>
-<td style="text-align:center">モンキー, フロント, ロンドン (monkii, furonto, rondon)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɒ</td>
-<td style="text-align:center">オ, o</td>
-<td style="text-align:center">socks</td>
-<td style="text-align:center">ソックス (sokkusu)</td>
-</tr>
-<tr>
-<td style="text-align:center">ʊ</td>
-<td style="text-align:center">ウ, u</td>
-<td style="text-align:center">book</td>
-<td style="text-align:center">ブック (bukku)</td>
-</tr>
-</tbody>
-</table>
-<p>###Schwa(weak vowel)</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th>Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">non-final ə</td>
-<td style="text-align:center">not fixed, based on spelling.</td>
-<td style="text-align:center">about, pilot, London</td>
-<td>アバウト, パイロット, ロンドン (abauto, pairotto, rondon)</td>
-</tr>
-<tr>
-<td style="text-align:center">final position ə</td>
-<td style="text-align:center">aa</td>
-<td style="text-align:center">carrier, hamburger</td>
-<td>キャリアー, ハンバーガー (kyariā, hambāgā)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="Long-vowels"><a href="#Long-vowels" class="headerlink" title="Long vowels"></a>Long vowels</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">ɑː</td>
-<td style="text-align:center">アー, ア aa, a</td>
-<td style="text-align:center">car</td>
-<td style="text-align:center">カー (kā)</td>
-</tr>
-<tr>
-<td style="text-align:center">iː</td>
-<td style="text-align:center">イー: ii</td>
-<td style="text-align:center">shield</td>
-<td style="text-align:center">シールド (shiirudo)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɔː</td>
-<td style="text-align:center">オー: oo</td>
-<td style="text-align:center">horse</td>
-<td style="text-align:center">ホース (hōsu)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɔː(同上)</td>
-<td style="text-align:center">oa</td>
-<td style="text-align:center">オア: door</td>
-<td style="text-align:center">ドア (doa)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɜː</td>
-<td style="text-align:center">アー: aa</td>
-<td style="text-align:center">bird</td>
-<td style="text-align:center">バード (bādo)</td>
-</tr>
-<tr>
-<td style="text-align:center">uː</td>
-<td style="text-align:center">ウー ū</td>
-<td style="text-align:center">shoe</td>
-<td style="text-align:center">シュー (shū)</td>
-</tr>
-<tr>
-<td style="text-align:center">juː</td>
-<td style="text-align:center">ュウ yū, see <a href="http://www.sljfaq.org/afaq/youon.html" target="_blank" rel="external">What is <em>yōon</em>?</a></td>
-<td style="text-align:center">cube</td>
-<td style="text-align:center">キューブ (kyūbu)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="Diphthongs"><a href="#Diphthongs" class="headerlink" title="Diphthongs"></a>Diphthongs</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">eɪ</td>
-<td style="text-align:center">エイ, ei</td>
-<td style="text-align:center">day</td>
-<td style="text-align:center">デイ (dei)</td>
-</tr>
-<tr>
-<td style="text-align:center">aɪ</td>
-<td style="text-align:center">アイ, ai</td>
-<td style="text-align:center">my</td>
-<td style="text-align:center">マイ (mai)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɔɪ</td>
-<td style="text-align:center">オーイ, ōi</td>
-<td style="text-align:center">boy</td>
-<td style="text-align:center">ボーイ (bōi)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɔɪ(同上)</td>
-<td style="text-align:center">オイ, oi</td>
-<td style="text-align:center">toy</td>
-<td style="text-align:center">トイ (toi)</td>
-</tr>
-<tr>
-<td style="text-align:center">əʊ</td>
-<td style="text-align:center">オ, o</td>
-<td style="text-align:center">phone</td>
-<td style="text-align:center">フォン (fon)</td>
-</tr>
-<tr>
-<td style="text-align:center">əʊ(同上)</td>
-<td style="text-align:center">オー, ō</td>
-<td style="text-align:center">no</td>
-<td style="text-align:center">ノー (nō)</td>
-</tr>
-<tr>
-<td style="text-align:center">aʊ</td>
-<td style="text-align:center">アウ, au</td>
-<td style="text-align:center">now</td>
-<td style="text-align:center">ナウ (nau)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɪə</td>
-<td style="text-align:center">イア, ia</td>
-<td style="text-align:center">pierce</td>
-<td style="text-align:center">ピアス (piasu)</td>
-</tr>
-<tr>
-<td style="text-align:center">ɛə</td>
-<td style="text-align:center">エア, ea</td>
-<td style="text-align:center">hair</td>
-<td style="text-align:center">ヘア (hea)</td>
-</tr>
-<tr>
-<td style="text-align:center">ʊə</td>
-<td style="text-align:center">ウアー, uaa</td>
-<td style="text-align:center">tour</td>
-<td style="text-align:center">ツアー (tsuā)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="Consonants"><a href="#Consonants" class="headerlink" title="Consonants"></a>Consonants</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">θ</td>
-<td style="text-align:center">シャ, シ, シュ, シェ, ショ s</td>
-<td style="text-align:center">think</td>
-<td style="text-align:center">シンク (shinku)</td>
-</tr>
-<tr>
-<td style="text-align:center">ð</td>
-<td style="text-align:center">z</td>
-<td style="text-align:center">the</td>
-<td style="text-align:center">ザ (za)</td>
-</tr>
-<tr>
-<td style="text-align:center">r</td>
-<td style="text-align:center">ラ, リ, ル, レ, ロ: r-kana</td>
-<td style="text-align:center">right</td>
-<td style="text-align:center">ライト (raito)</td>
-</tr>
-<tr>
-<td style="text-align:center">l</td>
-<td style="text-align:center">ラ, リ, ル, レ, ロ: r-kana</td>
-<td style="text-align:center">link</td>
-<td style="text-align:center">リンク (rinku)</td>
-</tr>
-<tr>
-<td style="text-align:center">ŋ spelt “ng”</td>
-<td style="text-align:center">ンガ, ンギ ng</td>
-<td style="text-align:center">singer</td>
-<td style="text-align:center">シンガー (shingā)</td>
-</tr>
-<tr>
-<td style="text-align:center">ŋ spelt “ng”(同上)</td>
-<td style="text-align:center">ン, n (occasionally)</td>
-<td style="text-align:center">Washington, surfing</td>
-<td style="text-align:center">ワシントン, サーフィン (washinton, sāfin)</td>
-</tr>
-<tr>
-<td style="text-align:center">ŋ spelt “nk” or “nc”</td>
-<td style="text-align:center">n</td>
-<td style="text-align:center">sink</td>
-<td style="text-align:center">シンク (shinku)</td>
-</tr>
-<tr>
-<td style="text-align:center">v</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">love</td>
-<td style="text-align:center">ラブ (rabu)</td>
-</tr>
-<tr>
-<td style="text-align:center">v(同上)</td>
-<td style="text-align:center">ヴァ, ヴィ, ヴ, ヴェ, ヴォ: v, written as ヴ (the u katakana) plus a small vowel</td>
-<td style="text-align:center">visual</td>
-<td style="text-align:center">ヴィジュアル (vijuaru)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="Consonants-taking-small-vowel-kana"><a href="#Consonants-taking-small-vowel-kana" class="headerlink" title="Consonants taking small vowel kana"></a>Consonants taking small vowel kana</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">w</td>
-<td style="text-align:center">ウィ: u + small vowel kana</td>
-<td style="text-align:center">win</td>
-<td style="text-align:center">ウィン (win)</td>
-</tr>
-<tr>
-<td style="text-align:center">f</td>
-<td style="text-align:center">ファ, フィ, フ, フェ, フォ: hu + small vowel kana</td>
-<td style="text-align:center">fight</td>
-<td style="text-align:center">ファイト (faito)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="Special-consonant-and-vowel-combinations"><a href="#Special-consonant-and-vowel-combinations" class="headerlink" title="Special consonant and vowel combinations"></a>Special consonant and vowel combinations</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">ti, di</td>
-<td style="text-align:center">ティ, ディ (te or de + small i) (newer method)</td>
-<td style="text-align:center">Disney</td>
-<td style="text-align:center">ディズニー (dizunii)</td>
-</tr>
-<tr>
-<td style="text-align:center">ti, di(同上)</td>
-<td style="text-align:center">chi, ji (older method)</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center">tu</td>
-<td style="text-align:center">トゥ: to + small u (newer method)</td>
-<td style="text-align:center">Tourette’s syndrome</td>
-<td style="text-align:center">トゥレットシンドローム (turettoshindorōmu)</td>
-</tr>
-<tr>
-<td style="text-align:center">tu(同上)</td>
-<td style="text-align:center">ツ: tsu</td>
-<td style="text-align:center">two</td>
-<td style="text-align:center">ツー (tsū)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="Consonant-clusters"><a href="#Consonant-clusters" class="headerlink" title="Consonant clusters"></a>Consonant clusters</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">English sound (IPA)</th>
-<th style="text-align:center">Japanese</th>
-<th style="text-align:center">Examples</th>
-<th style="text-align:center">Japanese transcriptionCapitals indicate small kana</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">dz</td>
-<td style="text-align:center">ッズ zzu</td>
-<td style="text-align:center">goods, kids</td>
-<td style="text-align:center">グッズ, キッズ (guzzu, kizzu)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="Conversions-based-on-spelling-and-other-oddities"><a href="#Conversions-based-on-spelling-and-other-oddities" class="headerlink" title="Conversions based on spelling, and other oddities"></a>Conversions based on spelling, and other oddities</h2><p>==Although most of the conversion from an English word into Japanese is based on the pronunciation, in several cases the pronunciation is based on spelling. In particular the schwa sound, the “uh” at the end of “doctor”, has no near equivalent in Japanese and so is usually transcribed depending on the spelling of the vowel. Other cases where spelling takes precedence include the ʌ vowel, the “u” in “cup” and “hut”, which is usually a, but when spelt with an o becomes o. For example “monkey” is monkii rather than mankii. Japanese also lengthens n sounds, such as<em>Anna</em> (アンナ) for the English name Anna, when they are spelt with two ns.==</p>
-<p>==In some cases, a mis-reading of a word survives into Japanese. For example, the woodworking tool “router”, which should have become rautā, is known as a rūtā, based on the spelling.==</p>
-<p>==Japanese tends to shorten three-mora constructions ending in syllabic n (ん) into two moras. For example “stainless steel” becomes <em>sutenresu</em>(ステンレス) rather than <em>suteinresu</em> (ステインレス).==</p>
-<h2 id="Transcription-of-names"><a href="#Transcription-of-names" class="headerlink" title="Transcription of names"></a>Transcription of names</h2><p>In the case of people’s names, Japanese tends to transcribe into near-equivalent versions not based on the pronunciation. For example, the English name Sarah is often transcribed into <em>Sara</em> (サラ) rather than <em>Sērā</em> (セーラー). For example American politician Sarah Palin is known as <em>Sara Peirin</em> (サラ・ペイリン) in Japan. Naomi is transcribed into <em>Naomi</em> (ナオミ), a common Japanese female name with a similar romanized spelling but different pronunciation, rather than Nēomi, a much closer representation of the pronunciation. For example British model Naomi Campbell is known as <em>Naomi Kyamberu</em> (ナオミ・キャンベル) in Japan. Similarly, Thomas is transcribed as Tōmasu using a long first vowel, and even more extremely, Paul may be transcribed into Paoro.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/11/「そうだ」、「ようだ」和「らしい」/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/11/「そうだ」、「ようだ」和「らしい」/" itemprop="url">「そうだ」、「ようだ」和「らしい」</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-11T00:00:00+08:00">
-                2017-12-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/日语/" itemprop="url" rel="index">
-                    <span itemprop="name">日语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="「そうだ」、「ようだ」和「らしい」"><a href="#「そうだ」、「ようだ」和「らしい」" class="headerlink" title="「そうだ」、「ようだ」和「らしい」"></a>「そうだ」、「ようだ」和「らしい」</h1><p>本文转自 <a href="https://m.hujiang.com/jp/p142613/" target="_blank" rel="external">这里</a></p>
-<h2 id="「そうだ」"><a href="#「そうだ」" class="headerlink" title="「そうだ」"></a>「そうだ」</h2><h3 id="传闻助动词「～そうだ」"><a href="#传闻助动词「～そうだ」" class="headerlink" title="传闻助动词「～そうだ」"></a>传闻助动词「～そうだ」</h3><h4 id="接续形式"><a href="#接续形式" class="headerlink" title="接续形式"></a>接续形式</h4><p>   接续形式：普通体<br>   传闻的「～そうだ」通常使用现在式，没有「～そうだった」（过去式）和「～そうではなかった」（否定形）的形式。不同于样态助动词「～そうだ」，它没有「～そうな·～そうに」这种活用形式。并且传闻的「～そうだ」接终止形，与样态助动词「～そうだ」的接续方法完全不同。</p>
-<p>####用法####<br>   这是一种将从他人那里得到的话或者情报向对方传达的表现形式。情报资源通常用「～によると」或者「～では」来表示。<br>   例：</p>
-<blockquote>
-<p>天気予報によると、今日は雨が降るそうです。　</p>
-<h3 id="样态助动词「～そうだ」"><a href="#样态助动词「～そうだ」" class="headerlink" title="样态助动词「～そうだ」"></a>样态助动词「～そうだ」</h3><p>####接续形式####</p>
-<ul>
-<li>动词连用形，形容词、形容动词词干（特殊：いいーよさそうだ。ないーなさそうだ）。</li>
-<li>样态的「～そうだ」不接名词或者「きれいな·赤い·かわいい」这种表示外观本身的形容词。</li>
-<li>否定形。动词用「～そうにない·～そうもない」，形容词用「～なさそうだ·～そうではない」。<br>比如：</li>
-</ul>
-<p>雨が降りそうだ→雨が降りそうにない／雨が降りそうもない。</p>
-<p>おいしそうだ→おいしくなさそうだ／おいしそうではない。</p>
-<p>元気そうだ→元気ではなさそうだ／元気そうではない。</p>
-</blockquote>
-<ul>
-<li><p>修饰名词时「～そうな＋名词」，修饰动词时「～そうに＋动词」。<br>比如：</p>
-<blockquote>
-<p>このリンゴはおいしそうだ。</p>
-<p>→おいしそうなリンゴですね。</p>
-<p>→  リンゴをおいしそうに食べている。</p>
-</blockquote>
-</li>
-</ul>
-<p>####用法####</p>
-<ul>
-<li><p>样态助动词「～そうだ」是主要表示视觉印象的（从外观来判断）的助动词，但是用「今にも～そうだ」的形式也可表示马上就要发生的状况。还有，即使是不能通过视觉来把握的动词，当表示含糊、暧昧的预感、直觉时，也可以用样态助动词「～そうだ」。</p>
-<p>比如：</p>
-<blockquote>
-<p>＜看得见的事态＞视觉印象。</p>
-<p>あっ、危ない！枝が折れそうだ。</p>
-<p>今にも雨が降り出しそうですねえ。</p>
-<p>彼はうれしそうに笑っていた。</p>
-<p>このリンゴはあまりおいしくなさそうです。</p>
-<p>＜看不见的事态＞预感、直觉。</p>
-<p>まだ会議は始まりそうもないから、コーヒーでも飲んできましょう。</p>
-<p>戦争はまだまだ続きそうですねえ。</p>
-<p>ああ、寒い。風邪をひきそうだ。</p>
-<p>この仕事は今日中に終わりそうです。</p>
-</blockquote>
-</li>
-<li><p>不能对过去的事态进行推量。</p>
-<p>样态助动词「～そうだ」通常只能表示现在或者将来的事情。表示过去的事情必须用「～ようだ」或者「～らしい」。</p>
-<blockquote>
-<p>×昨夜、雨が降りそうだ。</p>
-<p>○昨夜、雨が降ったらしい。（外部情报）</p>
-<p>○昨夜、雨が降ったようだ。（眼前状况）</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="「ようだ」"><a href="#「ようだ」" class="headerlink" title="「ようだ」"></a>「ようだ」</h2><p>###接续形式###</p>
-<p>与名词相同，只是这里的「～ようだ＜终止形＞」与形容动词一样，可以有「～ような＋名词＜连体形＞／～ように＋动词・形容词＜连用形＞」这样一些活用形式。</p>
-<blockquote>
-<p>お人形のようだ。＜终止形＞</p>
-<p>お人形のような女の子。＜连体形＞</p>
-<p>お人形のように可愛い。＜连用形＞</p>
-</blockquote>
-<h3 id="样态助动词「～ようだ」的用法"><a href="#样态助动词「～ようだ」的用法" class="headerlink" title="样态助动词「～ようだ」的用法"></a>样态助动词「～ようだ」的用法</h3><p>用法很多，首先表示将五官、感觉等作为判断材料的直觉判断。「～だろう·～かもしれない」是智力性的推量，这里的「～ようだ」必须是通过五官或者感觉等捕捉的在眼前的感觉推量。这个时候使用的副词「どうも」可以理解为「どうも（五官、身体的感觉）～ようだ」这种固定的形式。但是，下面的「～ようだ」的例文不能用「～だろう·～かもしれない」</p>
-<blockquote>
-<p>（接触）このお風呂、ぬるいようです。<br>（品尝）少し味が濃すぎるようです。<br>（闻）これ、腐っているようですよ。<br>（听脚步声）誰か来たようですから、ちょっと見てきます。<br>（看）鍵がかかっていますから、李さんはどこか出かけているようです。<br>（身体的感觉）少し寒気がします。風邪をひいたようです。</p>
-</blockquote>
-<h3 id="表示比喻的「～ようだ」的用法"><a href="#表示比喻的「～ようだ」的用法" class="headerlink" title="表示比喻的「～ようだ」的用法"></a>表示比喻的「～ようだ」的用法</h3><p>表示比喻的「～ようだ」几乎都是表示类似，经常使用「まるで～ようだ」这种形式。</p>
-<p>##「らしい」##</p>
-<h3 id="接续形式-1"><a href="#接续形式-1" class="headerlink" title="接续形式"></a>接续形式</h3><p>接续形式：接普通体或直接接名词。</p>
-<h3 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h3><p>主要是根据外部的情报进行推量。以听到的事情或者看到的事情或者传闻情报为判断材料来进行客观的判断。直接看到的、听到的事情我们还可以使用「～ようだ」来表示，听觉经常使用「～らしい」来表示。只是，根据间接的传闻情报来进行推量判断的时候我们只能使用「～らしい」。这种情况，多数使用「～によると～らしい」这种表现形式。</p>
-<blockquote>
-<p>道路が濡れているね。昨夜、雨が降ったらしい（⇔ようだ）。</p>
-<p>先生の話によると、劉君は良子さんと結婚したらしい。</p>
-<p>その話は、どうやら事実らしい。</p>
-</blockquote>
-<h3 id="「～によると～そうだ」与「～によると～らしい」"><a href="#「～によると～そうだ」与「～によると～らしい」" class="headerlink" title="「～によると～そうだ」与「～によると～らしい」"></a>「～によると～そうだ」与「～によると～らしい」</h3><p>传闻的「～そうだ」与「～らしい」有很深的关系。如果要问日本人怎么分别使用的话，一般说来将本人直接听到的事情传达给他人的时候使用传闻助动词「～そうだ」，传达间接听到的情报是使用「～らしい」。当对传闻的内容有一点点不确定的时候，日本人使用「～によると～らしい」</p>
-<blockquote>
-<p>天気予報によると、今日は雨が降るそうだ（→降るらしい）。</p>
-<p>手紙によると、鈴木さんは元気だそうだ（→元気らしい）</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2311,7 +2204,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">49</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2322,7 +2215,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
