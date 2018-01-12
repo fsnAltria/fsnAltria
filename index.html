@@ -304,7 +304,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:01:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
                 2018-01-12
               </time>
             
@@ -583,6 +583,356 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/汇编程序的编译与连接/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/汇编程序的编译与连接/" itemprop="url">汇编程序的编译与连接</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#汇编程序的编译与连接</p>
+<hr>
+<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>汇编程序写好后，使用汇编语言编译程序对源程序文件中的源程序进行编译，产生目标文件；再用连接程序对目标文件进行连接，生产可在操作系统中直接运行的可执行文件。<br>可执行文件包含两部分：</p>
+<blockquote>
+<ol>
+<li>程序（从源程序汇编语言中翻译过来的机器码）和数据（源程序中定义的数据）</li>
+<li>相关的描述信息（比如，程序有多大，要占用多少内存等）。操作系统依据可执行文件的相关描述信息，将可执行文件中的机器码和数据加载入内存，并进行相关初始化（比如设置CS:IP指向第一条要执行的指令），然后由CPU执行程序。</li>
+</ol>
+</blockquote>
+<p>##编译<br>在编译过程中，我们提供一个输入，即源程序文件。最多可以得到三个输出：目标文件（.obj）,列表文件(.lst),交叉引用文件(.crf)。这三个文件中，交叉引用文件是我们最终要得到的结果，而另外两个只是中间结果，可以让编译器忽略对它们的生成。</p>
+<p>##连接<br>这里只简单的说一下连接的几个作用。</p>
+<ol>
+<li>当源程序很大时，可以将它分为几个源程序文件来编译，每个源程序编译成为目标文件后，再用连接程序将他们连接到一起，生成一个可执行文件；</li>
+<li>程序中调用来某个库文件中的子程序，需要将这个库文件和该程序生成的目标文件连接到一起，生成一个可执行文件；</li>
+<li>一个源程序编译后，得到了存有机器码的目标文件，目标文件中的有些内容还不能直接用来生成可执行文件，连接程序将这些内容处理为最终的可执行信息。所以，在只有一个源程序文件，而又不需要调用某个库中的子程序的情况下，也必须用连接程序对目标文件进行处理，生成可执行文件。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/寄存器（内存访问）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/寄存器（内存访问）/" itemprop="url">寄存器（内存访问）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#寄存器（内存访问）</p>
+<hr>
+<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>##DS和[address]<br>8086CPU中有一个DS寄存器,通常用来存放要访问数据的段地址。</p>
+<blockquote>
+<p>move al,[0]</p>
+</blockquote>
+<p>这里使用move指令将一个内存单元中的内容送入一个寄存器。[0]表示内存单元的偏移地址。只有偏移地址是不能定位一个内存单元的，那么内存的段地址是多少呢？指令执行时，CPU自动取ds中的数据为内存单元的段地址。<br>有一点需要注意的是，8086CPU不支持直接将数据送到段寄存器。所以<strong><em>move ds,1000H</em></strong>这条指令是非法的。应该这样：</p>
+<blockquote>
+<p>move bx,1000H<br>move ds,bx</p>
+</blockquote>
+<p>至于为什么8086CPU不支持直接将数据送到段寄存器?这属于8086CPU硬件设计的问题，只需要知道这一点就够了。</p>
+<p>##move,add,sub指令总结</p>
+<blockquote>
+<p>move 寄存器,数据<br>move 寄存器,寄存器<br>move 寄存器,内存单元<br>move 内存单元,寄存器<br>move 段寄存器,寄存器<br>move 寄存器,段寄存器<br>move 内存单元,段寄存器<br>move 段寄存器，内存单元</p>
+</blockquote>
+<p>add与sub指令与move一样，只是不能对段寄存器进行操作。因为段寄存器不能像通用寄存器那样进行运算，这是硬件限制。而move指令不涉及运算，只是传送指令。</p>
+<p>##栈<br>8086CPU的push和pop都是以字为单位进行的。</p>
+<p>###两个问题</p>
+<p>例如，我们可以把10000H-1000FH这段内存当做栈使用，但是至少有两个问题。</p>
+<ol>
+<li>CPU如何知道10000H-1000FH这段空间被当做栈使用？</li>
+<li>在进行push，pop操作的时候，必须知道栈顶单元，可是，如何知道？</li>
+</ol>
+<blockquote>
+<p>8086CPU中，有两个寄存器，段寄存器SS和寄存器SP。栈顶地址存放在SS中，偏移地址存放在SP中。任意时刻，SS:SP指向栈顶元素。</p>
+</blockquote>
+<p>###push与pop功能描述<br>这样，我们就可以完整的描述push和pop的功能了，如<strong><em>push ax</em></strong></p>
+<blockquote>
+<ol>
+<li>SP=SP-2，SS:SP指向当前栈顶前面的单元，以当前栈顶前面的单元为新的栈顶。</li>
+<li>将ax中的内容送入SS:SP指向内存单元处，SS:SP指向新栈顶。</li>
+</ol>
+</blockquote>
+<p>pop执行过程与push刚好相反，<strong><em>pop ax</em></strong></p>
+<blockquote>
+<ol>
+<li>将SS:SP指向的内存单元处的数据送入ax</li>
+<li>SP=SP+2，SS:SP指向当前栈顶下面的单元，以当前栈顶下面的单元为新的栈顶。</li>
+</ol>
+</blockquote>
+<p>push和pop都可以操作寄存器，段寄存器和内存单元。</p>
+<blockquote>
+<p>push 寄存器<br>push 段寄存器<br>push 内存单元</p>
+</blockquote>
+<p>###栈顶超界<br>8086帮助我们解决栈顶超界问题，自己使用时注意。既要防止入栈太多导致超界，也要防止栈空的时候出栈导致的超界。</p>
+<p>###栈为什么逆向生长<br><strong><em>这段内容摘自《Reverse Engineering for Beginners》，作者：Dennis Yurichev</em></strong></p>
+<p>The reason that the stack grows backward is probably historical. When the computers were big and occupied a whole room, it was easy to divide memory into two parts, one for the heap and one for the stack. Of course, it was unknown how big the heap and the stack would be during program execution, sothis solution was the simplest possible.<br>In [D. M. Ritchie and K. Thompson, The UNIX Time Sharing System, (1974)]we can read：</p>
+<blockquote>
+<p>The user-core part of an image is divided into three logical segments.<br>The program text segment begins at location 0 in the virtual address<br>space. During execution, this segment is write-protected and a single<br>copy of it is shared among all processes executing the same program.<br>At the first 8K byte boundary above the program text segment in the<br>virtual address space begins a nonshared, writable data segment, the<br>size of which may be extended by a system call. Starting at the<br>highest address in the virtual address space is a stack segment, which<br>automatically grows downward as the hardware’s stack pointer<br>fluctuates.</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/pvbrowser如何通过Siemens tcp连接PLC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -614,7 +964,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:01:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
                 2018-01-12
               </time>
             
@@ -857,7 +1207,7 @@ CYCLE4=4,byteORG_DB(1,1,0)
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:01:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
                 2018-01-12
               </time>
             
@@ -932,6 +1282,371 @@ CYCLE4=4,byteORG_DB(1,1,0)
 <li>输入smart 200PLC的地址</li>
 <li><strong>最重要的一步：修改参数，把两个4D57改成201</strong><br>##建变量<br>新建变量<br>运行测试</li>
 </ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/CPU寻址/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/CPU寻址/" itemprop="url">CPU寻址</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="CPU寻址"><a href="#CPU寻址" class="headerlink" title="#CPU寻址"></a>#CPU寻址</h2><p><strong>本文摘自《汇编原理（第二版）》，作者王爽</strong></p>
+<p>##CPU组成##<br>一个典型的CPU由运算器、控制器、寄存器等器件构成，这些器件靠内部总线相连。简单的讲，在CPU中：</p>
+<blockquote>
+<ul>
+<li>运算器进信息处理；</li>
+<li>寄存器进行信息存储；</li>
+<li>控制器控制各种器件进行工作；</li>
+<li>内部总线连接各种器件，在它们之间进行数据的传送。</li>
+</ul>
+</blockquote>
+<p>####通用寄存器####<br>8086CPU的所有寄存器都是16位的。AX、BX、CX、DX这4个寄存器通常用来存放一般性的数据，被称为通用寄存器。<br>8086CPU的上一代CPU中的寄存器都是8位的，为了保证兼容，使原来基于上代CPU编写的程序稍加修改就可以运行在8086之上，8086CPU的AX、BX、CX、DX这4个寄存器都可分为两个独立使用的8位寄存器来用：例如AX可分为AH和AL。<br>出于对兼容性的考虑，8086CPU可以一次性处理以下两种尺寸的数据：字节和字。</p>
+<blockquote>
+<p>将AX分为AH和AI使用时，CPU在执行指令的时候认为AH和AL是两个不相关的寄存器。不要错误的认为i，诸如add al,93H的指令产生的进位会存储在ah中，add al,93H进行的8位运算。</p>
+</blockquote>
+<p>##CPU如何在内部形成内存单元的物理地址<br>8086是16位结构的CPU，什么是16位结构的CPU呢？</p>
+<pre><code>1. 运算器一次最多可以处理16位的数据；
+2. 存储器的最大宽度为16位；
+3. 寄存器和运算器之间的通路为16位。
+</code></pre><p>这也就是说，在8086内部，能够一次性处理、传输、暂时存储的信息最大长度是16位的（是不是32位系统与64位系统也是这样，除了在内存上有差别还在性能上有差别？）。内存单元的地址在送上地址总线之前，必须在CPU中处理、传输、暂时存放，对于16位的CPU，能一次性处理、传输、暂存16位的地址。但是，8086有20位地址总线，怎么办？<br><strong><em>8086CPU采用一种在内部用两个16位地址合成（通过地址加法器）的方法来形成一个20位物理地址。</em></strong><br>当8086CPU要读写内存时：</p>
+<blockquote>
+<ol>
+<li>CPU中的相关部件提供两个16位的地址，一个成为段地址，另一个称为偏移地址；</li>
+<li>段地址和偏移地址通过内部总线送入一个成位地址加法器的部件；</li>
+<li>地址加法器将两个16位地址合成为一个20位的物理地址；</li>
+<li>地址加法器通过内部总线将20位物理地址送入输入输出控制电路；</li>
+<li>输入输出控制电路将20位物理地址送上地址总线；</li>
+<li>20位物理地址被地址总线传送到存储器。</li>
+</ol>
+</blockquote>
+<p>地址加法器采用<strong><em>物理地址=段地址×16+偏移地址</em></strong>的方式合成物理地址。<br>例如两个16位，1230和00C8，1230*16=12300（左移4位）。12300+00C8=123C8。</p>
+<p>##段的概念##<br>段地址包含着段的概念，其实不是内存分段，段的划分来自CPU，由于8086CPU用“<strong>基础地址（段地址*16）+偏移地址=物理地址</strong>”的方式给出的内存单元的物理地址，使得我们可以用分段的方式来管理内存。<br>对于同一地址比如10000H~100FFH的内存单元，可以有很多种表示方式</p>
+<ol>
+<li>基础地址为10000H，段地址为1000H，大小为100H；</li>
+<li>可以认为10000H~1007FH、10080H~100FFH内存单元组成两个段，它们的基础地址为：10000H和10080H，段地址为：1000H和1008H，大小都为80H。</li>
+</ol>
+<p>有两点需要注意：</p>
+<blockquote>
+<ul>
+<li>段地址*16必然是16的倍数，所以一个段的起始地址也一定是16的倍数；</li>
+<li>偏移地址为16位，16位地址的寻址能力为64KB，所以一个段的长度最大为64KB</li>
+</ul>
+</blockquote>
+<p>##段寄存器##<br>段地址在8086CPU的段寄存器中存放。8086CPU有4个段寄存器：CS、DS、SS、ES。<strong><em>其中CS用来存放指令的段地址。</em></strong></p>
+<p>##CS和IP##<br>CS和IP是8086CPU中最关键的寄存器，它们指示了CPU当前要读指令的地址。CS为代码段寄存器，IP为指令指针寄存器，即CS*16+IP。<br>8086CPU的工作过程：</p>
+<ol>
+<li>从CS：IP指向的内存单元读取指令，读取指令进入指令缓冲器；</li>
+<li>IP指向下一条指令；</li>
+<li>执行指令。（转到步骤1，重复这个过程）<blockquote>
+<p>8086机中，任意时刻，CPU将CS：IP指向的内容当作指令执行。<br>在内存中，指令和数据没有任何区别，都是二进制信息，CPU在工作的时候把有的信息看作指令，有的信息看作数据。现在，如果提出一个问题：CPU根据什么将内存中的信息看作指令？如何回答？我们可以说，CPU将CS：IP指向的内存单元中的内容看作指令。</p>
+</blockquote>
+</li>
+</ol>
+<p>注意move指令不能改变CS、IP寄存器中的内容。能够改变CS、IP的内容的指令被统称为转移指令。如jump指令。</p>
+<p>##这本书中的第二章实验1可以多看几遍##</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/12/CPU如何控制器件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/12/CPU如何控制器件/" itemprop="url">CPU如何控制器件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-12T21:14:32+08:00">
+                2018-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#CPU如何控制器件</p>
+<hr>
+<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>##总线##<br>CPU想要进行数据的读写，必须和外部器件进行以下3类信息的交互。</p>
+<blockquote>
+<ul>
+<li>存储单元的地址（地址信息）</li>
+<li>器件的选择，读或写的命令（控制信息）</li>
+<li>读或写的数据（数据信息）</li>
+</ul>
+</blockquote>
+<p>通常将连接CPU和其他芯片的导线，称为总线。因此，总线从逻辑上分为3类，地址总线、控制总线和数据总线。<br>我们知道了CPU是如何进行数据读写的。可是，如何命令计算机进行数据的读写呢？<br>要让一个计算机或微处理器工作，应向它输入能够驱动它进行工作的电平信息（汇编指令，机器码）</p>
+<p>##接口卡##<br>计算机系统中，所有可用程序控制其工作的设备，必须收到CPU的控制。CPU对外部设备都不能直接控制，如显示器、音响、打印机等。直接控制这些设备进行工作的是插在扩展插槽上的接口卡。扩展插槽通过总线和CPU相连，所以接口卡也通过总线同CPU相连。CPU可以直接控制这些接口卡，从而实现CPU对外设的间接控制。简单的讲<strong><em>，就是CPU通过总线向接口卡发送命令，接口卡根据CPU的命令控制外设进行工作</em></strong>。</p>
+<p>##各类存储器芯片##<br>主要有RAM和ROM</p>
+<p>###随机存储器###<br>主随机存储器一般由两个位置上的RAM组成，装在主板上的RAM和插在扩展槽上的RAM。</p>
+<p>###装有BIOS的ROM###<br>BIOS是由主板和各类接口卡（如显卡、网卡等）厂商提供的软件系统，可以通过它利用该硬件设备进行最基本的输入输出。在主板和某些接口卡上茶有存储相应BIOS的ROM，例如，主板上的ROM中存储着主板的BIOS；显卡上的ROM中存储着显卡的BIOS；如果网卡上装有ROM，那么其中就可以存储网卡的BIOS。</p>
+<p>###接口卡上的RAM###<br>某些接口卡需要对大批量输入输出数据进行暂时存储，在其上装有RAM。最典型的是显存。显卡随时将显存中的数据向显示器输出。换句话说，我们将需要显示的内容写入显存，就会出现在显示器上。</p>
+<p>###内存地址空间###<br>上述的那些存储器，在物理上是独立的器件，但是在以下两点上相同。</p>
+<blockquote>
+<ul>
+<li>都和CPU的总线相连。</li>
+<li>CPU对他们进行读写的时候都通过控制线发出内存读写命令。</li>
+</ul>
+</blockquote>
+<p>这就是说，<strong><em>CPU在操纵它们的时候，把它们都当作内存来对待</em></strong>。<br>所有的物理存储器被看作一个由若干存储单元组成的逻辑存储器，每个物理存储器在这个逻辑存储器中占有一个地址段，即一段地址空间。CPU在这段地址空间中读写数据，实际上就是在对相对应的物理存储器中读写数据。<br>例如：</p>
+<blockquote>
+<p>地址0~7FFFH的32KB空间为主村级存储器地址空间；<br>地址8000H~9FFFH的8KB空间为显存地址空间；<br>地址A000H~FFFFH的24KB空间为各个ROM的地址空间。</p>
+</blockquote>
+<p>这样，CPU向内存地址为1000H的内存单元中写入数据，这个数据就被写入主随机存储器；CPU向内存地址为8000H的内存单元中写入数据，这个数据就被写入显存中，然后会被显卡输出到显示器上；CPU向内存地址为C00H的内存单元中写入数据的操作是没有结果的，因为是ROM。</p>
 
           
         
@@ -1237,6 +1952,299 @@ CYCLE4=4,byteORG_DB(1,1,0)
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/04/连读(2)之辅音结尾+首辅音/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/04/连读(2)之辅音结尾+首辅音/" itemprop="url">连读(2)之辅音结尾+首辅音</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-04T00:00:00+08:00">
+                2018-01-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/每日总结/" itemprop="url" rel="index">
+                    <span itemprop="name">每日总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="连读-2-之辅音结尾-首辅音"><a href="#连读-2-之辅音结尾-首辅音" class="headerlink" title="连读(2)之辅音结尾+首辅音"></a>连读(2)之辅音结尾+首辅音</h1><h2 id="当这两个辅音一样时"><a href="#当这两个辅音一样时" class="headerlink" title="当这两个辅音一样时"></a>当这两个辅音一样时</h2><p>当这两个辅音一样时（如同是“s”），我们只发一次音</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Bill likes swimming(Billlikesswimming)</td>
+<td style="text-align:center">bɪl laɪks ˈswɪmɪŋ</td>
+</tr>
+<tr>
+<td style="text-align:center">I’m gonna stop practicing(stoppracticing)</td>
+<td style="text-align:center">aɪm ˈgɑnə stɑp ˈpræktəsɪŋ</td>
+</tr>
+<tr>
+<td style="text-align:center">I’ll see you next time(nexttime)</td>
+<td style="text-align:center">aɪl si jʊ nɛkst taɪm</td>
+</tr>
+<tr>
+<td style="text-align:center">I wish she would call me(wishshe)</td>
+<td style="text-align:center">aɪ wɪʃ ʃi wəd kɔl mi</td>
+</tr>
+<tr>
+<td style="text-align:center">I had a bad day yesterday(badday)</td>
+<td style="text-align:center">aɪ həd ə bæd deɪ ˈjɛstərˌdeɪ</td>
+</tr>
+<tr>
+<td style="text-align:center">nine nails</td>
+<td style="text-align:center">naɪn neɪlz</td>
+</tr>
+<tr>
+<td style="text-align:center">His name is Bob barker(Bobbarker)</td>
+<td style="text-align:center">hɪz neɪm əz bɑb ˈbɑrkər</td>
+</tr>
+<tr>
+<td style="text-align:center">I love vegetables(lovevegetables)</td>
+<td style="text-align:center">aɪ lʌv ˈvɛʤtəbəlz</td>
+</tr>
+<tr>
+<td style="text-align:center">Everything  is going great(goinggreat)</td>
+<td style="text-align:center">ˈɛvriˌθɪŋ əz ˈgoʊɪŋ greɪt</td>
+</tr>
+</tbody>
+</table>
+<h2 id="具有两个相同发音点的辅音"><a href="#具有两个相同发音点的辅音" class="headerlink" title="具有两个相同发音点的辅音"></a>具有两个相同发音点的辅音</h2><p>“发音点”指的是发音的接触点，例如“p”和“b”,“t”和“d”等</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">used to=useto</td>
+<td style="text-align:center">juzd tʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">five friends</td>
+<td style="text-align:center">faɪv frɛndz</td>
+</tr>
+<tr>
+<td style="text-align:center">I have a big kitchen=I havea bigkitchen</td>
+<td style="text-align:center">aɪ həv ə bɪg ˈkɪʧən</td>
+</tr>
+<tr>
+<td style="text-align:center">supposed to</td>
+<td style="text-align:center">səˈpoʊzd tʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">need to</td>
+<td style="text-align:center">nid tʊ</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="当辅音的发音是停顿时"><a href="#当辅音的发音是停顿时" class="headerlink" title="当辅音的发音是停顿时"></a>当辅音的发音是停顿时</h2><p>当辅音的发音是停顿时例如“p、b、t、d”，而且后面跟着辅音，尽管发音点与前面的不同，我们仍保留第一个辅音连起来读。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">举例</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">a back door(backdoor)</td>
+<td style="text-align:center">ə bæk dɔr</td>
+</tr>
+<tr>
+<td style="text-align:center">help me/help him/help John</td>
+<td style="text-align:center">hɛlp mi/ hɛlp hɪm / hɛlp Jhon</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="综合练习"><a href="#综合练习" class="headerlink" title="综合练习"></a>综合练习</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">I wish she would talk to me</td>
+<td style="text-align:center">aɪ wɪʃ ʃi wəd tɔk tə mi</td>
+</tr>
+<tr>
+<td style="text-align:center">Did that man know about the situation</td>
+<td style="text-align:center">dɪd ðət mæn noʊ əˈbaʊt ðə ˌsɪʧuˈeɪʃən</td>
+</tr>
+<tr>
+<td style="text-align:center">I could drive you there right now</td>
+<td style="text-align:center">aɪ kəd draɪv jʊ ðɛr raɪt naʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">He always seem so happy</td>
+<td style="text-align:center">hi ˈɔlˌweɪz sim soʊ ˈhæpi</td>
+</tr>
+<tr>
+<td style="text-align:center">I used to work crazy hours but these days I’ve slowed down</td>
+<td style="text-align:center">aɪ juzd tə wɜrk ˈkreɪzi ˈaʊərz bət ðiz deɪz aɪv sloʊd daʊn</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/04/连读(1)之辅音结尾+首元音/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1450,822 +2458,11 @@ CYCLE4=4,byteORG_DB(1,1,0)
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/28/可重入与线程安全/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/28/可重入与线程安全/" itemprop="url">可重入与线程安全</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T00:00:00+08:00">
-                2017-12-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT/" itemprop="url" rel="index">
-                    <span itemprop="name">IT</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="可重入与线程安全"><a href="#可重入与线程安全" class="headerlink" title="可重入与线程安全"></a>可重入与线程安全</h1><blockquote>
-<p>本文 摘自Qt官方文档</p>
-</blockquote>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
-<li>A thread-safe function can be called simultaneously from multiple threads, even when the invocations use shared data, because all references to the shared data are serialized.</li>
-<li>A reentrant function can also be called simultaneously from multiple threads, but only if each invocation uses its own data.</li>
-</ul>
-<p>Hence, a thread-safe function is always reentrant, but a reentrant function is not always thread-safe.</p>
-<p>By extension, a class is said to be reentrant if its member functions can be called safely from multiple threads, as long as each thread uses a different instance of the class. The class is thread-safe if its member functions can be called safely from multiple threads, even if all the threads use the same instance of the class.</p>
-<h2 id="可重入"><a href="#可重入" class="headerlink" title="可重入"></a>可重入</h2><p>C++ classes are often reentrant, simply because they only access their own member data. Any thread can call a member function on an instance of a reentrant class, as long as no other thread can call a member function on the same instance of the class at the same time. For example, the Counter class below is reentrant:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class"> &#123;</span></div><div class="line"> <span class="keyword">public</span>:</div><div class="line">     Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; ++n; &#125;</div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; --n; &#125;</div><div class="line">     <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line"> <span class="keyword">private</span>:</div><div class="line">     <span class="keyword">int</span> n;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure>
-<p>The class isn’t thread-safe, because if multiple threads try to modify the data member n, the result is undefined. This is because the ++ and – operators aren’t always atomic. Indeed, they usually expand to three machine instructions:</p>
-<ol>
-<li>Load the variable’s value in a register.</li>
-<li>Increment or decrement the register’s value.</li>
-<li>Store the register’s value back into main memory.</li>
-</ol>
-<p>If thread A and thread B load the variable’s old value simultaneously, increment their register, and store it back, they end up overwriting each other, and the variable is incremented only once! </p>
-<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>Clearly, the access must be serialized: Thread A must perform steps 1, 2, 3 without interruption (atomically) before thread B can perform the same steps; or vice versa. An easy way to make the class thread-safe is to protect all access to the data members with a QMutex:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class">  &#123;</span></div><div class="line">  <span class="keyword">public</span>:</div><div class="line">      Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; ++n; &#125;</div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; --n; &#125;</div><div class="line">      <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line">  <span class="keyword">private</span>:</div><div class="line">      <span class="keyword">mutable</span> QMutex mutex;</div><div class="line">      <span class="keyword">int</span> n;</div><div class="line">  &#125;;</div></pre></td></tr></table></figure></p>
-<p>The QMutexLocker class automatically locks the mutex in its constructor and unlocks it when the destructor is invoked, at the end of the function. Locking the mutex ensures that access from different threads will be serialized. The mutex data member is declared with the mutable qualifier because we need to lock and unlock the mutex in value(), which is a const function. </p>
-<h2 id="个人简单概括"><a href="#个人简单概括" class="headerlink" title="个人简单概括"></a>个人简单概括</h2><p>我也上网看了很多博客，感觉网上关于这俩的说法都有些矛盾，这里就以Qt官方为准吧。</p>
-<p>可重入是针对类的两个实例，像全局变量这样的，会被调用两次因此结果不确定，对于两个实例自己的变量没事。</p>
-<p>线程安全是针对的类的一个实例，即即使是私有变量也可能被调两次，这样的需要“be serialized”.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/27/比较句/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/27/比较句/" itemprop="url">比较句</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-27T00:00:00+08:00">
-                2017-12-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="比较句"><a href="#比较句" class="headerlink" title="比较句"></a>比较句</h1><blockquote>
-<p>本文转自2017-12-19天天用英语</p>
-</blockquote>
-<p>目标句：</p>
-<blockquote>
-<p>Life’s transition from the sea to the land was as much of an evolutionary challenge as was the genesis of life.</p>
-</blockquote>
-<h2 id="比较句是特殊的并列句"><a href="#比较句是特殊的并列句" class="headerlink" title="比较句是特殊的并列句"></a>比较句是特殊的并列句</h2><blockquote>
-<ol>
-<li>Life’s transition from the sea to the land was an evolutionary challenge.</li>
-<li>The genesis of life was an evolutionary challenge.</li>
-</ol>
-</blockquote>
-<p>合成:</p>
-<blockquote>
-<p>Life’s transition from the sea to the land was as an evolutionary challenge as  the genesis of life ==was an evolutionary challenge==</p>
-</blockquote>
-<h2 id="尽量不要省略谓语动词"><a href="#尽量不要省略谓语动词" class="headerlink" title="尽量不要省略谓语动词"></a>尽量不要省略谓语动词</h2><ul>
-<li>Marry is more beautiful than Jenny.</li>
-</ul>
-<p>这个没问题</p>
-<ul>
-<li>I like her more than you</li>
-</ul>
-<p>意思一：我喜欢她，你也喜欢她，但是我比你更喜欢她</p>
-<pre><code>I like her more than you do
-</code></pre><p>意思二：我喜欢你，我也喜欢她，但是你俩比起来，我更喜欢她</p>
-<p>​        I like her more than I like you</p>
-<blockquote>
-<p>Life’s transition from the sea to the land was as an evolutionary challenge as the genesis of life ==was== </p>
-</blockquote>
-<h2 id="第二个句子的谓语动词可以倒装"><a href="#第二个句子的谓语动词可以倒装" class="headerlink" title="第二个句子的谓语动词可以倒装"></a>第二个句子的谓语动词可以倒装</h2><p>Data loads have a much smaller impact on performance than do merges.</p>
-<p>与数据合并相比，数据加载对性能的影响要小得多</p>
-<blockquote>
-<p>Life’s transition from the sea to the land was as much of an evolutionary challenge as ==was== the genesis of life.</p>
-</blockquote>
-<h2 id="比较名词属性"><a href="#比较名词属性" class="headerlink" title="比较名词属性"></a>比较名词属性</h2><ol>
-<li><p>“more”后面要加上一个”of”</p>
-<p>He is more of a strategist than of a tactician.</p>
-</li>
-<li><p>“as”后面要加上“much of”</p>
-<p>He was quite as much of a Rationalist as I am.</p>
-</li>
-</ol>
-<blockquote>
-<p>Life’s transition from the sea to the land was as ==much of== an evolutionary challenge as ==was== the genesis of life.</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/天分重要吗/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/天分重要吗/" itemprop="url">天分重要吗</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/杂谈/" itemprop="url" rel="index">
-                    <span itemprop="name">杂谈</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#天分重要吗</p>
-<blockquote>
-<p>本文摘自尹航的训练营理论课5：天分重要吗</p>
-</blockquote>
-<p>​    大家上学的时候有没有听老师或者父母或者其它同学的父母说过这样的话：”哎呀，这孩子特别聪明，就是不细心，不然他学习特别好。“（这里的不细心可以换成没有耐心，不过认真等等）</p>
-<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
-<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
-<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/However的用法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/However的用法/" itemprop="url">However的用法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#However的用法</p>
-<blockquote>
-<p>本文摘自天天用英语</p>
-</blockquote>
-<h2 id="副词，-然而、不过、但是"><a href="#副词，-然而、不过、但是" class="headerlink" title="副词，  然而、不过、但是"></a>副词，  然而、不过、但是</h2><ul>
-<li>近义词nevertheless</li>
-<li>This is a cheap and simple process. However, there are dangers. 这是个花钱少而又简单的方法，不过有危险。</li>
-</ul>
-<h2 id="副词，-无论多大-好、严重等"><a href="#副词，-无论多大-好、严重等" class="headerlink" title="副词， 无论多大[好、严重等]"></a>副词， 无论多大[好、严重等]</h2><ul>
-<li>相当与No matter how</li>
-<li>You should report any incident, however minor it is. 任何事件你都应该汇报，不管它多小。</li>
-</ul>
-<h2 id="副词，-到底-如何？-表示惊讶"><a href="#副词，-到底-如何？-表示惊讶" class="headerlink" title="副词， (到底)如何？[表示惊讶]"></a>副词， (到底)如何？[表示惊讶]</h2><ul>
-<li>However did he get that job?他到底是怎样得到那份工作的？</li>
-</ul>
-<h2 id="conjunction-in-whatever-way-不管怎样，无论如何"><a href="#conjunction-in-whatever-way-不管怎样，无论如何" class="headerlink" title="conjunction.  in whatever way 不管怎样，无论如何"></a>conjunction.  in whatever way 不管怎样，无论如何</h2><ul>
-<li>You can do it however you like. 你可以按自己的意思去做。</li>
-</ul>
-<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
-<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
-<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/什么叫真五轴？什么叫假五轴？与三轴有什么区别？/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/什么叫真五轴？什么叫假五轴？与三轴有什么区别？/" itemprop="url">什么叫真五轴？什么叫假五轴？与三轴有什么区别？</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="什么叫真五轴？什么叫假五轴？与三轴有什么区别？"><a href="#什么叫真五轴？什么叫假五轴？与三轴有什么区别？" class="headerlink" title="什么叫真五轴？什么叫假五轴？与三轴有什么区别？"></a>什么叫真五轴？什么叫假五轴？与三轴有什么区别？</h2><blockquote>
-<p>本文转自<a href="http://mp.weixin.qq.com/s/5fnLs8P4B_S3_Ub9H9smBg" target="_blank" rel="external">这里</a></p>
-</blockquote>
-<p>​    真五轴就是有RTCP功能。能根据主轴的摆长及旋转台的机械坐标进行自动换算。在编制程序时，只需要考虑工件的坐标，不需要考虑主轴的摆长及旋转台的位置。</p>
-<p>​    是否是真五轴，不是看五个轴是否联动，假五轴也可五轴联动。主轴要是有RTCP真五轴的算法。就是做分度加工，有ＲＴＣＰ功能的真五轴只要设置一个坐标系，只需要一次对刀设坐标。而假五轴则麻烦很多。</p>
-<p>​    拥有RTCP功能的数控系统，可以直接使用刀尖编程，无需考虑旋转轴中心距离。应用RTCP模式后，编程5坐标加工就可以直接针对刀具刀尖而不是旋转主轴头的中心，因此编程就会变得简单、高效很多。</p>
-<p>​    原文有图，满形象的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2311,7 +2508,7 @@ CYCLE4=4,byteORG_DB(1,1,0)
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-count">54</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
