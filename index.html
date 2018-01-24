@@ -273,7 +273,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/读Qt示例之Modbus Master example(一)/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/26/非重读音节的作用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -292,7 +292,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/24/读Qt示例之Modbus Master example(一)/" itemprop="url">读Qt示例之Modbus Master example(一)</a></h1>
+                <a class="post-title-link" href="/2018/01/26/非重读音节的作用/" itemprop="url">非重读音节的作用</a></h1>
         
 
         <div class="post-meta">
@@ -304,8 +304,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:10+08:00">
-                2018-01-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-26T00:00:00+08:00">
+                2018-01-26
               </time>
             
 
@@ -327,8 +327,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index">
-                    <span itemprop="name">Qt</span>
+                  <a href="/categories/英语/" itemprop="url" rel="index">
+                    <span itemprop="name">英语</span>
                   </a>
                 </span>
 
@@ -366,25 +366,117 @@
       
         
           
-            <p>﻿#读Qt示例之Modbus Master example(一)#</p>
-<p>本示例来自于Qt5.6.2</p>
-<p>本篇主要看WriteRegisterModel这个模型类是怎么实现的<br>涉及知识点主要是model/view中的model<br><img src="http://img.blog.csdn.net/20170716184111963?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Modbus Master示例的界面"></p>
-<p>WriteRegisterModel有四个变量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public:</div><div class="line">	int m_number;            //读写的个数</div><div class="line">    int m_address;           //读写的起始位置</div><div class="line">	QBitArray m_coils;          //Coils</div><div class="line">    QVector&lt;quint16&gt; m_holdingRegisters;//HoldlingRegister</div></pre></td></tr></table></figure>
-<p>Modbus 一共有四组变量，其中可写的是 Coils，HoldingRegisters<br>该示例每组变量一共有10个值，m_address是起始位置，m_number是从起始位置开始读几个。</p>
-<p>##实现只读功能##<br>该模型是二维的，因此除了构造函数以外，只需要实现三个函数:rowCount(),columnCount()和data()函数。如果是字符串列表那样一维的，则只需实现rowCount()和data()函数。如果模型是树状图那样的层次结构，还需要实现index()和parent()函数.<br>其中rowCount(),columnCount()返回模型的行列数，data()返回指定模型索引的数据项。<br>也可以实现headerData()函数，它是显示表头的。</p>
-<p>先看看构造函数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">WriteRegisterModel::WriteRegisterModel(QObject *parent)</div><div class="line">    : QAbstractTableModel(parent),</div><div class="line">      m_coils(RowCount, false), m_holdingRegisters(RowCount, 0u)</div><div class="line">&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>还有rowCount(),columnCount()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">int WriteRegisterModel::rowCount(const QModelIndex &amp;/*parent*/) const</div><div class="line">&#123;</div><div class="line">    return RowCount;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int WriteRegisterModel::columnCount(const QModelIndex &amp;/*parent*/) const</div><div class="line">&#123;</div><div class="line">    return ColumnCount;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>这几个没啥好说的<br>data()函数:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">QVariant WriteRegisterModel::data(<span class="keyword">const</span> QModelIndex &amp;index, <span class="keyword">int</span> role) <span class="keyword">const</span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (!index.isValid() || index.row() &gt;= RowCount || index.column() &gt;= ColumnCount)</div><div class="line">        <span class="keyword">return</span> QVariant();<span class="comment">//要求索引有效，行列号在大小范围之内</span></div><div class="line"></div><div class="line">    Q_ASSERT(m_coils.count() == RowCount);</div><div class="line">    Q_ASSERT(m_holdingRegisters.count() == RowCount);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (index.column() == NumColumn &amp;&amp; role == Qt::DisplayRole)<span class="comment">//NumColumn被枚举为0</span></div><div class="line">        <span class="keyword">return</span> QString::number(index.row());<span class="comment">//第一列返回行号</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (index.column() == CoilsColumn &amp;&amp; role == Qt::CheckStateRole) <span class="comment">// coils</span></div><div class="line">        <span class="keyword">return</span> m_coils.at(index.row()) ? Qt::Checked : Qt::Unchecked;<span class="comment">//返回是否被选中(at返回该位置的值)</span></div><div class="line"></div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (index.column() == HoldingColumn &amp;&amp; role == Qt::DisplayRole) <span class="comment">//holding registers</span></div><div class="line">        <span class="keyword">return</span> QString(<span class="string">"0x%1"</span>).arg(QString::number(m_holdingRegisters.at(index.row()), <span class="number">16</span>));<span class="comment">//以十六进制返回指定位置的值</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> QVariant();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>headerData()函数:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">QVariant WriteRegisterModel::headerData(int section, Qt::Orientation orientation, int role) const</div><div class="line">&#123;</div><div class="line">    if (role != Qt::DisplayRole)</div><div class="line">        return QVariant();</div><div class="line"></div><div class="line">    if (orientation == Qt::Horizontal) &#123;</div><div class="line">        switch (section) &#123;</div><div class="line">        case NumColumn:</div><div class="line">            return QStringLiteral(&quot;#&quot;);</div><div class="line">        case CoilsColumn:</div><div class="line">            return QStringLiteral(&quot;Coils  &quot;);</div><div class="line">        case HoldingColumn:</div><div class="line">            return QStringLiteral(&quot;Holding Registers&quot;);</div><div class="line">        default:</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return QVariant();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>##添加写功能##<br>为了使模型可编辑,需要另外两个函数flags()和setData()<br>flags():</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Qt::ItemFlags WriteRegisterModel::flags(const QModelIndex &amp;index) const</div><div class="line">&#123;</div><div class="line">    if (!index.isValid() || index.row() &gt;= RowCount || index.column() &gt;= ColumnCount)</div><div class="line">        return QAbstractTableModel::flags(index);</div><div class="line"></div><div class="line">    Qt::ItemFlags flags = QAbstractTableModel::flags(index);</div><div class="line">    if ((index.row() &lt; m_address) || (index.row() &gt;= (m_address + m_number)))//如果index小于起始位置，大于结束位置，则返回0</div><div class="line">        flags &amp;= ~Qt::ItemIsEnabled;//？不懂返回为什么这么写？</div><div class="line"></div><div class="line">    if (index.column() == CoilsColumn) //coils</div><div class="line">        return flags | Qt::ItemIsUserCheckable;</div><div class="line">    if (index.column() == HoldingColumn) //holding registers</div><div class="line">        return flags | Qt::ItemIsEditable;</div><div class="line"></div><div class="line">    return flags;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>委托在创建编辑器以前会检测项目是否是可编辑的，模型必须让委托知道它的项目是可编辑的，这里为模型中的每一个项目返回一个正确的标识来达到这个目的。<br>setData():</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">bool WriteRegisterModel::setData(const QModelIndex &amp;index, const QVariant &amp;value, int role)</div><div class="line">&#123;</div><div class="line">    if (!index.isValid() ||  index.row() &gt;= RowCount || index.column() &gt;= ColumnCount)</div><div class="line">        return false;</div><div class="line"></div><div class="line">    Q_ASSERT(m_coils.count() == RowCount);//如果()里为0，返回警告</div><div class="line">    Q_ASSERT(m_holdingRegisters.count() == RowCount);</div><div class="line"></div><div class="line">    if (index.column() == CoilsColumn &amp;&amp; role == Qt::CheckStateRole) &#123; // coils</div><div class="line">        auto s = static_cast&lt;Qt::CheckState&gt;(value.toUInt());//？这里的类型转换为什么要这样？</div><div class="line">        s == Qt::Checked ? m_coils.setBit(index.row()) : m_coils.clearBit(index.row());</div><div class="line">        emit dataChanged(index, index);</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (index.column() == HoldingColumn &amp;&amp; Qt::EditRole) &#123; // holding registers</div><div class="line">        bool result = false;</div><div class="line">        quint16 newValue = value.toString().toUShort(&amp;result, 16);//？还有这里？</div><div class="line">        if (result)</div><div class="line">            m_holdingRegisters[index.row()] = newValue;</div><div class="line"></div><div class="line">        emit dataChanged(index, index);</div><div class="line">        return result;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>注意，我们并不需要知道委托是怎样执行真正的编辑操作的，而只需要为委托向模型中设置一条途径，这个是通过setData()函数实现的<em>（个人理解，这里不需要知道是怎样执行的是指:比如我没有找到setData函数被调用的地方，应该就是这种吧）</em><br><strong>当数据被设置后，模型必须让视图知道有数据已经改变了，这就是最后都有个emit dataChanged(index, index);的意义</strong></p>
-<p>setData函数就是给这个item设置一个QVariant的值，但是，这个函数有两个参数，第一个QVariant自然是需要设置的值，另一个是一个int型数据，Qt中把这个称为role角色，所谓角色，是指设定进item的这个Qvariant所扮演的角色，实际就是对设定值的标定，因为item可以设置许多值，这就需要一个用以区分的标志，这个区分标志就叫角色。</p>
+            <p>#非重读音节的作用#</p>
+<p>##特点</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">单词</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">madam</td>
+<td style="text-align:center">ˈmædəm</td>
+</tr>
+<tr>
+<td style="text-align:center">problem</td>
+<td style="text-align:center">ˈprɑbləm</td>
+</tr>
+<tr>
+<td style="text-align:center">symptom</td>
+<td style="text-align:center">ˈsɪmptəm</td>
+</tr>
+<tr>
+<td style="text-align:center">album</td>
+<td style="text-align:center">ˈælbəm</td>
+</tr>
+</tbody>
+</table>
+<p>上面四个单词有两个共同点:</p>
+<ol>
+<li>以元音字母加m结尾,”am”,”em”,”om”,”um”</li>
+<li>第一个音节重读</li>
+</ol>
+<p>因为”am”,”em”,”om”,”um”位于非重读音节，都被弱化发əm</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">单词</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">o’clock</td>
+<td style="text-align:center">əˈklɑk</td>
+</tr>
+<tr>
+<td style="text-align:center">doctor</td>
+<td style="text-align:center"><a href="https://tophonetics.com/#" target="_blank" rel="external">ˈdɑktər</a></td>
+</tr>
+<tr>
+<td style="text-align:center">photography</td>
+<td style="text-align:center">fəˈtɑgrəfi</td>
+</tr>
+</tbody>
+</table>
+<p>上面三个单词都有两个”o”,可以看出在非重读音节中，o的发音被弱化为了ə</p>
+<p>##发音相同写法不同的词</p>
+<p>我们来看两个单词:</p>
+<ol>
+<li>atom</li>
+<li>adam</li>
+</ol>
+<p>这两个单词发音是一样的,atom中的”o”和adam中的”a”非重读被弱化为ə,</p>
+<p>两个的音标ˈætəm ˈædəm </p>
+<p>结合t的发音特点，这两个发音是一样的</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">单词</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">lesson</td>
+<td style="text-align:center">ˈlɛsən</td>
+</tr>
+<tr>
+<td style="text-align:center">lessen</td>
+<td style="text-align:center">ˈlɛsən</td>
+</tr>
+<tr>
+<td style="text-align:center">caller</td>
+<td style="text-align:center">ˈkɔlər</td>
+</tr>
+<tr>
+<td style="text-align:center">collar</td>
+<td style="text-align:center">ˈkɑlər</td>
+</tr>
+<tr>
+<td style="text-align:center">profit</td>
+<td style="text-align:center"><a href="https://tophonetics.com/#" target="_blank" rel="external">ˈprɑfət</a></td>
+</tr>
+<tr>
+<td style="text-align:center">prophet</td>
+<td style="text-align:center">ˈprɑfət</td>
+</tr>
+<tr>
+<td style="text-align:center">seller</td>
+<td style="text-align:center">ˈsɛlər</td>
+</tr>
+<tr>
+<td style="text-align:center">cellar</td>
+<td style="text-align:center">ˈsɛlər</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
 
           
         
@@ -464,7 +556,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:10+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -608,7 +700,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:10+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -887,6 +979,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/读Qt示例之Modbus Master example(一)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/读Qt示例之Modbus Master example(一)/" itemprop="url">读Qt示例之Modbus Master example(一)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index">
+                    <span itemprop="name">Qt</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#读Qt示例之Modbus Master example(一)#</p>
+<p>本示例来自于Qt5.6.2</p>
+<p>本篇主要看WriteRegisterModel这个模型类是怎么实现的<br>涉及知识点主要是model/view中的model<br><img src="http://img.blog.csdn.net/20170716184111963?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Modbus Master示例的界面"></p>
+<p>WriteRegisterModel有四个变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public:</div><div class="line">	int m_number;            //读写的个数</div><div class="line">    int m_address;           //读写的起始位置</div><div class="line">	QBitArray m_coils;          //Coils</div><div class="line">    QVector&lt;quint16&gt; m_holdingRegisters;//HoldlingRegister</div></pre></td></tr></table></figure>
+<p>Modbus 一共有四组变量，其中可写的是 Coils，HoldingRegisters<br>该示例每组变量一共有10个值，m_address是起始位置，m_number是从起始位置开始读几个。</p>
+<p>##实现只读功能##<br>该模型是二维的，因此除了构造函数以外，只需要实现三个函数:rowCount(),columnCount()和data()函数。如果是字符串列表那样一维的，则只需实现rowCount()和data()函数。如果模型是树状图那样的层次结构，还需要实现index()和parent()函数.<br>其中rowCount(),columnCount()返回模型的行列数，data()返回指定模型索引的数据项。<br>也可以实现headerData()函数，它是显示表头的。</p>
+<p>先看看构造函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">WriteRegisterModel::WriteRegisterModel(QObject *parent)</div><div class="line">    : QAbstractTableModel(parent),</div><div class="line">      m_coils(RowCount, false), m_holdingRegisters(RowCount, 0u)</div><div class="line">&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>还有rowCount(),columnCount()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">int WriteRegisterModel::rowCount(const QModelIndex &amp;/*parent*/) const</div><div class="line">&#123;</div><div class="line">    return RowCount;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int WriteRegisterModel::columnCount(const QModelIndex &amp;/*parent*/) const</div><div class="line">&#123;</div><div class="line">    return ColumnCount;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这几个没啥好说的<br>data()函数:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">QVariant WriteRegisterModel::data(<span class="keyword">const</span> QModelIndex &amp;index, <span class="keyword">int</span> role) <span class="keyword">const</span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (!index.isValid() || index.row() &gt;= RowCount || index.column() &gt;= ColumnCount)</div><div class="line">        <span class="keyword">return</span> QVariant();<span class="comment">//要求索引有效，行列号在大小范围之内</span></div><div class="line"></div><div class="line">    Q_ASSERT(m_coils.count() == RowCount);</div><div class="line">    Q_ASSERT(m_holdingRegisters.count() == RowCount);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (index.column() == NumColumn &amp;&amp; role == Qt::DisplayRole)<span class="comment">//NumColumn被枚举为0</span></div><div class="line">        <span class="keyword">return</span> QString::number(index.row());<span class="comment">//第一列返回行号</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (index.column() == CoilsColumn &amp;&amp; role == Qt::CheckStateRole) <span class="comment">// coils</span></div><div class="line">        <span class="keyword">return</span> m_coils.at(index.row()) ? Qt::Checked : Qt::Unchecked;<span class="comment">//返回是否被选中(at返回该位置的值)</span></div><div class="line"></div><div class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (index.column() == HoldingColumn &amp;&amp; role == Qt::DisplayRole) <span class="comment">//holding registers</span></div><div class="line">        <span class="keyword">return</span> QString(<span class="string">"0x%1"</span>).arg(QString::number(m_holdingRegisters.at(index.row()), <span class="number">16</span>));<span class="comment">//以十六进制返回指定位置的值</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> QVariant();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>headerData()函数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">QVariant WriteRegisterModel::headerData(int section, Qt::Orientation orientation, int role) const</div><div class="line">&#123;</div><div class="line">    if (role != Qt::DisplayRole)</div><div class="line">        return QVariant();</div><div class="line"></div><div class="line">    if (orientation == Qt::Horizontal) &#123;</div><div class="line">        switch (section) &#123;</div><div class="line">        case NumColumn:</div><div class="line">            return QStringLiteral(&quot;#&quot;);</div><div class="line">        case CoilsColumn:</div><div class="line">            return QStringLiteral(&quot;Coils  &quot;);</div><div class="line">        case HoldingColumn:</div><div class="line">            return QStringLiteral(&quot;Holding Registers&quot;);</div><div class="line">        default:</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return QVariant();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>##添加写功能##<br>为了使模型可编辑,需要另外两个函数flags()和setData()<br>flags():</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Qt::ItemFlags WriteRegisterModel::flags(const QModelIndex &amp;index) const</div><div class="line">&#123;</div><div class="line">    if (!index.isValid() || index.row() &gt;= RowCount || index.column() &gt;= ColumnCount)</div><div class="line">        return QAbstractTableModel::flags(index);</div><div class="line"></div><div class="line">    Qt::ItemFlags flags = QAbstractTableModel::flags(index);</div><div class="line">    if ((index.row() &lt; m_address) || (index.row() &gt;= (m_address + m_number)))//如果index小于起始位置，大于结束位置，则返回0</div><div class="line">        flags &amp;= ~Qt::ItemIsEnabled;//？不懂返回为什么这么写？</div><div class="line"></div><div class="line">    if (index.column() == CoilsColumn) //coils</div><div class="line">        return flags | Qt::ItemIsUserCheckable;</div><div class="line">    if (index.column() == HoldingColumn) //holding registers</div><div class="line">        return flags | Qt::ItemIsEditable;</div><div class="line"></div><div class="line">    return flags;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>委托在创建编辑器以前会检测项目是否是可编辑的，模型必须让委托知道它的项目是可编辑的，这里为模型中的每一个项目返回一个正确的标识来达到这个目的。<br>setData():</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">bool WriteRegisterModel::setData(const QModelIndex &amp;index, const QVariant &amp;value, int role)</div><div class="line">&#123;</div><div class="line">    if (!index.isValid() ||  index.row() &gt;= RowCount || index.column() &gt;= ColumnCount)</div><div class="line">        return false;</div><div class="line"></div><div class="line">    Q_ASSERT(m_coils.count() == RowCount);//如果()里为0，返回警告</div><div class="line">    Q_ASSERT(m_holdingRegisters.count() == RowCount);</div><div class="line"></div><div class="line">    if (index.column() == CoilsColumn &amp;&amp; role == Qt::CheckStateRole) &#123; // coils</div><div class="line">        auto s = static_cast&lt;Qt::CheckState&gt;(value.toUInt());//？这里的类型转换为什么要这样？</div><div class="line">        s == Qt::Checked ? m_coils.setBit(index.row()) : m_coils.clearBit(index.row());</div><div class="line">        emit dataChanged(index, index);</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (index.column() == HoldingColumn &amp;&amp; Qt::EditRole) &#123; // holding registers</div><div class="line">        bool result = false;</div><div class="line">        quint16 newValue = value.toString().toUShort(&amp;result, 16);//？还有这里？</div><div class="line">        if (result)</div><div class="line">            m_holdingRegisters[index.row()] = newValue;</div><div class="line"></div><div class="line">        emit dataChanged(index, index);</div><div class="line">        return result;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意，我们并不需要知道委托是怎样执行真正的编辑操作的，而只需要为委托向模型中设置一条途径，这个是通过setData()函数实现的<em>（个人理解，这里不需要知道是怎样执行的是指:比如我没有找到setData函数被调用的地方，应该就是这种吧）</em><br><strong>当数据被设置后，模型必须让视图知道有数据已经改变了，这就是最后都有个emit dataChanged(index, index);的意义</strong></p>
+<p>setData函数就是给这个item设置一个QVariant的值，但是，这个函数有两个参数，第一个QVariant自然是需要设置的值，另一个是一个int型数据，Qt中把这个称为role角色，所谓角色，是指设定进item的这个Qvariant所扮演的角色，实际就是对设定值的标定，因为item可以设置许多值，这就需要一个用以区分的标志，这个区分标志就叫角色。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/汇编程序的编译与连接/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -918,7 +1170,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:10+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1076,7 +1328,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:10+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1237,7 +1489,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/《C++ Primer Plus》(第六版)笔记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC基本知识（二）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -1256,7 +1508,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/24/《C++ Primer Plus》(第六版)笔记/" itemprop="url">《C++ Primer Plus》(第六版)笔记</a></h1>
+                <a class="post-title-link" href="/2018/01/24/PLC基本知识（二）/" itemprop="url">PLC基本知识（二）</a></h1>
         
 
         <div class="post-meta">
@@ -1268,7 +1520,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1291,8 +1543,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT/" itemprop="url" rel="index">
-                    <span itemprop="name">IT</span>
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
                   </a>
                 </span>
 
@@ -1330,24 +1582,13 @@
       
         
           
-            <p>#《C++ Primer Plus》(第六版)笔记#</p>
-<p>##1 什么时候应调用析构函数呢？##<br>这由编译器决定，通常不应在代码中显式的调用析构函数（有例外）。<br>如果创建的是静态储存类对象，则其析构函数将在程序结束时自动被调用。如果创建的是自动存储类对象，则其析构函数将在程序执行完代码块时（该对象在其中定义的）自动被调用。如果对象是通过new创建的，则它将驻留在栈内存或自由存储区中，当使用delete来释放内存时，其析构函数将自动被调用。最后程序可以创建临时对象来完成特定的操作，在这种情况下，程序将在结束对该对象的使用时自动调用其析构函数。</p>
-<p>##2 三种链接性##<br>外部链接性（可在其他文件中访问）<br>内部链接性（只能在当前文件中访问）<br>无链接性（只能在当前函数或代码块中访问）<br>创建链接性为外部的静态持续变量，必须在代码块的外面声明它；<br>创建链接性为内部的静态持续变量，必须在代码块的外面声明它，并使用static限定符；<br>要创建没有链接性的静态持续变量，必须在代码块内声明它，并使用static限定符。</p>
-<p>##3 单定义规则##<br>一方面，在每个使用外部变量的文件中，都必须声明它；另一方面，C++有“单定义规则”（One Definition Rule,ODR）,该规则指出，变量只能有一次定义。为满足这种需求，C++提供了两种变量声明。一种是定义声明（defining declaration）或简称定义（definition），它给变量分配存储空间；另一种是引用声明（referencing declaration）或简称声明（declaration），它不给变量分配存储空间，因为它引用已有变量。<br>引用声明使用关键字extern，<strong>且不进行初始化</strong>，否则，声明为定义，导致分配存储空间：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">double</span> up;  <span class="comment">//definition ,up is 0</span></div><div class="line"><span class="keyword">extern</span> <span class="keyword">int</span> blem;<span class="comment">// blem defined elsewhere</span></div><div class="line"><span class="keyword">extern</span> <span class="keyword">char</span> gr=<span class="string">'Z'</span>;<span class="comment">//definition because initializ</span></div></pre></td></tr></table></figure>
-<p>单定义规则并不意味着不能有多个变量的名称相同。然而虽然程序中可包含多个同名的变量，但每个变量都只有一个定义。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//file01.cpp</div><div class="line">	extern int cats=20;//definition because of initialzation</div><div class="line">	int dogs=22;//also a definition</div><div class="line">	int fleas;//also a definition</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//file02.cpp</div><div class="line">//use cats and dogs from file01.cpp</div><div class="line">	extern int cats;//not definitions because of they use</div><div class="line">	extern int dogs;//extern and have no initialization</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//file03.cpp</div><div class="line">//use cats,dogs,and fleas from file01.cpp</div><div class="line">	extern int cats;</div><div class="line">	extern int dogs;</div><div class="line">	extern int fleas;</div></pre></td></tr></table></figure>
-<p>上面file02中没有重新声明变量fleas，因此无法访问它，在file01中，关键字extern并非必不可少，因为即使省略它，效果也相同。</p>
-<p>##再谈const##<br>在C++（但不是C语言中），const限定符，对默认存储类型稍有影响。在默认情况下全局变量的链接性为外部的，但<strong>const全局变量的链接性为内部的</strong>.<br>因为这让程序员更加轻松。例如一组常量放在头文件中，并在同一个程序 的多个文件中使用该头文件。那么预处理器将头文件的内容包含到源文件后，所有源文件都将包含类似下面这样的定义:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">const int finger=10;</div><div class="line">const char* warning=&quot;walk!&quot;;</div></pre></td></tr></table></figure>
-<p>如果全局const的链接性是外部，则根据单定义规则，这将出错。也就是说，只能有一个文件可以包含前面的声明，而其他文件必须使用extern关键字来提供引用声明。另外，只有未使用extern关键字的声明才能进行初始化:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//extern would be required if const had external linkage</div><div class="line">extern const int fingers;//can not be initialized</div><div class="line">extern const char* warning;</div></pre></td></tr></table></figure>
-<p>因此，需要为某个文件使用一组定义，而其他文件使用另一组声明。然而，如果链接性为内部的，则可以在所有文件中使用相同的声明。</p>
-<p>如果处于某种原因，希望某个常量链接性为外部的，则可以使用extern关键字如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">extern const int states=50;//definition with external linkage</div></pre></td></tr></table></figure>
-<p>在种情况下，必须在所有使用该常量的文件中使用extern关键字来声明它。然而，鉴于单个const在多个文件之间共享，因此只有一个文件可对其进行初始化。<br>在函数或代码块中声明const时，其作用域为代码块，即仅当程序执行该代码块中的代码时，该常量才是可用的。</p>
+            <p>﻿##PLC基本知识（二）##</p>
+<ul>
+<li>RS232与RS485区别：RS485用双绞线传输，传的是差分信号，当A比B电压高时为“1”，低时为“0”，因此RS485抗干扰能力较强，通常能传输1000米以上，RS232至少3根线，一根是TxD，一根RxD，一根GND，传送时把TTL转换成+-12V电平。RS232传输距离较短，一般10米左右。因此RS485为半双工个，RS232为全双工。 还有RS485已经是网络技术了，一条总线上可以连接200多节点，而RS232只能在2点之间通信。485上跑，必然是主从模式。</li>
+<li>三种时基的刷新方式（1ms，10ms，100ms）：简单的说，1ms的定时器采用中断方式刷新当前值，每隔1ms系统自动刷新一次定时器和当前位，与扫描周期无关；10ms的定时器，定时器位和当前值总是在每个扫描周期开始时被刷新，之后在整个扫描周期内不变；100ms的定时器，是在该指令被执行时刷新，是在扫描过程中读到该定时器时才对定时器接点和当前值进行更新；因此确保每个扫描周期内，程序仅为100ms的定时器执行一次指令，以便使定时器保持正确计时。</li>
+<li>状态转移图或步进梯形图中输出继电器想多次使用，例如两个Q0.0，可以采用第一个Q0.0用立即输出线圈，后面一个用普通输出线圈。</li>
+<li>S7-300有4种电源模块，其中PS305是直流供电，PS307是交流供电，电源模块与S7-300PLC的背板之间没有连接，可以隔离安装，CPU不能对电源进行诊断。</li>
+</ul>
 
           
         
@@ -1427,7 +1668,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1568,7 +1809,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/pvbrowser如何通过Siemens tcp连接PLC/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/《C++ Primer Plus》(第六版)笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -1587,7 +1828,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/24/pvbrowser如何通过Siemens tcp连接PLC/" itemprop="url">pvbrowser如何通过Siemens tcp连接PLC</a></h1>
+                <a class="post-title-link" href="/2018/01/24/《C++ Primer Plus》(第六版)笔记/" itemprop="url">《C++ Primer Plus》(第六版)笔记</a></h1>
         
 
         <div class="post-meta">
@@ -1599,7 +1840,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1622,8 +1863,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控-pvbrowser/" itemprop="url" rel="index">
-                    <span itemprop="name">工控 pvbrowser</span>
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
                   </a>
                 </span>
 
@@ -1661,108 +1902,24 @@
       
         
           
-            <h1 id="pvbrowser如何通过Siemens-tcp连接PLC"><a href="#pvbrowser如何通过Siemens-tcp连接PLC" class="headerlink" title="pvbrowser如何通过Siemens tcp连接PLC"></a>pvbrowser如何通过Siemens tcp连接PLC</h1><hr>
-<p>pvbrowser是一款德国的基于Qt的开源组态软件。尽管市场中用的很少，我们还是可以通过看其源码学习很多东西。</p>
-<p>pvbrowser里有两种方式通过Simens tcp与PLC通讯:Daemon与pvbaddon.</p>
-<p>##Daemon</p>
-<p>###通过Daemon生成EXE文件<br>打开pvdevelop，选择<em>菜单栏-&gt;daemon-&gt;Siemens Tcp</em></p>
-<pre><code>shared_memory=C:\\automation\\shm\\siemens.shm
-mailbox=C:\\automation\\mbx\\siemens.mbx
-# type := S7_200 | S7_300 | S7_400 | S5 | S7_1200 | LOGO
-slave=0 adr=192.168.1.99 type=S7_1200 fetch_write=0 function=1 rack_slot=0
-idletime=50 milliseconds
-#eventlog host=localhost port=6000
-# ORG := ORG_DB | ORG_M | ORG_E | ORG_A | ORG_PEPA | ORG_Z | ORG_T
-# cycle := slave + org + dbnum + start + len
-cycle1 slave=0 org=ORG_E  dbnum=0 start=0 len=1
-cycle2 slave=0 org=ORG_A  dbnum=0 start=0 len=1
-</code></pre><p>这里面有以下几个需要注意的点:</p>
-<ol>
-<li>shared memory和mailbox的文件路径是需要自己建的，这个软件不会给你建。<br>Note that these directories must be created first by you. Note that the size of the shared memory must be equal in the daemon and in the pvserver.<br>2.关于 fetch_write的设定<br>fetch_write=1为fetch/write服务,fetch_write=0为S7连接。<br>(1) There is the old Fetch/Write protocol from the old S5 PLC<br>(fetch_write=1).Fetch/Write只支持S5和300，400系列.<br>(2) And there is the current Siemens PLC protocol introduced with the S7 series of PLC (fetch_write=0).</li>
-<li>FUNCTION    := optional parameter for PLC (1=PG,2=OP,3=Step7Basic)<br>经验证123均可连通。</li>
-<li>经验证，rack_slot这个值设随机值都能通</li>
-<li>ORG_E指的是Eingang(输入)，ORG_A指的是Ausgang(输出)，ORG_M是Merker(这个单词没查到，经验证是M区)，ORG_DB是Datenbaustein(DB区).此外还有ORG_PEPA指的是Peripheral(外围设备) Area R/W ，ORG_Z意思是Zaehler(计数器),ORG_T意思是Timer(计时器)<br>设置好以后点compile，然后点close.<br>这时，项目文件夹下会生成siemensdaemon.cpp,siemensdaemon.h,siemensdaemon.exe和siemensdaemon.mksimens四个文件<br>运行siemensdaemon.exe文件，数据就从PLC里面读取到共享内存里了(可能会遇到缺少*.dll文件，在pvbrowser安装目录里找到对应的文件放进项目文件即可)。<br>###如何进行调试<br>当我们遇到连接不通的时候怎么办呢，因为是pvbrowser是基于Qt的，我们可以通过Qt对其进行调试。</li>
-<li>新建空Qt控制台项目，添加Deamon生成的siemensdaemon.h和siemensdaemon.cpp文件。并将缺少的头文件放到目录里，这些头文件可以在pvb安装目录底下找到。</li>
-<li><p>在该项目的makefile里添加</p>
-<p> win32-g++ {<br> QMAKE_LFLAGS      += -static-libgcc<br> win32:LIBS        += $(PVBDIR)/win-mingw/bin/libserverlib.a<br> win32:LIBS        += $(PVBDIR)/win-mingw/bin/librllib.a<br> win32:LIBS        += -lws2_32 -ladvapi32 -lpthread<br> win32:INCLUDEPATH += $(PVBDIR)/pvserver<br> win32:INCLUDEPATH += $(PVBDIR)/rllib/lib<br> }</p>
-</li>
-</ol>
-<p>这样项目就建好了，可以进行更改调试。</p>
-<p>##pvbaddon<br>可以在pvbrowser下载pvbaddon<br>在pvbaddon\pvbaddon\daemons\siemenstcp\client\release目录下有siemenstcp_client.exe 文件，需要配合ini文件使用。<br>example.ini</p>
-<pre><code># ini file for siemenstcp_client
-#
-# DEBUG       := 1 | 0
-# SLAVE&lt;N&gt;    := IP,PLC_TYPE,FETCH_WRITE,FUNCTION,RACK_SLOT
-# PLC_TYPE    := ANY | S7_200 | S7_300 | S7_400 | S5 | S7_1200 | LOGO
-# FETCH_WRITE := 1 | 0 # default 1
-# FUNCTION    := optional parameter for PLC (1=PG,2=OP,3=Step7Basic)
-# RACK_SLOT   := optional parameter for PLC  Byte(upper_3_bit_is_rack / lower_5_bit_is_slot)
-# CYCLE&lt;N&gt;    := &lt;count&gt;,&lt;name&gt;
-# name        := byte&lt;ORG&gt;(slave,dbnum,adr)   | 
-#                float&lt;ORG&gt;(slave,dbnum,adr)  |
-#                dword&lt;ORG&gt;(slave,dbnum,adr)  |
-#                short&lt;ORG&gt;(slave,dbnum,adr)  |
-#                udword&lt;ORG&gt;(slave,dbnum,adr) |
-#                ushort&lt;ORG&gt;(slave,dbnum,adr)
-# ORG         := ORG_DB | ORG_M | ORG_E | ORG_A | ORG_PEPA | ORG_Z | ORG_T
-# HAVETO_SWAP := 1 | 0 # must be 1 on intel machines
-# CYCLETIME in milliseconds
-# SHARED_MEMORY_SIZE must be equal to SHARED_MEMORY_SIZE of pvserver
-# MAX_NAME_LENGTH is maximum length of variable name in shared memory 
-#
-
-[GLOBAL]
-DEBUG=1
-CYCLETIME=1000
-HAVETO_SWAP=1
-
-[SOCKET]
-NUM_SLAVES=1
-SLAVE1=192.168.1.101,ANY,0
-#SLAVE2=192.168.1.35,S7_200,0,1,2
-
-# You may also specify the TSAPs explicitly.
-# In that case the PLC_TYPE does not care. Use ANY.
-[SLAVE1_CONNECT_BLOCK]
-#S7-200
-CB13=&apos;M&apos; # remote TSAP        (not necessary to set explicitly)
-CB14=&apos;W&apos; # remote TSAP        (not necessary to set explicitly)
-CB17=&apos;M&apos; # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
-CB18=&apos;W&apos; # local  TSAP slot 1 (upper_3_bit_is_rack / lower_5_bit_is_slot)
-#S7-300
-#CB13=2 # remote TSAP        (not necessary to set explicitly)
-#CB14=1 # remote TSAP        (not necessary to set explicitly)
-#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
-#CB18=2 # local  TSAP slot 2 (upper_3_bit_is_rack / lower_5_bit_is_slot)
-#S7-400
-#CB13=2 # remote TSAP        (not necessary to set explicitly)
-#CB14=1 # remote TSAP        (not necessary to set explicitly)
-#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
-#CB18=3 # local  TSAP slot 3 (upper_3_bit_is_rack / lower_5_bit_is_slot)
-#S7-1200
-#CB13=2 # remote TSAP        (not necessary to set explicitly)
-#CB14=1 # remote TSAP        (not necessary to set explicitly)
-#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
-#CB18=0 # local  TSAP slot 0 (upper_3_bit_is_rack / lower_5_bit_is_slot)
-
-[RLLIB]
-MAX_NAME_LENGTH=30
-SHARED_MEMORY=/srv/automation/shm/siemenstcp1.shm
-SHARED_MEMORY_SIZE=65536
-MAILBOX=/srv/automation/mbx/siemenstcp1.mbx
-
-[CYCLES]
-NUM_CYCLES=4
-CYCLE1=10,byteORG_M(1,0,0)
-CYCLE2=4,byteORG_E(1,0,0)
-CYCLE3=4,byteORG_A(1,0,0)
-CYCLE4=4,byteORG_DB(1,1,0)
-#CYCLE2=1,byteORG_M(2,2,3)
-</code></pre><p>这里我没有做更改，更改的话与Deamon需要注意的地方相同。<br>打开cmd cd到该目录下运行</p>
-<pre><code>siemenstcp_client.exe example.ini
-</code></pre><p>数据就到mailbox里面了</p>
-<p>调试的话，里面有Qt项目文件可以直接打开</p>
-<p>这样PLC数据就读取到shared memory或mailbox里了，可以进行后期的上位编程。</p>
+            <p>#《C++ Primer Plus》(第六版)笔记#</p>
+<p>##1 什么时候应调用析构函数呢？##<br>这由编译器决定，通常不应在代码中显式的调用析构函数（有例外）。<br>如果创建的是静态储存类对象，则其析构函数将在程序结束时自动被调用。如果创建的是自动存储类对象，则其析构函数将在程序执行完代码块时（该对象在其中定义的）自动被调用。如果对象是通过new创建的，则它将驻留在栈内存或自由存储区中，当使用delete来释放内存时，其析构函数将自动被调用。最后程序可以创建临时对象来完成特定的操作，在这种情况下，程序将在结束对该对象的使用时自动调用其析构函数。</p>
+<p>##2 三种链接性##<br>外部链接性（可在其他文件中访问）<br>内部链接性（只能在当前文件中访问）<br>无链接性（只能在当前函数或代码块中访问）<br>创建链接性为外部的静态持续变量，必须在代码块的外面声明它；<br>创建链接性为内部的静态持续变量，必须在代码块的外面声明它，并使用static限定符；<br>要创建没有链接性的静态持续变量，必须在代码块内声明它，并使用static限定符。</p>
+<p>##3 单定义规则##<br>一方面，在每个使用外部变量的文件中，都必须声明它；另一方面，C++有“单定义规则”（One Definition Rule,ODR）,该规则指出，变量只能有一次定义。为满足这种需求，C++提供了两种变量声明。一种是定义声明（defining declaration）或简称定义（definition），它给变量分配存储空间；另一种是引用声明（referencing declaration）或简称声明（declaration），它不给变量分配存储空间，因为它引用已有变量。<br>引用声明使用关键字extern，<strong>且不进行初始化</strong>，否则，声明为定义，导致分配存储空间：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">double</span> up;  <span class="comment">//definition ,up is 0</span></div><div class="line"><span class="keyword">extern</span> <span class="keyword">int</span> blem;<span class="comment">// blem defined elsewhere</span></div><div class="line"><span class="keyword">extern</span> <span class="keyword">char</span> gr=<span class="string">'Z'</span>;<span class="comment">//definition because initializ</span></div></pre></td></tr></table></figure>
+<p>单定义规则并不意味着不能有多个变量的名称相同。然而虽然程序中可包含多个同名的变量，但每个变量都只有一个定义。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//file01.cpp</div><div class="line">	extern int cats=20;//definition because of initialzation</div><div class="line">	int dogs=22;//also a definition</div><div class="line">	int fleas;//also a definition</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">//file02.cpp</div><div class="line">//use cats and dogs from file01.cpp</div><div class="line">	extern int cats;//not definitions because of they use</div><div class="line">	extern int dogs;//extern and have no initialization</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//file03.cpp</div><div class="line">//use cats,dogs,and fleas from file01.cpp</div><div class="line">	extern int cats;</div><div class="line">	extern int dogs;</div><div class="line">	extern int fleas;</div></pre></td></tr></table></figure>
+<p>上面file02中没有重新声明变量fleas，因此无法访问它，在file01中，关键字extern并非必不可少，因为即使省略它，效果也相同。</p>
+<p>##再谈const##<br>在C++（但不是C语言中），const限定符，对默认存储类型稍有影响。在默认情况下全局变量的链接性为外部的，但<strong>const全局变量的链接性为内部的</strong>.<br>因为这让程序员更加轻松。例如一组常量放在头文件中，并在同一个程序 的多个文件中使用该头文件。那么预处理器将头文件的内容包含到源文件后，所有源文件都将包含类似下面这样的定义:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">const int finger=10;</div><div class="line">const char* warning=&quot;walk!&quot;;</div></pre></td></tr></table></figure>
+<p>如果全局const的链接性是外部，则根据单定义规则，这将出错。也就是说，只能有一个文件可以包含前面的声明，而其他文件必须使用extern关键字来提供引用声明。另外，只有未使用extern关键字的声明才能进行初始化:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//extern would be required if const had external linkage</div><div class="line">extern const int fingers;//can not be initialized</div><div class="line">extern const char* warning;</div></pre></td></tr></table></figure>
+<p>因此，需要为某个文件使用一组定义，而其他文件使用另一组声明。然而，如果链接性为内部的，则可以在所有文件中使用相同的声明。</p>
+<p>如果处于某种原因，希望某个常量链接性为外部的，则可以使用extern关键字如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">extern const int states=50;//definition with external linkage</div></pre></td></tr></table></figure>
+<p>在种情况下，必须在所有使用该常量的文件中使用extern关键字来声明它。然而，鉴于单个const在多个文件之间共享，因此只有一个文件可对其进行初始化。<br>在函数或代码块中声明const时，其作用域为代码块，即仅当程序执行该代码块中的代码时，该常量才是可用的。</p>
 
           
         
@@ -1811,7 +1968,7 @@ CYCLE4=4,byteORG_DB(1,1,0)
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC基本知识（二）/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/Qt modbus通讯写上位/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -1830,7 +1987,7 @@ CYCLE4=4,byteORG_DB(1,1,0)
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/24/PLC基本知识（二）/" itemprop="url">PLC基本知识（二）</a></h1>
+                <a class="post-title-link" href="/2018/01/24/Qt modbus通讯写上位/" itemprop="url">Qt modbus通讯写上位</a></h1>
         
 
         <div class="post-meta">
@@ -1842,155 +1999,7 @@ CYCLE4=4,byteORG_DB(1,1,0)
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿##PLC基本知识（二）##</p>
-<ul>
-<li>RS232与RS485区别：RS485用双绞线传输，传的是差分信号，当A比B电压高时为“1”，低时为“0”，因此RS485抗干扰能力较强，通常能传输1000米以上，RS232至少3根线，一根是TxD，一根RxD，一根GND，传送时把TTL转换成+-12V电平。RS232传输距离较短，一般10米左右。因此RS485为半双工个，RS232为全双工。 还有RS485已经是网络技术了，一条总线上可以连接200多节点，而RS232只能在2点之间通信。485上跑，必然是主从模式。</li>
-<li>三种时基的刷新方式（1ms，10ms，100ms）：简单的说，1ms的定时器采用中断方式刷新当前值，每隔1ms系统自动刷新一次定时器和当前位，与扫描周期无关；10ms的定时器，定时器位和当前值总是在每个扫描周期开始时被刷新，之后在整个扫描周期内不变；100ms的定时器，是在该指令被执行时刷新，是在扫描过程中读到该定时器时才对定时器接点和当前值进行更新；因此确保每个扫描周期内，程序仅为100ms的定时器执行一次指令，以便使定时器保持正确计时。</li>
-<li>状态转移图或步进梯形图中输出继电器想多次使用，例如两个Q0.0，可以采用第一个Q0.0用立即输出线圈，后面一个用普通输出线圈。</li>
-<li>S7-300有4种电源模块，其中PS305是直流供电，PS307是交流供电，电源模块与S7-300PLC的背板之间没有连接，可以隔离安装，CPU不能对电源进行诊断。</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/QStandardItemModel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/QStandardItemModel/" itemprop="url">QStandardItemModel</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -2052,24 +2061,25 @@ CYCLE4=4,byteORG_DB(1,1,0)
       
         
           
-            <p>﻿#QStandardItemModel#</p>
-<p>以下内容摘自 《t中的C++技术》</p>
-<p>##基本知识##<br>类QabstractItemModel，QabstractListModel，QAbstractTableModel不保存数据，用户需要从这些类派生出子类，并在子类中定义某种数据结构来保存数据。与此不同，类QStandardItemModel负责保存数据，每个数据项被表示为类QStandardItem的对象。<br><strong>QStandardItem用来保存一个数据项，再使用QStandardItemModel将这些数据项组织起来，形成列表、表格或者树，以供其他视图类显示。</strong><br>一个数据项由若干个『角色，数据子项』对组成。类QStandardItem负责保存、访问这些数据。该类的内部定义了一个类型为QVector的容器，每个容器元素本质上存放一个『角色，数据子项』对。<br>由于各个角色对应的数据子项可能具有不同的类型，Qt使用QVariant来存放每个数据子项。当用户希望将一些数据存放在一个QStandardItem对象中时，可以调用其成员函数：<br>void setData ( const QVariant &amp; value, int role)<br>将『role, value』对存入。<br>当用户希望读取该对象中的数据时，可以调用另外一个成员函数：</p>
-<p>QVariant data ( int role = ) const</p>
-<p>读取角色role对应的数据子项。</p>
-<p>以上两个函数是QStandardItem的核心。<strong>有了这两个函数，我们就可以访问该类所表示数据项的任何一个『角色，数据子项』对。然而，对于一些常用角色，该类提供了更加简洁、容易记忆的成员函数。</strong>例如，当一个数据项被显示在视图中时，它往往包含一些文字、一个图标，还可能包含一个复选框。角色Qt::BackgroundRole控制显示背景，Qt::FontRole控制文字字体，Qt::ForegroundRole控制文字颜色，Qt::CheckStateRole控制复选框的状态。该类提供的一组成员函数可以方便地访问这些常用角色对应的数据子项。成员函数setBackground()、background()分别设置/返回背景刷子。函数setFont()、font()分别设置/返回文字字体。函数setForeground()、foreground()分别设置/返回字体颜色。函数setCheckState()、checkState()分别设置/返回复选框状态。</p>
-<p>##如果数据集被表示为一个列表##<br>如果数据集被表示为一个列表，我们可以调用类QStandardItemModel的成员函数<strong>appendRow()</strong>向列表中添加一个数据项，使用<strong>item()</strong>读取一个数据项,代码如下:</p>
-<figure class="highlight qt"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel listModel;</div><div class="line">QStandardItem *rootItem = listModel.invisibleRootItem(); <span class="comment">//获取模型最底层的根节点         </span></div><div class="line"><span class="keyword">for</span> (<span class="built_in">int</span> row = <span class="number">0</span>; row &lt; <span class="number">4</span>; ++row) &#123;</div><div class="line"> QStandardItem *item = <span class="keyword">new</span> QStandardItem(QString(<span class="string">"%0"</span>).arg(row) );<span class="comment">//表示一个数据项，构造函数在内部调用该类的setData()函数，将QString对象作为Qt::DisplayRole对应的数据子项存入新构造的对象</span></div><div class="line"> rootItem-&gt;appendRow( item );  <span class="comment">//将该数据项作为根节点的子节点添加到列表中。</span></div><div class="line">&#125; </div><div class="line">QListView listView;<span class="comment">//因为数据集本身是一个列表，所以使用QListView展示</span></div><div class="line">listView.setModel ( &amp; listModel );</div></pre></td></tr></table></figure>
-<p><strong>QStandardItem(QString(“%0”).arg(row) );这句话的构造函数在内部调用该类的setData()函数，将QString对象作为Qt::DisplayRole对应的数据子项存入新构造的对象（终于找到哪调用的setData()函数了）</strong></p>
-<p>##如果数据集被表示为一个表格##<br>如果数据集被表示为一个表格，可以调用类QStandardItemModel的成员函数<strong>setItem()</strong>设定表格中的某个数据项,代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel tableModel(4, 4);</div><div class="line"> for (int row = 0; row &lt; 4; ++row) &#123;</div><div class="line">   for (int column = 0; column &lt; 4; ++column) &#123;</div><div class="line">    QStandardItem *item = new QStandardItem(</div><div class="line">     QString(&quot;%0,%1&quot;).arg(row).arg(column));</div><div class="line">    tableModel.setItem(row, column, item);</div><div class="line">   &#125;</div><div class="line"> &#125; </div><div class="line"> QTableView tableView;//因为数据集是个表格，所以使用QTableView</div><div class="line"> tableView.setModel( &amp; tableModel );</div></pre></td></tr></table></figure>
-<p>##如果数据集被表示为一个树##<br>如果数据集被表示为一个树，可以调用类QStandardItemModel的成员函数appendRow()向某个树节点添加子节点。通过多次调用该函数，可以构建一棵复杂的树。代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel treeModel;</div><div class="line">QStandardItem *parentItem = treeModel.invisibleRootItem();</div><div class="line">for (int i = 0; i &lt; 4; ++i) &#123;</div><div class="line"> QStandardItem *item = new QStandardItem(QString(&quot;%0&quot;).arg(i));</div><div class="line"> parentItem-&gt;appendRow(item);</div><div class="line"> parentItem = item;</div><div class="line">&#125;</div><div class="line">QTreeView treeView;//由于数据集是一棵树，我们使用QTreeView显示它</div><div class="line">treeView.setModel( &amp; treeModel );</div></pre></td></tr></table></figure>
-<p>##总结##<br>类QStandardItemModel之所以能够表示列表、表格、树甚至更复杂的数据结构，得益于类QStandardItem在其内部定义了一个类型为QVector<code>&lt;</code>QStandardItem*<code>&gt;</code>的容器，可以将每个容器元素所指的QStandardItem对象设定为子对象。表现在如下图所示的类图上，类QStandardItem和自身具有“children”关系。一个类和自身发生关联，在UML中被称为自关联（self association）。类QStandardItemModel定义了一个名为root的数据成员，逻辑上是一个指向QStandardItem对象的指针。这个对象可以设定多个QStandardItem的对象作为自己的子对象，而其中每个子对象又可以包含其他的子对象。依此类推，这棵树可以具有任意深度，每个父对象可以包含任意多个子对象。<img src="http://img.blog.csdn.net/20170721213157481?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="类QStandardItem使用自关联以形成层次结构"><br>很自然地，QStandardItemModel可以使用QStandardItem表示具有树状数据结构的数据集，如图13 14所示。图中的每个小方框表示类QStandardItem的一个对象。如果小方框的边线为虚，相应的QStandardItem对象并不表示数据集中的任何数据，仅被用来表示某种数据结构。如果小方框的边线为实，相应的QStandardItem对象就表示数据集中的一个数据项。在右侧的图中，QStandardItemModel的数据成员root所指的对象表示一个不可见的根，而数据集的根（图中结点G）被表示为这个不可见根的一个子节点。<br><img src="http://img.blog.csdn.net/20170721213942624?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="类QStandardItem使用自关联形成列表、表格与树"><br>列表被看作一个特殊的树：不可见根具有若干个子节点，每个子节点表示列表中的一个数据项，不再包含任何子节点，如该图左侧所示。而表格的表示方式反而麻烦一些。不可见根含有若干子节点（图中A，B，C），这些子节点并不表示数据集中的任何数据项。第i个子节点会包含若干子节点（比如图中D，E，F），这些子节点才表示表格第i行的数据项。</p>
-<p>###优点###<br>使用QStandardItemModel表示数据集具有以下优点：该类使用QStandardItem存放数据项，用户不必定义任何数据结构来存放数据项；QStandardItem使用自关联关系，能够表达列表、表格、树甚至更复杂的数据结构，能够涵盖各种各样的数据集；QStandardItem本身存放着多个『角色，数据子项』，视图类、委托类或者其他用户定义的类能够方便地依据角色访问各个数据子项。</p>
-<p>###缺点###<br>然而，这种表示方法也有局限性：当数据集中的数据项很多时，施加在数据集上的某些操作的执行效率会很低。比如，设数据集是一个1万行、20列的表格，其中第10列存放的是浮点数。如果我们想计算这一列的平均值，按照图13 14，这需要遍历所有行，取得第10列的QStandardItem对象，再依据角色“Qt::DisplayRole”取得对应的数据子项。由于这个数据子项的类型为QString，还需要将其转换为浮点数，最后求所有浮点数的平均值。这些操作会耗费较长的时间。</p>
-<p>###结论###<br>因此，对于数据量不是很大、对性能要求不是很高的场合，我们可以使用类QStandardItemModel来表示一个数据集。否则，用户应该从QAbstractItemModel、QAbstractListModel或者QAbstractTableModel派生新类，自行管理数据集的存放与访问。</p>
-
+            <p>﻿#Qt modbus通讯写上位#</p>
+<p>继上次PLC展厅，通过北辰网关的转Modbus功能，使用Qt写一个简单的S7-300的上位程序，可以查看正转时间，反转时间，还可以控制电机启停。</p>
+<p>##北辰网关设置##<br>北辰网关的设置可以参考这篇文章<a href="http://jingyan.baidu.com/article/afd8f4de833eea34e286e9c5.html" target="_blank" rel="external">西门子PLC实现modbusTCP通讯</a><br>我的设置如下图：<br><img src="http://img.blog.csdn.net/20170915084535034?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##UI界面##<br><img src="http://img.blog.csdn.net/20170915090942203?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##计时器的实现##<br>构造函数中<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">timer1 = <span class="keyword">new</span> QTimer(<span class="keyword">this</span>);	<span class="comment">//timer1为QTimer类型</span></div><div class="line">connect(timer1, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div><div class="line">timer1-&gt;start(<span class="number">1000</span>);</div></pre></td></tr></table></figure></p>
+<p>showTime()中</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">time=time.addSecs(<span class="number">60</span>);<span class="comment">//time为QTime类型</span></div><div class="line">QString text = time.toString(<span class="string">"hh:mm"</span>);</div><div class="line"><span class="keyword">if</span> ((time.second() % <span class="number">2</span>) == <span class="number">0</span>)</div><div class="line">       text[<span class="number">2</span>] = <span class="string">' '</span>;</div><div class="line">ui-&gt;lcdNumber-&gt;display(text);</div></pre></td></tr></table></figure>
+<p>##Modbus通讯##<br>modbus通讯可以参考我之前的文章<a href="http://blog.csdn.net/fsnaltria/article/details/75093073" target="_blank" rel="external">QModbusClient</a></p>
+<p>##QObject::sender()##<br>因为有正转时间，反转时间，停止时间三个时间需要计时</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">connect(timer1, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div><div class="line">connect(timer2, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div><div class="line">connect(timer3, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div></pre></td></tr></table></figure>
+<p>它们都连接到槽showTime();因此，需要在showTime()中判断是哪个对象发出了timeout()信号，这个是通过QObject::sender()来实现的。<br>在showTime()中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">QTimer *t=qobject_cast&lt;QTimer *&gt;(sender());</div><div class="line">if(t==timer1)</div><div class="line">       ui-&gt;lcdNumber-&gt;display(text);</div><div class="line">   else if (t==timer2)</div><div class="line">       ui-&gt;lcdNumber_2-&gt;display(text);</div><div class="line">   else</div><div class="line">       ui-&gt;lcdNumber_3-&gt;display(text);</div></pre></td></tr></table></figure>
+<p>##控制电机启停##<br>因为通过北辰的网关没有读出M区的变量，采取通过控制DB块来控制电机启停。<br>修改PLC起保停程序如下：<br><img src="http://img.blog.csdn.net/20170915093851758?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>I0.0和I0.1是通过PLC按钮启停。在Qt上位中可以向DB3.DBX0.0写入1和0来控制PLC启停。为什么是DB3，因为在北辰网关的设置中，ModbusTcp映射DB号为3</p>
+<p>##源程序##<br>mymodbus.h</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">#ifndef MYMODBUS_H</div><div class="line">#define MYMODBUS_H</div><div class="line"></div><div class="line">#include &lt;QWidget&gt;</div><div class="line">#include &lt;QLCDNumber&gt;</div><div class="line">#include &lt;QModbusDataUnit&gt;</div><div class="line">#include &lt;QTimer&gt;</div><div class="line">#include &lt;QTime&gt;</div><div class="line">#include &lt;QModbusTcpClient&gt;</div><div class="line">#include &lt;QDebug&gt;</div><div class="line"></div><div class="line">class ModbusRly;</div><div class="line">class QModbusTcpClient;</div><div class="line"></div><div class="line"></div><div class="line">namespace Ui &#123;</div><div class="line">class MyModbus;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class MyModbus : public QWidget</div><div class="line">&#123;</div><div class="line">    Q_OBJECT</div><div class="line"></div><div class="line">public:</div><div class="line">    explicit MyModbus(QWidget *parent = 0);</div><div class="line">    ~MyModbus();</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">    QModbusTcpClient *client;</div><div class="line">    QTime time;</div><div class="line">    QString entry[5];</div><div class="line">    QTimer *timer1;</div><div class="line">    QTimer *timer2;</div><div class="line">    QTimer *timer3;</div><div class="line">    Ui::MyModbus *ui;</div><div class="line"></div><div class="line">public slots:</div><div class="line">    void showTime();</div><div class="line"></div><div class="line">private slots:</div><div class="line">    void on_pushButton_clicked();</div><div class="line">    void on_pushButton_2_clicked();</div><div class="line">    void readReady();</div><div class="line">    void on_pushButton_3_clicked();</div><div class="line">    void on_pushButton_4_clicked();</div><div class="line">    void on_pushButton_5_clicked();</div><div class="line">&#125;;</div><div class="line"></div><div class="line">#endif // MYMODBUS_H</div></pre></td></tr></table></figure>
+<p>mymodbus.cpp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div></pre></td><td class="code"><pre><div class="line">#include &quot;mymodbus.h&quot;</div><div class="line">#include &quot;ui_mymodbus.h&quot;</div><div class="line"></div><div class="line">MyModbus::MyModbus(QWidget *parent) :</div><div class="line">    QWidget(parent),client(nullptr),time(QTime(0,0,0)),</div><div class="line">    ui(new Ui::MyModbus)</div><div class="line">&#123;</div><div class="line"></div><div class="line">    ui-&gt;setupUi(this);</div><div class="line">    ui-&gt;pushButton_2-&gt;setEnabled(false);</div><div class="line">    ui-&gt;pushButton_5-&gt;setEnabled(false);</div><div class="line">    ui-&gt;pushButton_3-&gt;setEnabled(false);</div><div class="line">    ui-&gt;pushButton_4-&gt;setEnabled(false);</div><div class="line">    timer1 = new QTimer(this);</div><div class="line">    timer2=new QTimer(this);</div><div class="line">    timer3=new QTimer(this);</div><div class="line">    connect(timer1, SIGNAL(timeout()), this, SLOT(showTime()));</div><div class="line">    connect(timer2, SIGNAL(timeout()), this, SLOT(showTime()));</div><div class="line">    connect(timer3, SIGNAL(timeout()), this, SLOT(showTime()));</div><div class="line">    if (ui-&gt;lineEdit-&gt;text().isEmpty())</div><div class="line">        ui-&gt;lineEdit-&gt;setText(QLatin1Literal(&quot;192.168.1.99&quot;));</div><div class="line"></div><div class="line">&#125;</div><div class="line">void MyModbus::showTime()</div><div class="line">&#123;</div><div class="line">    QTimer *t=qobject_cast&lt;QTimer *&gt;(sender());</div><div class="line">    on_pushButton_2_clicked();</div><div class="line">    time=time.addSecs(60);</div><div class="line"></div><div class="line">    QString text = time.toString(&quot;hh:mm&quot;);</div><div class="line">    if ((time.second() % 2) == 0)</div><div class="line">        text[2] = &apos; &apos;;</div><div class="line">    if(t==timer1)</div><div class="line">        ui-&gt;lcdNumber-&gt;display(text);</div><div class="line">    else if (t==timer2)</div><div class="line">        ui-&gt;lcdNumber_2-&gt;display(text);</div><div class="line">    //else</div><div class="line">      //  ui-&gt;lcdNumber_3-&gt;display(text);</div><div class="line">&#125;</div><div class="line">MyModbus::~MyModbus()</div><div class="line">&#123;</div><div class="line">    delete client;</div><div class="line">    delete ui;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_clicked()</div><div class="line">&#123;</div><div class="line">    client=new QModbusTcpClient(this);</div><div class="line">    client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter,ui-&gt;lineEdit-&gt;text());</div><div class="line">    client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);</div><div class="line">    if(!client-&gt;connectDevice())</div><div class="line">    &#123;</div><div class="line">        qDebug(&quot;failed&quot;);</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">        qDebug(&quot;successed&quot;);</div><div class="line">        ui-&gt;pushButton_2-&gt;setEnabled(true);</div><div class="line">        ui-&gt;pushButton_5-&gt;setEnabled(true);</div><div class="line">        ui-&gt;pushButton_3-&gt;setEnabled(true);</div><div class="line">        ui-&gt;pushButton_4-&gt;setEnabled(true);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_2_clicked()</div><div class="line">&#123;</div><div class="line">    if(!client)</div><div class="line">        return;</div><div class="line">    QModbusDataUnit readUnit(QModbusDataUnit::Coils, 00000, 5);</div><div class="line"></div><div class="line"></div><div class="line">    if (auto *reply = client-&gt;sendReadRequest(readUnit, 2)) // client id 255</div><div class="line">    &#123;</div><div class="line">        if (!reply-&gt;isFinished())</div><div class="line">        &#123;</div><div class="line">            // connect the finished signal of the request to your read slot</div><div class="line">            connect(reply, &amp;QModbusReply::finished, this, &amp;MyModbus::readReady);</div><div class="line"></div><div class="line">        &#125;</div><div class="line">        else</div><div class="line">        &#123;</div><div class="line">            delete reply; // broadcast replies return immediately</div><div class="line">            qDebug(&quot;delete reply&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">       qDebug(&quot;request error&quot;); // request error</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::readReady()</div><div class="line">&#123;</div><div class="line">    auto *reply = qobject_cast&lt;QModbusReply *&gt;(sender());</div><div class="line">    if (!reply)</div><div class="line">        return;</div><div class="line">    if (reply-&gt;error() == QModbusDevice::NoError) &#123;</div><div class="line">        const QModbusDataUnit unit = reply-&gt;result();</div><div class="line">        for (uint i = 0; i &lt; unit.valueCount(); i++) &#123;</div><div class="line">        entry[i] = QString::number(unit.value(i),</div><div class="line">                                          unit.registerType() &lt;= QModbusDataUnit::Coils ? 10 : 16);</div><div class="line">        qDebug()&lt;&lt;i&lt;&lt;entry[i];</div><div class="line">        &#125;</div><div class="line">     if(entry[3].toInt()==1&amp;&amp;entry[2].toInt()==1)</div><div class="line">     &#123;</div><div class="line">        timer1-&gt;start(1000);</div><div class="line">        timer2-&gt;stop();</div><div class="line">        timer3-&gt;stop();</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">     else if(entry[3].toInt()==0&amp;&amp;entry[2].toInt()==1)</div><div class="line">     &#123;</div><div class="line">        timer2-&gt;start(1000);</div><div class="line">        timer1-&gt;stop();</div><div class="line">        timer3-&gt;stop();</div><div class="line"></div><div class="line">     &#125;</div><div class="line">     else if(entry[2].toInt()==0)</div><div class="line">     &#123;</div><div class="line">         timer1-&gt;stop();</div><div class="line">         timer2-&gt;stop();</div><div class="line">         timer3-&gt;start(1000);</div><div class="line">         time.setHMS(0,0,0);</div><div class="line">     &#125;</div><div class="line"></div><div class="line"></div><div class="line">    &#125;</div><div class="line">    reply-&gt;deleteLater();</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_3_clicked()</div><div class="line">&#123;</div><div class="line">    if(!client)</div><div class="line">        return;</div><div class="line">    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 0, 1); // write 1 value in address 30000</div><div class="line">    writeUnit.setValue(0,256);</div><div class="line">    if (auto *reply = client-&gt;sendWriteRequest(writeUnit, 2))</div><div class="line">    &#123;</div><div class="line">        if (!reply-&gt;isFinished())</div><div class="line">        &#123;</div><div class="line">            connect(reply, &amp;QModbusReply::finished, this, [this, reply]()</div><div class="line">            &#123;</div><div class="line">                if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                        // error in reply</div><div class="line">                    qDebug(&quot;No Error&quot;);</div><div class="line">                    reply-&gt;deleteLater();</div><div class="line">                &#125;);</div><div class="line">        &#125;</div><div class="line">        else</div><div class="line">        &#123;</div><div class="line">            if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                // error in reply</div><div class="line">            qDebug(&quot;No Error1&quot;);</div><div class="line">            // broadcast replies return immediately</div><div class="line">            reply-&gt;deleteLater();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">        // error in request</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_4_clicked()</div><div class="line">&#123;</div><div class="line">    if(!client)</div><div class="line">        return;</div><div class="line">    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 0, 1); // write 1 value in address 30001</div><div class="line">    writeUnit.setValue(0,0);</div><div class="line">    if (auto *reply = client-&gt;sendWriteRequest(writeUnit, 2))</div><div class="line">    &#123;</div><div class="line">        if (!reply-&gt;isFinished())</div><div class="line">        &#123;</div><div class="line">            connect(reply, &amp;QModbusReply::finished, this, [this, reply]()</div><div class="line">            &#123;</div><div class="line">                if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                        // error in reply</div><div class="line">                    qDebug(&quot;No Error&quot;);</div><div class="line">                    reply-&gt;deleteLater();</div><div class="line">                &#125;);</div><div class="line">        &#125;</div><div class="line">        else</div><div class="line">        &#123;</div><div class="line">            if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                // error in reply</div><div class="line"></div><div class="line">            // broadcast replies return immediately</div><div class="line">            reply-&gt;deleteLater();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">        // error in request</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_5_clicked()</div><div class="line">&#123;</div><div class="line">     client-&gt;disconnectDevice();</div><div class="line">     ui-&gt;pushButton_5-&gt;setEnabled(false);</div><div class="line">     ui-&gt;pushButton_2-&gt;setEnabled(false);</div><div class="line">     ui-&gt;pushButton_3-&gt;setEnabled(false);</div><div class="line">     ui-&gt;pushButton_4-&gt;setEnabled(false);</div><div class="line">     timer1-&gt;stop();</div><div class="line">     timer2-&gt;stop();</div><div class="line">     timer3-&gt;stop();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>main.cpp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#include &quot;mymodbus.h&quot;</div><div class="line">#include &lt;QApplication&gt;</div><div class="line"></div><div class="line">int main(int argc, char *argv[])</div><div class="line">&#123;</div><div class="line">    QApplication a(argc, argv);</div><div class="line">    MyModbus w;</div><div class="line">    w.show();</div><div class="line"></div><div class="line">    return a.exec();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
           
         
       
@@ -2154,7 +2164,7 @@ CYCLE4=4,byteORG_DB(1,1,0)
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-count">74</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

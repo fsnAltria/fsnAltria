@@ -273,7 +273,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC展厅/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/pvbrowser如何通过Siemens tcp连接PLC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -292,7 +292,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/24/PLC展厅/" itemprop="url">PLC展厅</a></h1>
+                <a class="post-title-link" href="/2018/01/24/pvbrowser如何通过Siemens tcp连接PLC/" itemprop="url">pvbrowser如何通过Siemens tcp连接PLC</a></h1>
         
 
         <div class="post-meta">
@@ -304,7 +304,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -327,8 +327,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
+                  <a href="/categories/工控-pvbrowser/" itemprop="url" rel="index">
+                    <span itemprop="name">工控 pvbrowser</span>
                   </a>
                 </span>
 
@@ -366,477 +366,108 @@
       
         
           
-            <p>﻿#PLC展厅#</p>
-<p>最近在做数控PLC的展厅，其中PLC部分每个PLC都需要控制一个电机，要求实现正转一分钟,再反转一分钟，换向时要求暂停20S如此循环。<br>程序虽然简单，但涉及到PLC种类较多，现记录下来，以免遗忘。<br> 所有PLC控制电机都是Q0.2控制是否转，Q0.3控制正反转，Q0.0和Q0.1是正反转指示灯。</p>
-<p>##西门子 S7-300 CPU315-2DP##<br>这是第一个写的程序，其中方波函数是这样实现的：<br><img src="http://img.blog.csdn.net/20170827204310806?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br> M1.0会产生一个周期为2分钟的方波</p>
-<p>换向时先暂停再启动是这样实现的：<br><img src="http://img.blog.csdn.net/20170827204451551?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##西门子 S7-200 CPU226##<br>这个200的要求单键起停，单键起停是这样的：<br><img src="http://img.blog.csdn.net/20170830072443383?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>方波是这样的，M0.1产生周期为2分钟的方波。这个跟300是一模一样的：<br><img src="http://img.blog.csdn.net/20170830072507100?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>下面是换向时暂停的实现：<br><img src="http://img.blog.csdn.net/20170830072533494?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##西门子 200smart##<br>200smart的软件是MicroWin Smart ，它跟200的程序是一样的，虽然软件不一样，但程序可以复制粘贴，一样能用。</p>
-<p>##施耐德 M340##<br>这个CPU的编程软件是Unity Pro XL<br>这里值得一说的是它的IO地址分配，其硬件组态是这样的<br><img src="http://img.blog.csdn.net/20170830072645784?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>我们可以看到DDI1602位于1号槽，DDO1602位于2号槽，因此它的IO地址是这样表示的 %I0.1.0，%Q0.2.0，中间的表示第几个槽，后面表示第几位。<br><img src="http://img.blog.csdn.net/20170830072705643?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>其程序思路跟300是一样的<br>整个程序如下：<br><img src="http://img.blog.csdn.net/20170830072723279?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830072739989?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##三菱Q02##<br>这个CPU有个问题：</p>
+            <h1 id="pvbrowser如何通过Siemens-tcp连接PLC"><a href="#pvbrowser如何通过Siemens-tcp连接PLC" class="headerlink" title="pvbrowser如何通过Siemens tcp连接PLC"></a>pvbrowser如何通过Siemens tcp连接PLC</h1><hr>
+<p>pvbrowser是一款德国的基于Qt的开源组态软件。尽管市场中用的很少，我们还是可以通过看其源码学习很多东西。</p>
+<p>pvbrowser里有两种方式通过Simens tcp与PLC通讯:Daemon与pvbaddon.</p>
+<p>##Daemon</p>
+<p>###通过Daemon生成EXE文件<br>打开pvdevelop，选择<em>菜单栏-&gt;daemon-&gt;Siemens Tcp</em></p>
+<pre><code>shared_memory=C:\\automation\\shm\\siemens.shm
+mailbox=C:\\automation\\mbx\\siemens.mbx
+# type := S7_200 | S7_300 | S7_400 | S5 | S7_1200 | LOGO
+slave=0 adr=192.168.1.99 type=S7_1200 fetch_write=0 function=1 rack_slot=0
+idletime=50 milliseconds
+#eventlog host=localhost port=6000
+# ORG := ORG_DB | ORG_M | ORG_E | ORG_A | ORG_PEPA | ORG_Z | ORG_T
+# cycle := slave + org + dbnum + start + len
+cycle1 slave=0 org=ORG_E  dbnum=0 start=0 len=1
+cycle2 slave=0 org=ORG_A  dbnum=0 start=0 len=1
+</code></pre><p>这里面有以下几个需要注意的点:</p>
 <ol>
-<li>写完程序后，需要将“RESET/L.CLR”开关拨到RESET复位未知，执行复位操作之后，一定要将这个开关拨到中间位置</li>
-<li>复位后，将“STOP/RUN”开关拨到RUN位置，此时PLC“MODE”灯“RUN”状态指示灯常亮，PLC开始执行任务。</li>
+<li>shared memory和mailbox的文件路径是需要自己建的，这个软件不会给你建。<br>Note that these directories must be created first by you. Note that the size of the shared memory must be equal in the daemon and in the pvserver.<br>2.关于 fetch_write的设定<br>fetch_write=1为fetch/write服务,fetch_write=0为S7连接。<br>(1) There is the old Fetch/Write protocol from the old S5 PLC<br>(fetch_write=1).Fetch/Write只支持S5和300，400系列.<br>(2) And there is the current Siemens PLC protocol introduced with the S7 series of PLC (fetch_write=0).</li>
+<li>FUNCTION    := optional parameter for PLC (1=PG,2=OP,3=Step7Basic)<br>经验证123均可连通。</li>
+<li>经验证，rack_slot这个值设随机值都能通</li>
+<li>ORG_E指的是Eingang(输入)，ORG_A指的是Ausgang(输出)，ORG_M是Merker(这个单词没查到，经验证是M区)，ORG_DB是Datenbaustein(DB区).此外还有ORG_PEPA指的是Peripheral(外围设备) Area R/W ，ORG_Z意思是Zaehler(计数器),ORG_T意思是Timer(计时器)<br>设置好以后点compile，然后点close.<br>这时，项目文件夹下会生成siemensdaemon.cpp,siemensdaemon.h,siemensdaemon.exe和siemensdaemon.mksimens四个文件<br>运行siemensdaemon.exe文件，数据就从PLC里面读取到共享内存里了(可能会遇到缺少*.dll文件，在pvbrowser安装目录里找到对应的文件放进项目文件即可)。<br>###如何进行调试<br>当我们遇到连接不通的时候怎么办呢，因为是pvbrowser是基于Qt的，我们可以通过Qt对其进行调试。</li>
+<li>新建空Qt控制台项目，添加Deamon生成的siemensdaemon.h和siemensdaemon.cpp文件。并将缺少的头文件放到目录里，这些头文件可以在pvb安装目录底下找到。</li>
+<li><p>在该项目的makefile里添加</p>
+<p> win32-g++ {<br> QMAKE_LFLAGS      += -static-libgcc<br> win32:LIBS        += $(PVBDIR)/win-mingw/bin/libserverlib.a<br> win32:LIBS        += $(PVBDIR)/win-mingw/bin/librllib.a<br> win32:LIBS        += -lws2_32 -ladvapi32 -lpthread<br> win32:INCLUDEPATH += $(PVBDIR)/pvserver<br> win32:INCLUDEPATH += $(PVBDIR)/rllib/lib<br> }</p>
+</li>
 </ol>
-<p>再回到写程序上，三菱本来也想用上面的套路，但是三菱没有断开延时继电器，思路不变，但是需要换一种更通用的实现方法</p>
-<p>方波函数的实现：<br><img src="http://img.blog.csdn.net/20170830072756677?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>M1输出周期为2分钟的方波函数<br><img src="http://img.blog.csdn.net/20170830072821477?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>这里使用了置位复位实现了跟S7-300这个地方一样的逻辑，虽然复杂，但更加通用。<br>因为这个三菱的程序都是使用基本指令实现的，所以可以移植到别的更老的PLC上。</p>
-<p>##欧姆龙 C200HE##<br>欧姆龙的编程软件为CX-ONE<br><img src="http://img.blog.csdn.net/20170830074540388?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830074604040?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830074622662?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830074637543?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##欧姆龙CJ2G##<br>软件和程序同上</p>
-<p>##AB NX700 CPU750B##<br>这里有个坑，如果你去搜索，几乎所有的回答都说NX700使用的软件是WINGPC，但你使用这个软件虽然能找到NX700系列，但是却没有750B这个CPU。因为NX700有两个软件750B使用的是WINFPST 2（顺便一提，这个软件跟下面松下的软件基本一模一样，而且可以使用这个软件连接松下的PLC，反之亦然）<br>这里要先分配IO单元：<br><img src="http://img.blog.csdn.net/20170830075638827?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>这里的槽1是输入，槽3是输出。其地址与底下的“W几”。例如这里的槽1输入第一个点地址为X20<br>程序如下：<br><img src="http://img.blog.csdn.net/20170830080027142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##松下CPU02##<br>松下的软件是FPWIN GR2 ，正如上面所说，这个跟上面AB的非常像<br>使用方法<br>程序找不到了，反正跟上面差不多</p>
-<p>##安川MP920 CPU02##<br>安川MP900系列的编程软件是MPE720 V5的版本，其中V5.61可以装在win7，这个软件网上基本已经找不到了，我还是在淘宝上买了一个。<br>安川现在都是MPE720 V7了，从V6开始就不支持MP900系列了。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/Qt modbus通讯写上位/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/Qt modbus通讯写上位/" itemprop="url">Qt modbus通讯写上位</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index">
-                    <span itemprop="name">Qt</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿#Qt modbus通讯写上位#</p>
-<p>继上次PLC展厅，通过北辰网关的转Modbus功能，使用Qt写一个简单的S7-300的上位程序，可以查看正转时间，反转时间，还可以控制电机启停。</p>
-<p>##北辰网关设置##<br>北辰网关的设置可以参考这篇文章<a href="http://jingyan.baidu.com/article/afd8f4de833eea34e286e9c5.html" target="_blank" rel="external">西门子PLC实现modbusTCP通讯</a><br>我的设置如下图：<br><img src="http://img.blog.csdn.net/20170915084535034?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##UI界面##<br><img src="http://img.blog.csdn.net/20170915090942203?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p>##计时器的实现##<br>构造函数中<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">timer1 = <span class="keyword">new</span> QTimer(<span class="keyword">this</span>);	<span class="comment">//timer1为QTimer类型</span></div><div class="line">connect(timer1, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div><div class="line">timer1-&gt;start(<span class="number">1000</span>);</div></pre></td></tr></table></figure></p>
-<p>showTime()中</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">time=time.addSecs(<span class="number">60</span>);<span class="comment">//time为QTime类型</span></div><div class="line">QString text = time.toString(<span class="string">"hh:mm"</span>);</div><div class="line"><span class="keyword">if</span> ((time.second() % <span class="number">2</span>) == <span class="number">0</span>)</div><div class="line">       text[<span class="number">2</span>] = <span class="string">' '</span>;</div><div class="line">ui-&gt;lcdNumber-&gt;display(text);</div></pre></td></tr></table></figure>
-<p>##Modbus通讯##<br>modbus通讯可以参考我之前的文章<a href="http://blog.csdn.net/fsnaltria/article/details/75093073" target="_blank" rel="external">QModbusClient</a></p>
-<p>##QObject::sender()##<br>因为有正转时间，反转时间，停止时间三个时间需要计时</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">connect(timer1, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div><div class="line">connect(timer2, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div><div class="line">connect(timer3, SIGNAL(timeout()), <span class="keyword">this</span>, SLOT(showTime()));</div></pre></td></tr></table></figure>
-<p>它们都连接到槽showTime();因此，需要在showTime()中判断是哪个对象发出了timeout()信号，这个是通过QObject::sender()来实现的。<br>在showTime()中</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">QTimer *t=qobject_cast&lt;QTimer *&gt;(sender());</div><div class="line">if(t==timer1)</div><div class="line">       ui-&gt;lcdNumber-&gt;display(text);</div><div class="line">   else if (t==timer2)</div><div class="line">       ui-&gt;lcdNumber_2-&gt;display(text);</div><div class="line">   else</div><div class="line">       ui-&gt;lcdNumber_3-&gt;display(text);</div></pre></td></tr></table></figure>
-<p>##控制电机启停##<br>因为通过北辰的网关没有读出M区的变量，采取通过控制DB块来控制电机启停。<br>修改PLC起保停程序如下：<br><img src="http://img.blog.csdn.net/20170915093851758?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>I0.0和I0.1是通过PLC按钮启停。在Qt上位中可以向DB3.DBX0.0写入1和0来控制PLC启停。为什么是DB3，因为在北辰网关的设置中，ModbusTcp映射DB号为3</p>
-<p>##源程序##<br>mymodbus.h</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">#ifndef MYMODBUS_H</div><div class="line">#define MYMODBUS_H</div><div class="line"></div><div class="line">#include &lt;QWidget&gt;</div><div class="line">#include &lt;QLCDNumber&gt;</div><div class="line">#include &lt;QModbusDataUnit&gt;</div><div class="line">#include &lt;QTimer&gt;</div><div class="line">#include &lt;QTime&gt;</div><div class="line">#include &lt;QModbusTcpClient&gt;</div><div class="line">#include &lt;QDebug&gt;</div><div class="line"></div><div class="line">class ModbusRly;</div><div class="line">class QModbusTcpClient;</div><div class="line"></div><div class="line"></div><div class="line">namespace Ui &#123;</div><div class="line">class MyModbus;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class MyModbus : public QWidget</div><div class="line">&#123;</div><div class="line">    Q_OBJECT</div><div class="line"></div><div class="line">public:</div><div class="line">    explicit MyModbus(QWidget *parent = 0);</div><div class="line">    ~MyModbus();</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">    QModbusTcpClient *client;</div><div class="line">    QTime time;</div><div class="line">    QString entry[5];</div><div class="line">    QTimer *timer1;</div><div class="line">    QTimer *timer2;</div><div class="line">    QTimer *timer3;</div><div class="line">    Ui::MyModbus *ui;</div><div class="line"></div><div class="line">public slots:</div><div class="line">    void showTime();</div><div class="line"></div><div class="line">private slots:</div><div class="line">    void on_pushButton_clicked();</div><div class="line">    void on_pushButton_2_clicked();</div><div class="line">    void readReady();</div><div class="line">    void on_pushButton_3_clicked();</div><div class="line">    void on_pushButton_4_clicked();</div><div class="line">    void on_pushButton_5_clicked();</div><div class="line">&#125;;</div><div class="line"></div><div class="line">#endif // MYMODBUS_H</div></pre></td></tr></table></figure>
-<p>mymodbus.cpp</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div></pre></td><td class="code"><pre><div class="line">#include &quot;mymodbus.h&quot;</div><div class="line">#include &quot;ui_mymodbus.h&quot;</div><div class="line"></div><div class="line">MyModbus::MyModbus(QWidget *parent) :</div><div class="line">    QWidget(parent),client(nullptr),time(QTime(0,0,0)),</div><div class="line">    ui(new Ui::MyModbus)</div><div class="line">&#123;</div><div class="line"></div><div class="line">    ui-&gt;setupUi(this);</div><div class="line">    ui-&gt;pushButton_2-&gt;setEnabled(false);</div><div class="line">    ui-&gt;pushButton_5-&gt;setEnabled(false);</div><div class="line">    ui-&gt;pushButton_3-&gt;setEnabled(false);</div><div class="line">    ui-&gt;pushButton_4-&gt;setEnabled(false);</div><div class="line">    timer1 = new QTimer(this);</div><div class="line">    timer2=new QTimer(this);</div><div class="line">    timer3=new QTimer(this);</div><div class="line">    connect(timer1, SIGNAL(timeout()), this, SLOT(showTime()));</div><div class="line">    connect(timer2, SIGNAL(timeout()), this, SLOT(showTime()));</div><div class="line">    connect(timer3, SIGNAL(timeout()), this, SLOT(showTime()));</div><div class="line">    if (ui-&gt;lineEdit-&gt;text().isEmpty())</div><div class="line">        ui-&gt;lineEdit-&gt;setText(QLatin1Literal(&quot;192.168.1.99&quot;));</div><div class="line"></div><div class="line">&#125;</div><div class="line">void MyModbus::showTime()</div><div class="line">&#123;</div><div class="line">    QTimer *t=qobject_cast&lt;QTimer *&gt;(sender());</div><div class="line">    on_pushButton_2_clicked();</div><div class="line">    time=time.addSecs(60);</div><div class="line"></div><div class="line">    QString text = time.toString(&quot;hh:mm&quot;);</div><div class="line">    if ((time.second() % 2) == 0)</div><div class="line">        text[2] = &apos; &apos;;</div><div class="line">    if(t==timer1)</div><div class="line">        ui-&gt;lcdNumber-&gt;display(text);</div><div class="line">    else if (t==timer2)</div><div class="line">        ui-&gt;lcdNumber_2-&gt;display(text);</div><div class="line">    //else</div><div class="line">      //  ui-&gt;lcdNumber_3-&gt;display(text);</div><div class="line">&#125;</div><div class="line">MyModbus::~MyModbus()</div><div class="line">&#123;</div><div class="line">    delete client;</div><div class="line">    delete ui;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_clicked()</div><div class="line">&#123;</div><div class="line">    client=new QModbusTcpClient(this);</div><div class="line">    client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter,ui-&gt;lineEdit-&gt;text());</div><div class="line">    client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);</div><div class="line">    if(!client-&gt;connectDevice())</div><div class="line">    &#123;</div><div class="line">        qDebug(&quot;failed&quot;);</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">        qDebug(&quot;successed&quot;);</div><div class="line">        ui-&gt;pushButton_2-&gt;setEnabled(true);</div><div class="line">        ui-&gt;pushButton_5-&gt;setEnabled(true);</div><div class="line">        ui-&gt;pushButton_3-&gt;setEnabled(true);</div><div class="line">        ui-&gt;pushButton_4-&gt;setEnabled(true);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_2_clicked()</div><div class="line">&#123;</div><div class="line">    if(!client)</div><div class="line">        return;</div><div class="line">    QModbusDataUnit readUnit(QModbusDataUnit::Coils, 00000, 5);</div><div class="line"></div><div class="line"></div><div class="line">    if (auto *reply = client-&gt;sendReadRequest(readUnit, 2)) // client id 255</div><div class="line">    &#123;</div><div class="line">        if (!reply-&gt;isFinished())</div><div class="line">        &#123;</div><div class="line">            // connect the finished signal of the request to your read slot</div><div class="line">            connect(reply, &amp;QModbusReply::finished, this, &amp;MyModbus::readReady);</div><div class="line"></div><div class="line">        &#125;</div><div class="line">        else</div><div class="line">        &#123;</div><div class="line">            delete reply; // broadcast replies return immediately</div><div class="line">            qDebug(&quot;delete reply&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">       qDebug(&quot;request error&quot;); // request error</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::readReady()</div><div class="line">&#123;</div><div class="line">    auto *reply = qobject_cast&lt;QModbusReply *&gt;(sender());</div><div class="line">    if (!reply)</div><div class="line">        return;</div><div class="line">    if (reply-&gt;error() == QModbusDevice::NoError) &#123;</div><div class="line">        const QModbusDataUnit unit = reply-&gt;result();</div><div class="line">        for (uint i = 0; i &lt; unit.valueCount(); i++) &#123;</div><div class="line">        entry[i] = QString::number(unit.value(i),</div><div class="line">                                          unit.registerType() &lt;= QModbusDataUnit::Coils ? 10 : 16);</div><div class="line">        qDebug()&lt;&lt;i&lt;&lt;entry[i];</div><div class="line">        &#125;</div><div class="line">     if(entry[3].toInt()==1&amp;&amp;entry[2].toInt()==1)</div><div class="line">     &#123;</div><div class="line">        timer1-&gt;start(1000);</div><div class="line">        timer2-&gt;stop();</div><div class="line">        timer3-&gt;stop();</div><div class="line"></div><div class="line">     &#125;</div><div class="line"></div><div class="line">     else if(entry[3].toInt()==0&amp;&amp;entry[2].toInt()==1)</div><div class="line">     &#123;</div><div class="line">        timer2-&gt;start(1000);</div><div class="line">        timer1-&gt;stop();</div><div class="line">        timer3-&gt;stop();</div><div class="line"></div><div class="line">     &#125;</div><div class="line">     else if(entry[2].toInt()==0)</div><div class="line">     &#123;</div><div class="line">         timer1-&gt;stop();</div><div class="line">         timer2-&gt;stop();</div><div class="line">         timer3-&gt;start(1000);</div><div class="line">         time.setHMS(0,0,0);</div><div class="line">     &#125;</div><div class="line"></div><div class="line"></div><div class="line">    &#125;</div><div class="line">    reply-&gt;deleteLater();</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_3_clicked()</div><div class="line">&#123;</div><div class="line">    if(!client)</div><div class="line">        return;</div><div class="line">    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 0, 1); // write 1 value in address 30000</div><div class="line">    writeUnit.setValue(0,256);</div><div class="line">    if (auto *reply = client-&gt;sendWriteRequest(writeUnit, 2))</div><div class="line">    &#123;</div><div class="line">        if (!reply-&gt;isFinished())</div><div class="line">        &#123;</div><div class="line">            connect(reply, &amp;QModbusReply::finished, this, [this, reply]()</div><div class="line">            &#123;</div><div class="line">                if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                        // error in reply</div><div class="line">                    qDebug(&quot;No Error&quot;);</div><div class="line">                    reply-&gt;deleteLater();</div><div class="line">                &#125;);</div><div class="line">        &#125;</div><div class="line">        else</div><div class="line">        &#123;</div><div class="line">            if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                // error in reply</div><div class="line">            qDebug(&quot;No Error1&quot;);</div><div class="line">            // broadcast replies return immediately</div><div class="line">            reply-&gt;deleteLater();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">        // error in request</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_4_clicked()</div><div class="line">&#123;</div><div class="line">    if(!client)</div><div class="line">        return;</div><div class="line">    QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 0, 1); // write 1 value in address 30001</div><div class="line">    writeUnit.setValue(0,0);</div><div class="line">    if (auto *reply = client-&gt;sendWriteRequest(writeUnit, 2))</div><div class="line">    &#123;</div><div class="line">        if (!reply-&gt;isFinished())</div><div class="line">        &#123;</div><div class="line">            connect(reply, &amp;QModbusReply::finished, this, [this, reply]()</div><div class="line">            &#123;</div><div class="line">                if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                        // error in reply</div><div class="line">                    qDebug(&quot;No Error&quot;);</div><div class="line">                    reply-&gt;deleteLater();</div><div class="line">                &#125;);</div><div class="line">        &#125;</div><div class="line">        else</div><div class="line">        &#123;</div><div class="line">            if (reply-&gt;error() != QModbusDevice::NoError)</div><div class="line">                // error in reply</div><div class="line"></div><div class="line">            // broadcast replies return immediately</div><div class="line">            reply-&gt;deleteLater();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else</div><div class="line">    &#123;</div><div class="line">        // error in request</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void MyModbus::on_pushButton_5_clicked()</div><div class="line">&#123;</div><div class="line">     client-&gt;disconnectDevice();</div><div class="line">     ui-&gt;pushButton_5-&gt;setEnabled(false);</div><div class="line">     ui-&gt;pushButton_2-&gt;setEnabled(false);</div><div class="line">     ui-&gt;pushButton_3-&gt;setEnabled(false);</div><div class="line">     ui-&gt;pushButton_4-&gt;setEnabled(false);</div><div class="line">     timer1-&gt;stop();</div><div class="line">     timer2-&gt;stop();</div><div class="line">     timer3-&gt;stop();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>main.cpp</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#include &quot;mymodbus.h&quot;</div><div class="line">#include &lt;QApplication&gt;</div><div class="line"></div><div class="line">int main(int argc, char *argv[])</div><div class="line">&#123;</div><div class="line">    QApplication a(argc, argv);</div><div class="line">    MyModbus w;</div><div class="line">    w.show();</div><div class="line"></div><div class="line">    return a.exec();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC单按钮起停例程/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/PLC单按钮起停例程/" itemprop="url">PLC单按钮起停例程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿#PLC单按钮起停例程#</p>
-<p><img src="http://img.blog.csdn.net/20170720154348350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC基本知识（一）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/PLC基本知识（一）/" itemprop="url">PLC基本知识（一）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿#PLC基本知识（一）#</p>
-<p>##数字IO模块的源型与漏型##<br>源型（source），电流是从端子流出来的，具有PNP晶体管的输出特性.<br>漏极（sink），电流是从段子流进去的，具有NPN晶体管的输出特性.</p>
-<p>从使用上来说，NPN三极管工作时是集电极接高电压，发射极接低电压，基极输入电压升高时趋向导通，基极输入电压降低时趋向截止；而PNP三极管工作时则是集电极接低电压，发射极接高电压，基极输入电压升高时趋向截止，基极输入电压降低时趋向导通。</p>
-<p>所谓漏极输入，是一种有PLC内部提供输入信号源，全部输入信号的一端汇总到输入的公共连接端COM的输入形式，又称为汇点输入。输入传感器为接近开关时，只要接近开关的输出驱动力足够，漏型输入的PLC输入端就可以直接与NPN集电极开路型接近开关的输出进行连接。</p>
-<p>所谓源型输入，是一种由外部提供输入信号电源或使用PLC内部提供给输入回路的电源，全部输入信号为”有源”信号，并独立输入PLC的输入连接形式。输入传感器为接近开关时，只要接近开关的输出驱动力足够，源型输入的PLC输入端就可以直接与PNP集电极开路型接近开关的输出进行连接。</p>
-<p>欧美的PLC一般是源型，输入一般用PNP的开关，高电平输入,而日韩系列PLC偏好使用漏型，一般使用NPN型的开关也就是低电平输入。</p>
-<p>源型输出是指输出的是直流正极，漏型输出指的是直流负极。</p>
-<p>漏型输入，即NPN晶体管，当逻辑状态为1（真）时，信号为24V，当逻辑状态为0（假）时，信号为0V。<br>源型输入，即PNP晶体管，当逻辑状态为1（真）时，信号为0V，当逻辑状态为0（假）时，信号为24V。</p>
+<p>这样项目就建好了，可以进行更改调试。</p>
+<p>##pvbaddon<br>可以在pvbrowser下载pvbaddon<br>在pvbaddon\pvbaddon\daemons\siemenstcp\client\release目录下有siemenstcp_client.exe 文件，需要配合ini文件使用。<br>example.ini</p>
+<pre><code># ini file for siemenstcp_client
+#
+# DEBUG       := 1 | 0
+# SLAVE&lt;N&gt;    := IP,PLC_TYPE,FETCH_WRITE,FUNCTION,RACK_SLOT
+# PLC_TYPE    := ANY | S7_200 | S7_300 | S7_400 | S5 | S7_1200 | LOGO
+# FETCH_WRITE := 1 | 0 # default 1
+# FUNCTION    := optional parameter for PLC (1=PG,2=OP,3=Step7Basic)
+# RACK_SLOT   := optional parameter for PLC  Byte(upper_3_bit_is_rack / lower_5_bit_is_slot)
+# CYCLE&lt;N&gt;    := &lt;count&gt;,&lt;name&gt;
+# name        := byte&lt;ORG&gt;(slave,dbnum,adr)   | 
+#                float&lt;ORG&gt;(slave,dbnum,adr)  |
+#                dword&lt;ORG&gt;(slave,dbnum,adr)  |
+#                short&lt;ORG&gt;(slave,dbnum,adr)  |
+#                udword&lt;ORG&gt;(slave,dbnum,adr) |
+#                ushort&lt;ORG&gt;(slave,dbnum,adr)
+# ORG         := ORG_DB | ORG_M | ORG_E | ORG_A | ORG_PEPA | ORG_Z | ORG_T
+# HAVETO_SWAP := 1 | 0 # must be 1 on intel machines
+# CYCLETIME in milliseconds
+# SHARED_MEMORY_SIZE must be equal to SHARED_MEMORY_SIZE of pvserver
+# MAX_NAME_LENGTH is maximum length of variable name in shared memory 
+#
+
+[GLOBAL]
+DEBUG=1
+CYCLETIME=1000
+HAVETO_SWAP=1
+
+[SOCKET]
+NUM_SLAVES=1
+SLAVE1=192.168.1.101,ANY,0
+#SLAVE2=192.168.1.35,S7_200,0,1,2
+
+# You may also specify the TSAPs explicitly.
+# In that case the PLC_TYPE does not care. Use ANY.
+[SLAVE1_CONNECT_BLOCK]
+#S7-200
+CB13=&apos;M&apos; # remote TSAP        (not necessary to set explicitly)
+CB14=&apos;W&apos; # remote TSAP        (not necessary to set explicitly)
+CB17=&apos;M&apos; # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+CB18=&apos;W&apos; # local  TSAP slot 1 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+#S7-300
+#CB13=2 # remote TSAP        (not necessary to set explicitly)
+#CB14=1 # remote TSAP        (not necessary to set explicitly)
+#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+#CB18=2 # local  TSAP slot 2 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+#S7-400
+#CB13=2 # remote TSAP        (not necessary to set explicitly)
+#CB14=1 # remote TSAP        (not necessary to set explicitly)
+#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+#CB18=3 # local  TSAP slot 3 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+#S7-1200
+#CB13=2 # remote TSAP        (not necessary to set explicitly)
+#CB14=1 # remote TSAP        (not necessary to set explicitly)
+#CB17=1 # local  TSAP PG     (1=PG,2=OP,3=Step7Basic)
+#CB18=0 # local  TSAP slot 0 (upper_3_bit_is_rack / lower_5_bit_is_slot)
+
+[RLLIB]
+MAX_NAME_LENGTH=30
+SHARED_MEMORY=/srv/automation/shm/siemenstcp1.shm
+SHARED_MEMORY_SIZE=65536
+MAILBOX=/srv/automation/mbx/siemenstcp1.mbx
+
+[CYCLES]
+NUM_CYCLES=4
+CYCLE1=10,byteORG_M(1,0,0)
+CYCLE2=4,byteORG_E(1,0,0)
+CYCLE3=4,byteORG_A(1,0,0)
+CYCLE4=4,byteORG_DB(1,1,0)
+#CYCLE2=1,byteORG_M(2,2,3)
+</code></pre><p>这里我没有做更改，更改的话与Deamon需要注意的地方相同。<br>打开cmd cd到该目录下运行</p>
+<pre><code>siemenstcp_client.exe example.ini
+</code></pre><p>数据就到mailbox里面了</p>
+<p>调试的话，里面有Qt项目文件可以直接打开</p>
+<p>这样PLC数据就读取到shared memory或mailbox里了，可以进行后期的上位编程。</p>
 
           
         
@@ -916,7 +547,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1049,6 +680,468 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/QStandardItemModel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/QStandardItemModel/" itemprop="url">QStandardItemModel</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index">
+                    <span itemprop="name">Qt</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#QStandardItemModel#</p>
+<p>以下内容摘自 《t中的C++技术》</p>
+<p>##基本知识##<br>类QabstractItemModel，QabstractListModel，QAbstractTableModel不保存数据，用户需要从这些类派生出子类，并在子类中定义某种数据结构来保存数据。与此不同，类QStandardItemModel负责保存数据，每个数据项被表示为类QStandardItem的对象。<br><strong>QStandardItem用来保存一个数据项，再使用QStandardItemModel将这些数据项组织起来，形成列表、表格或者树，以供其他视图类显示。</strong><br>一个数据项由若干个『角色，数据子项』对组成。类QStandardItem负责保存、访问这些数据。该类的内部定义了一个类型为QVector的容器，每个容器元素本质上存放一个『角色，数据子项』对。<br>由于各个角色对应的数据子项可能具有不同的类型，Qt使用QVariant来存放每个数据子项。当用户希望将一些数据存放在一个QStandardItem对象中时，可以调用其成员函数：<br>void setData ( const QVariant &amp; value, int role)<br>将『role, value』对存入。<br>当用户希望读取该对象中的数据时，可以调用另外一个成员函数：</p>
+<p>QVariant data ( int role = ) const</p>
+<p>读取角色role对应的数据子项。</p>
+<p>以上两个函数是QStandardItem的核心。<strong>有了这两个函数，我们就可以访问该类所表示数据项的任何一个『角色，数据子项』对。然而，对于一些常用角色，该类提供了更加简洁、容易记忆的成员函数。</strong>例如，当一个数据项被显示在视图中时，它往往包含一些文字、一个图标，还可能包含一个复选框。角色Qt::BackgroundRole控制显示背景，Qt::FontRole控制文字字体，Qt::ForegroundRole控制文字颜色，Qt::CheckStateRole控制复选框的状态。该类提供的一组成员函数可以方便地访问这些常用角色对应的数据子项。成员函数setBackground()、background()分别设置/返回背景刷子。函数setFont()、font()分别设置/返回文字字体。函数setForeground()、foreground()分别设置/返回字体颜色。函数setCheckState()、checkState()分别设置/返回复选框状态。</p>
+<p>##如果数据集被表示为一个列表##<br>如果数据集被表示为一个列表，我们可以调用类QStandardItemModel的成员函数<strong>appendRow()</strong>向列表中添加一个数据项，使用<strong>item()</strong>读取一个数据项,代码如下:</p>
+<figure class="highlight qt"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel listModel;</div><div class="line">QStandardItem *rootItem = listModel.invisibleRootItem(); <span class="comment">//获取模型最底层的根节点         </span></div><div class="line"><span class="keyword">for</span> (<span class="built_in">int</span> row = <span class="number">0</span>; row &lt; <span class="number">4</span>; ++row) &#123;</div><div class="line"> QStandardItem *item = <span class="keyword">new</span> QStandardItem(QString(<span class="string">"%0"</span>).arg(row) );<span class="comment">//表示一个数据项，构造函数在内部调用该类的setData()函数，将QString对象作为Qt::DisplayRole对应的数据子项存入新构造的对象</span></div><div class="line"> rootItem-&gt;appendRow( item );  <span class="comment">//将该数据项作为根节点的子节点添加到列表中。</span></div><div class="line">&#125; </div><div class="line">QListView listView;<span class="comment">//因为数据集本身是一个列表，所以使用QListView展示</span></div><div class="line">listView.setModel ( &amp; listModel );</div></pre></td></tr></table></figure>
+<p><strong>QStandardItem(QString(“%0”).arg(row) );这句话的构造函数在内部调用该类的setData()函数，将QString对象作为Qt::DisplayRole对应的数据子项存入新构造的对象（终于找到哪调用的setData()函数了）</strong></p>
+<p>##如果数据集被表示为一个表格##<br>如果数据集被表示为一个表格，可以调用类QStandardItemModel的成员函数<strong>setItem()</strong>设定表格中的某个数据项,代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel tableModel(4, 4);</div><div class="line"> for (int row = 0; row &lt; 4; ++row) &#123;</div><div class="line">   for (int column = 0; column &lt; 4; ++column) &#123;</div><div class="line">    QStandardItem *item = new QStandardItem(</div><div class="line">     QString(&quot;%0,%1&quot;).arg(row).arg(column));</div><div class="line">    tableModel.setItem(row, column, item);</div><div class="line">   &#125;</div><div class="line"> &#125; </div><div class="line"> QTableView tableView;//因为数据集是个表格，所以使用QTableView</div><div class="line"> tableView.setModel( &amp; tableModel );</div></pre></td></tr></table></figure>
+<p>##如果数据集被表示为一个树##<br>如果数据集被表示为一个树，可以调用类QStandardItemModel的成员函数appendRow()向某个树节点添加子节点。通过多次调用该函数，可以构建一棵复杂的树。代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel treeModel;</div><div class="line">QStandardItem *parentItem = treeModel.invisibleRootItem();</div><div class="line">for (int i = 0; i &lt; 4; ++i) &#123;</div><div class="line"> QStandardItem *item = new QStandardItem(QString(&quot;%0&quot;).arg(i));</div><div class="line"> parentItem-&gt;appendRow(item);</div><div class="line"> parentItem = item;</div><div class="line">&#125;</div><div class="line">QTreeView treeView;//由于数据集是一棵树，我们使用QTreeView显示它</div><div class="line">treeView.setModel( &amp; treeModel );</div></pre></td></tr></table></figure>
+<p>##总结##<br>类QStandardItemModel之所以能够表示列表、表格、树甚至更复杂的数据结构，得益于类QStandardItem在其内部定义了一个类型为QVector<code>&lt;</code>QStandardItem*<code>&gt;</code>的容器，可以将每个容器元素所指的QStandardItem对象设定为子对象。表现在如下图所示的类图上，类QStandardItem和自身具有“children”关系。一个类和自身发生关联，在UML中被称为自关联（self association）。类QStandardItemModel定义了一个名为root的数据成员，逻辑上是一个指向QStandardItem对象的指针。这个对象可以设定多个QStandardItem的对象作为自己的子对象，而其中每个子对象又可以包含其他的子对象。依此类推，这棵树可以具有任意深度，每个父对象可以包含任意多个子对象。<img src="http://img.blog.csdn.net/20170721213157481?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="类QStandardItem使用自关联以形成层次结构"><br>很自然地，QStandardItemModel可以使用QStandardItem表示具有树状数据结构的数据集，如图13 14所示。图中的每个小方框表示类QStandardItem的一个对象。如果小方框的边线为虚，相应的QStandardItem对象并不表示数据集中的任何数据，仅被用来表示某种数据结构。如果小方框的边线为实，相应的QStandardItem对象就表示数据集中的一个数据项。在右侧的图中，QStandardItemModel的数据成员root所指的对象表示一个不可见的根，而数据集的根（图中结点G）被表示为这个不可见根的一个子节点。<br><img src="http://img.blog.csdn.net/20170721213942624?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="类QStandardItem使用自关联形成列表、表格与树"><br>列表被看作一个特殊的树：不可见根具有若干个子节点，每个子节点表示列表中的一个数据项，不再包含任何子节点，如该图左侧所示。而表格的表示方式反而麻烦一些。不可见根含有若干子节点（图中A，B，C），这些子节点并不表示数据集中的任何数据项。第i个子节点会包含若干子节点（比如图中D，E，F），这些子节点才表示表格第i行的数据项。</p>
+<p>###优点###<br>使用QStandardItemModel表示数据集具有以下优点：该类使用QStandardItem存放数据项，用户不必定义任何数据结构来存放数据项；QStandardItem使用自关联关系，能够表达列表、表格、树甚至更复杂的数据结构，能够涵盖各种各样的数据集；QStandardItem本身存放着多个『角色，数据子项』，视图类、委托类或者其他用户定义的类能够方便地依据角色访问各个数据子项。</p>
+<p>###缺点###<br>然而，这种表示方法也有局限性：当数据集中的数据项很多时，施加在数据集上的某些操作的执行效率会很低。比如，设数据集是一个1万行、20列的表格，其中第10列存放的是浮点数。如果我们想计算这一列的平均值，按照图13 14，这需要遍历所有行，取得第10列的QStandardItem对象，再依据角色“Qt::DisplayRole”取得对应的数据子项。由于这个数据子项的类型为QString，还需要将其转换为浮点数，最后求所有浮点数的平均值。这些操作会耗费较长的时间。</p>
+<p>###结论###<br>因此，对于数据量不是很大、对性能要求不是很高的场合，我们可以使用类QStandardItemModel来表示一个数据集。否则，用户应该从QAbstractItemModel、QAbstractListModel或者QAbstractTableModel派生新类，自行管理数据集的存放与访问。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC展厅/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/PLC展厅/" itemprop="url">PLC展厅</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#PLC展厅#</p>
+<p>最近在做数控PLC的展厅，其中PLC部分每个PLC都需要控制一个电机，要求实现正转一分钟,再反转一分钟，换向时要求暂停20S如此循环。<br>程序虽然简单，但涉及到PLC种类较多，现记录下来，以免遗忘。<br> 所有PLC控制电机都是Q0.2控制是否转，Q0.3控制正反转，Q0.0和Q0.1是正反转指示灯。</p>
+<p>##西门子 S7-300 CPU315-2DP##<br>这是第一个写的程序，其中方波函数是这样实现的：<br><img src="http://img.blog.csdn.net/20170827204310806?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br> M1.0会产生一个周期为2分钟的方波</p>
+<p>换向时先暂停再启动是这样实现的：<br><img src="http://img.blog.csdn.net/20170827204451551?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##西门子 S7-200 CPU226##<br>这个200的要求单键起停，单键起停是这样的：<br><img src="http://img.blog.csdn.net/20170830072443383?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>方波是这样的，M0.1产生周期为2分钟的方波。这个跟300是一模一样的：<br><img src="http://img.blog.csdn.net/20170830072507100?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>下面是换向时暂停的实现：<br><img src="http://img.blog.csdn.net/20170830072533494?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##西门子 200smart##<br>200smart的软件是MicroWin Smart ，它跟200的程序是一样的，虽然软件不一样，但程序可以复制粘贴，一样能用。</p>
+<p>##施耐德 M340##<br>这个CPU的编程软件是Unity Pro XL<br>这里值得一说的是它的IO地址分配，其硬件组态是这样的<br><img src="http://img.blog.csdn.net/20170830072645784?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>我们可以看到DDI1602位于1号槽，DDO1602位于2号槽，因此它的IO地址是这样表示的 %I0.1.0，%Q0.2.0，中间的表示第几个槽，后面表示第几位。<br><img src="http://img.blog.csdn.net/20170830072705643?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>其程序思路跟300是一样的<br>整个程序如下：<br><img src="http://img.blog.csdn.net/20170830072723279?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830072739989?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##三菱Q02##<br>这个CPU有个问题：</p>
+<ol>
+<li>写完程序后，需要将“RESET/L.CLR”开关拨到RESET复位未知，执行复位操作之后，一定要将这个开关拨到中间位置</li>
+<li>复位后，将“STOP/RUN”开关拨到RUN位置，此时PLC“MODE”灯“RUN”状态指示灯常亮，PLC开始执行任务。</li>
+</ol>
+<p>再回到写程序上，三菱本来也想用上面的套路，但是三菱没有断开延时继电器，思路不变，但是需要换一种更通用的实现方法</p>
+<p>方波函数的实现：<br><img src="http://img.blog.csdn.net/20170830072756677?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>M1输出周期为2分钟的方波函数<br><img src="http://img.blog.csdn.net/20170830072821477?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>这里使用了置位复位实现了跟S7-300这个地方一样的逻辑，虽然复杂，但更加通用。<br>因为这个三菱的程序都是使用基本指令实现的，所以可以移植到别的更老的PLC上。</p>
+<p>##欧姆龙 C200HE##<br>欧姆龙的编程软件为CX-ONE<br><img src="http://img.blog.csdn.net/20170830074540388?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830074604040?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830074622662?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20170830074637543?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##欧姆龙CJ2G##<br>软件和程序同上</p>
+<p>##AB NX700 CPU750B##<br>这里有个坑，如果你去搜索，几乎所有的回答都说NX700使用的软件是WINGPC，但你使用这个软件虽然能找到NX700系列，但是却没有750B这个CPU。因为NX700有两个软件750B使用的是WINFPST 2（顺便一提，这个软件跟下面松下的软件基本一模一样，而且可以使用这个软件连接松下的PLC，反之亦然）<br>这里要先分配IO单元：<br><img src="http://img.blog.csdn.net/20170830075638827?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>这里的槽1是输入，槽3是输出。其地址与底下的“W几”。例如这里的槽1输入第一个点地址为X20<br>程序如下：<br><img src="http://img.blog.csdn.net/20170830080027142?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>##松下CPU02##<br>松下的软件是FPWIN GR2 ，正如上面所说，这个跟上面AB的非常像<br>使用方法<br>程序找不到了，反正跟上面差不多</p>
+<p>##安川MP920 CPU02##<br>安川MP900系列的编程软件是MPE720 V5的版本，其中V5.61可以装在win7，这个软件网上基本已经找不到了，我还是在淘宝上买了一个。<br>安川现在都是MPE720 V7了，从V6开始就不支持MP900系列了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC单按钮起停例程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/PLC单按钮起停例程/" itemprop="url">PLC单按钮起停例程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#PLC单按钮起停例程#</p>
+<p><img src="http://img.blog.csdn.net/20170720154348350?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/Kepware与 smart200建立连接的方法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1080,7 +1173,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1203,6 +1296,325 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC基本知识（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/PLC基本知识（一）/" itemprop="url">PLC基本知识（一）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#PLC基本知识（一）#</p>
+<p>##数字IO模块的源型与漏型##<br>源型（source），电流是从端子流出来的，具有PNP晶体管的输出特性.<br>漏极（sink），电流是从段子流进去的，具有NPN晶体管的输出特性.</p>
+<p>从使用上来说，NPN三极管工作时是集电极接高电压，发射极接低电压，基极输入电压升高时趋向导通，基极输入电压降低时趋向截止；而PNP三极管工作时则是集电极接低电压，发射极接高电压，基极输入电压升高时趋向截止，基极输入电压降低时趋向导通。</p>
+<p>所谓漏极输入，是一种有PLC内部提供输入信号源，全部输入信号的一端汇总到输入的公共连接端COM的输入形式，又称为汇点输入。输入传感器为接近开关时，只要接近开关的输出驱动力足够，漏型输入的PLC输入端就可以直接与NPN集电极开路型接近开关的输出进行连接。</p>
+<p>所谓源型输入，是一种由外部提供输入信号电源或使用PLC内部提供给输入回路的电源，全部输入信号为”有源”信号，并独立输入PLC的输入连接形式。输入传感器为接近开关时，只要接近开关的输出驱动力足够，源型输入的PLC输入端就可以直接与PNP集电极开路型接近开关的输出进行连接。</p>
+<p>欧美的PLC一般是源型，输入一般用PNP的开关，高电平输入,而日韩系列PLC偏好使用漏型，一般使用NPN型的开关也就是低电平输入。</p>
+<p>源型输出是指输出的是直流正极，漏型输出指的是直流负极。</p>
+<p>漏型输入，即NPN晶体管，当逻辑状态为1（真）时，信号为24V，当逻辑状态为0（假）时，信号为0V。<br>源型输入，即PNP晶体管，当逻辑状态为1（真）时，信号为0V，当逻辑状态为0（假）时，信号为24V。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/CPU如何控制器件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/CPU如何控制器件/" itemprop="url">CPU如何控制器件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#CPU如何控制器件</p>
+<hr>
+<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>##总线##<br>CPU想要进行数据的读写，必须和外部器件进行以下3类信息的交互。</p>
+<blockquote>
+<ul>
+<li>存储单元的地址（地址信息）</li>
+<li>器件的选择，读或写的命令（控制信息）</li>
+<li>读或写的数据（数据信息）</li>
+</ul>
+</blockquote>
+<p>通常将连接CPU和其他芯片的导线，称为总线。因此，总线从逻辑上分为3类，地址总线、控制总线和数据总线。<br>我们知道了CPU是如何进行数据读写的。可是，如何命令计算机进行数据的读写呢？<br>要让一个计算机或微处理器工作，应向它输入能够驱动它进行工作的电平信息（汇编指令，机器码）</p>
+<p>##接口卡##<br>计算机系统中，所有可用程序控制其工作的设备，必须收到CPU的控制。CPU对外部设备都不能直接控制，如显示器、音响、打印机等。直接控制这些设备进行工作的是插在扩展插槽上的接口卡。扩展插槽通过总线和CPU相连，所以接口卡也通过总线同CPU相连。CPU可以直接控制这些接口卡，从而实现CPU对外设的间接控制。简单的讲<strong><em>，就是CPU通过总线向接口卡发送命令，接口卡根据CPU的命令控制外设进行工作</em></strong>。</p>
+<p>##各类存储器芯片##<br>主要有RAM和ROM</p>
+<p>###随机存储器###<br>主随机存储器一般由两个位置上的RAM组成，装在主板上的RAM和插在扩展槽上的RAM。</p>
+<p>###装有BIOS的ROM###<br>BIOS是由主板和各类接口卡（如显卡、网卡等）厂商提供的软件系统，可以通过它利用该硬件设备进行最基本的输入输出。在主板和某些接口卡上茶有存储相应BIOS的ROM，例如，主板上的ROM中存储着主板的BIOS；显卡上的ROM中存储着显卡的BIOS；如果网卡上装有ROM，那么其中就可以存储网卡的BIOS。</p>
+<p>###接口卡上的RAM###<br>某些接口卡需要对大批量输入输出数据进行暂时存储，在其上装有RAM。最典型的是显存。显卡随时将显存中的数据向显示器输出。换句话说，我们将需要显示的内容写入显存，就会出现在显示器上。</p>
+<p>###内存地址空间###<br>上述的那些存储器，在物理上是独立的器件，但是在以下两点上相同。</p>
+<blockquote>
+<ul>
+<li>都和CPU的总线相连。</li>
+<li>CPU对他们进行读写的时候都通过控制线发出内存读写命令。</li>
+</ul>
+</blockquote>
+<p>这就是说，<strong><em>CPU在操纵它们的时候，把它们都当作内存来对待</em></strong>。<br>所有的物理存储器被看作一个由若干存储单元组成的逻辑存储器，每个物理存储器在这个逻辑存储器中占有一个地址段，即一段地址空间。CPU在这段地址空间中读写数据，实际上就是在对相对应的物理存储器中读写数据。<br>例如：</p>
+<blockquote>
+<p>地址0~7FFFH的32KB空间为主村级存储器地址空间；<br>地址8000H~9FFFH的8KB空间为显存地址空间；<br>地址A000H~FFFFH的24KB空间为各个ROM的地址空间。</p>
+</blockquote>
+<p>这样，CPU向内存地址为1000H的内存单元中写入数据，这个数据就被写入主随机存储器；CPU向内存地址为8000H的内存单元中写入数据，这个数据就被写入显存中，然后会被显卡输出到显示器上；CPU向内存地址为C00H的内存单元中写入数据的操作是没有结果的，因为是ROM。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/CPU寻址/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1234,7 +1646,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T21:16:19+08:00">
                 2018-01-24
               </time>
             
@@ -1350,176 +1762,6 @@
 </ol>
 <p>注意move指令不能改变CS、IP寄存器中的内容。能够改变CS、IP的内容的指令被统称为转移指令。如jump指令。</p>
 <p>##这本书中的第二章实验1可以多看几遍##</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/CPU如何控制器件/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/CPU如何控制器件/" itemprop="url">CPU如何控制器件</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT/" itemprop="url" rel="index">
-                    <span itemprop="name">IT</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#CPU如何控制器件</p>
-<hr>
-<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
-<p>##总线##<br>CPU想要进行数据的读写，必须和外部器件进行以下3类信息的交互。</p>
-<blockquote>
-<ul>
-<li>存储单元的地址（地址信息）</li>
-<li>器件的选择，读或写的命令（控制信息）</li>
-<li>读或写的数据（数据信息）</li>
-</ul>
-</blockquote>
-<p>通常将连接CPU和其他芯片的导线，称为总线。因此，总线从逻辑上分为3类，地址总线、控制总线和数据总线。<br>我们知道了CPU是如何进行数据读写的。可是，如何命令计算机进行数据的读写呢？<br>要让一个计算机或微处理器工作，应向它输入能够驱动它进行工作的电平信息（汇编指令，机器码）</p>
-<p>##接口卡##<br>计算机系统中，所有可用程序控制其工作的设备，必须收到CPU的控制。CPU对外部设备都不能直接控制，如显示器、音响、打印机等。直接控制这些设备进行工作的是插在扩展插槽上的接口卡。扩展插槽通过总线和CPU相连，所以接口卡也通过总线同CPU相连。CPU可以直接控制这些接口卡，从而实现CPU对外设的间接控制。简单的讲<strong><em>，就是CPU通过总线向接口卡发送命令，接口卡根据CPU的命令控制外设进行工作</em></strong>。</p>
-<p>##各类存储器芯片##<br>主要有RAM和ROM</p>
-<p>###随机存储器###<br>主随机存储器一般由两个位置上的RAM组成，装在主板上的RAM和插在扩展槽上的RAM。</p>
-<p>###装有BIOS的ROM###<br>BIOS是由主板和各类接口卡（如显卡、网卡等）厂商提供的软件系统，可以通过它利用该硬件设备进行最基本的输入输出。在主板和某些接口卡上茶有存储相应BIOS的ROM，例如，主板上的ROM中存储着主板的BIOS；显卡上的ROM中存储着显卡的BIOS；如果网卡上装有ROM，那么其中就可以存储网卡的BIOS。</p>
-<p>###接口卡上的RAM###<br>某些接口卡需要对大批量输入输出数据进行暂时存储，在其上装有RAM。最典型的是显存。显卡随时将显存中的数据向显示器输出。换句话说，我们将需要显示的内容写入显存，就会出现在显示器上。</p>
-<p>###内存地址空间###<br>上述的那些存储器，在物理上是独立的器件，但是在以下两点上相同。</p>
-<blockquote>
-<ul>
-<li>都和CPU的总线相连。</li>
-<li>CPU对他们进行读写的时候都通过控制线发出内存读写命令。</li>
-</ul>
-</blockquote>
-<p>这就是说，<strong><em>CPU在操纵它们的时候，把它们都当作内存来对待</em></strong>。<br>所有的物理存储器被看作一个由若干存储单元组成的逻辑存储器，每个物理存储器在这个逻辑存储器中占有一个地址段，即一段地址空间。CPU在这段地址空间中读写数据，实际上就是在对相对应的物理存储器中读写数据。<br>例如：</p>
-<blockquote>
-<p>地址0~7FFFH的32KB空间为主村级存储器地址空间；<br>地址8000H~9FFFH的8KB空间为显存地址空间；<br>地址A000H~FFFFH的24KB空间为各个ROM的地址空间。</p>
-</blockquote>
-<p>这样，CPU向内存地址为1000H的内存单元中写入数据，这个数据就被写入主随机存储器；CPU向内存地址为8000H的内存单元中写入数据，这个数据就被写入显存中，然后会被显卡输出到显示器上；CPU向内存地址为C00H的内存单元中写入数据的操作是没有结果的，因为是ROM。</p>
 
           
         
@@ -1752,176 +1994,6 @@ mingw32-make.exe install
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/23/OPC UA基本概念结构/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/23/OPC UA基本概念结构/" itemprop="url">OPC UA基本概念结构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T00:00:00+08:00">
-                2018-01-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/OPC-工控/" itemprop="url" rel="index">
-                    <span itemprop="name">OPC 工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="OPC-UA基本概念结构"><a href="#OPC-UA基本概念结构" class="headerlink" title="OPC UA基本概念结构"></a>OPC UA基本概念结构</h1><blockquote>
-<p>本文摘自《OPC统一架构》，作者：Wolfgang Mahnke • Stefan-Helmut Leitner•Matthias Damm</p>
-</blockquote>
-<p>OPC UA建模的基本概念是节点以及节点之间的引用。节点可以根据不同的用途归属于不同的节点类别(NodeClass)，一些节点代表实例，另一些代表类型等等。<br>属性(Attritube)被用来描述节点，一个节点的属性取决于NodeClass，不过，每个节点也有一些通用属性，例如:NodeId,NodeClass,BrowseName,DisplayName,Description等。</p>
-<p>##引用<br>从理论上讲，引用描述了两个确定节点之间的关系。因此，源节点、目标节点、引用的语义(即RefenceTyoe)和引用的方向唯一确定一个引用。<br>我们可以把引用看作一个指向其他节点的指针，通过保存其他节点的Id来指向另一个节点。指针可引用不存在(或不再存在)于服务器的节点，也可以引用其他服务器上的节点。<br>引用是两个节点之间的连接，引用不能直接访问，只能间接的通过浏览节点访问。引用有引用类型，分为分层次化引用和非层次化引用两个子类型。<br><img src="http://oxehqp0gf.bkt.clouddn.com/OPCUA%E5%9F%BA%E6%9C%AC%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.PNG" alt="OPCUA基本引用类型层次结构"><br>例如:</p>
-<ol>
-<li>当需要建立层次模型时，应当使用层次化引用；例如，组织(Organizes)引用类型表示两个节点需要通过层次方式连接起来，我们可以把文件系统映射到OPC UA，文件夹可以被当做节点，使用Organsizes引用来引用其子文件夹。</li>
-<li>其他一些情况应使用非层次化引用，如暴露不同层次结构间的关系，例如，非层次化的HasTypeDefinition从一个实例引用到类型层次中的类型。</li>
-</ol>
-<p>##对象、变量和方法<br>在OPC UA中，最重要的节点类别(NodeClass)是对象、变量和方法。对象可以拥有变量和方法，而且可以触发事件。</p>
-<ul>
-<li>节点类别为变量的节点代表一个值，客户端可以对这个值进行读取、写入和订阅其变化。</li>
-<li>节点类别为方法的节点代表服务器中一个由客户端调用并返回结果的方法。每个方法指定客户端应使用的输入参数和客户端希望得到的结果即输出参数。使用方法的目的是它执行的比较快。</li>
-<li>节点类别为对象的节点用于地址空间结构，对象使用变量对外提供值，对象不像变量一样拥有Value属性。对象可以用于分组管理变量，方法或其他对象。对象也可以是一个事件通知器，客户端可以订阅事件通知其来接收事件。<ul>
-<li>除了些通用属性，对象唯一的附加属性是用来识别对象是否可以作为事件通知器，即客户端是否可以订阅对象来接受事件，或者读取、更新事件的历史。</li>
-<li>变量的附加属性比较多。值得注意的一点是，变量的数据类型(DataType)这个附加属性。变量的数据类型表示为地址空间的节点，因此这个附加属性是NodeId类型的。</li>
-<li>方法的附加属性有Executable和UseExecutable，这两个是关于执行方面的。除了附加属性，方法还拥有特性(Property)，说白了就是属于方法的输入输出变量。方法的输入输出参数不是通过属性描述的，而是通过变量。</li>
-</ul>
-</li>
-</ul>
-<p>##对象类型和变量类型<br>OPC UA的地址空间定义了两种节点类别(NodeClass),ObjectType用来定义对象类型，而VariableType用来定义变量类型。方法没有对应的类型定义。方法可以绑定到一个对象类型上，从而可以在对象上使用，方法是由浏览名称和方法参数确定的，因此没有定义类型的必要。<br>如果使用一个概念，来解释对象类型和变量类型共同的特征，则会称之为类型定义(TypeDefinition)（个人理解，类型定义就是使用ObjectType或VariableType来定义对象或变量类型的总称）。</p>
-<p>###简单对象类型<br>对象类型分为简单的和复杂的。复杂对象类型暴露其下的一些节点结构，这些节点在类型的每一个实例中出现，而简单对象类型只定义对象的一些语义。<br>当使用NodeManagement(节点管理)服务创建一个新对象时，必须提供类型定义。新对象的一些属性没有必要被指定，可以用对象类型的默认值填充。另外对象类型支持继承。详细可以看书上的例子。</p>
-<p>###简单变量类型<br>像对象类型一样，变量类型也分为简单的和复杂的。</p>
-<p>###复杂对象类型<br>复杂对象类型暴露其下的一些节点的结构，这些节点在对象类型的每一个实例中出现。<br><img src="http://oxehqp0gf.bkt.clouddn.com/OPCUA%E5%A4%8D%E6%9D%82%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B.PNG" alt="OPCUA复杂对象类型"><br>对象类型MotorType使用的节点类别是对象类型。但它下面的所有节点的节点类别都是对象、变量或方法。这些节点都是实例而不是类型，然而它们通常不是真正的包含实际值的实例，因此它们被称为实例声明。<br>实例声明有一点需要注意，因为实例声明的一个主要特点是:</p>
-<blockquote>
-<p>可以相对该对象类型，唯一标识每个实例声明，而且同样的相对标识不仅适用于该实例声明，也适用于该对象类型实例的对应部分。</p>
-</blockquote>
-<p>只有保证这个特点才可以用对象信息类型来编程。<br>那么NodeId不能作为这个标识。因为实例声明与实例是不同的节点，因此NodeId肯定不同。为此，我们使用浏览路径(BrowsePath)。从对象类型开始，顺着层次化引用的前进方向标识实例声明。</p>
-<p>###复杂变量类型<br>复杂变量类型与复杂对象类型非常相似，但主要区别是她们只能用变量作为实例声明，而不能用对象或方法。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1972,7 +2044,7 @@ mingw32-make.exe install
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-count">74</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
