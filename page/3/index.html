@@ -273,6 +273,1203 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/23/OPC UA基本概念结构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/23/OPC UA基本概念结构/" itemprop="url">OPC UA基本概念结构</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T00:00:00+08:00">
+                2018-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OPC-工控/" itemprop="url" rel="index">
+                    <span itemprop="name">OPC 工控</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="OPC-UA基本概念结构"><a href="#OPC-UA基本概念结构" class="headerlink" title="OPC UA基本概念结构"></a>OPC UA基本概念结构</h1><blockquote>
+<p>本文摘自《OPC统一架构》，作者：Wolfgang Mahnke • Stefan-Helmut Leitner•Matthias Damm</p>
+</blockquote>
+<p>OPC UA建模的基本概念是节点以及节点之间的引用。节点可以根据不同的用途归属于不同的节点类别(NodeClass)，一些节点代表实例，另一些代表类型等等。<br>属性(Attritube)被用来描述节点，一个节点的属性取决于NodeClass，不过，每个节点也有一些通用属性，例如:NodeId,NodeClass,BrowseName,DisplayName,Description等。</p>
+<p>##引用<br>从理论上讲，引用描述了两个确定节点之间的关系。因此，源节点、目标节点、引用的语义(即RefenceTyoe)和引用的方向唯一确定一个引用。<br>我们可以把引用看作一个指向其他节点的指针，通过保存其他节点的Id来指向另一个节点。指针可引用不存在(或不再存在)于服务器的节点，也可以引用其他服务器上的节点。<br>引用是两个节点之间的连接，引用不能直接访问，只能间接的通过浏览节点访问。引用有引用类型，分为分层次化引用和非层次化引用两个子类型。<br><img src="http://oxehqp0gf.bkt.clouddn.com/OPCUA%E5%9F%BA%E6%9C%AC%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.PNG" alt="OPCUA基本引用类型层次结构"><br>例如:</p>
+<ol>
+<li>当需要建立层次模型时，应当使用层次化引用；例如，组织(Organizes)引用类型表示两个节点需要通过层次方式连接起来，我们可以把文件系统映射到OPC UA，文件夹可以被当做节点，使用Organsizes引用来引用其子文件夹。</li>
+<li>其他一些情况应使用非层次化引用，如暴露不同层次结构间的关系，例如，非层次化的HasTypeDefinition从一个实例引用到类型层次中的类型。</li>
+</ol>
+<p>##对象、变量和方法<br>在OPC UA中，最重要的节点类别(NodeClass)是对象、变量和方法。对象可以拥有变量和方法，而且可以触发事件。</p>
+<ul>
+<li>节点类别为变量的节点代表一个值，客户端可以对这个值进行读取、写入和订阅其变化。</li>
+<li>节点类别为方法的节点代表服务器中一个由客户端调用并返回结果的方法。每个方法指定客户端应使用的输入参数和客户端希望得到的结果即输出参数。使用方法的目的是它执行的比较快。</li>
+<li>节点类别为对象的节点用于地址空间结构，对象使用变量对外提供值，对象不像变量一样拥有Value属性。对象可以用于分组管理变量，方法或其他对象。对象也可以是一个事件通知器，客户端可以订阅事件通知其来接收事件。<ul>
+<li>除了些通用属性，对象唯一的附加属性是用来识别对象是否可以作为事件通知器，即客户端是否可以订阅对象来接受事件，或者读取、更新事件的历史。</li>
+<li>变量的附加属性比较多。值得注意的一点是，变量的数据类型(DataType)这个附加属性。变量的数据类型表示为地址空间的节点，因此这个附加属性是NodeId类型的。</li>
+<li>方法的附加属性有Executable和UseExecutable，这两个是关于执行方面的。除了附加属性，方法还拥有特性(Property)，说白了就是属于方法的输入输出变量。方法的输入输出参数不是通过属性描述的，而是通过变量。</li>
+</ul>
+</li>
+</ul>
+<p>##对象类型和变量类型<br>OPC UA的地址空间定义了两种节点类别(NodeClass),ObjectType用来定义对象类型，而VariableType用来定义变量类型。方法没有对应的类型定义。方法可以绑定到一个对象类型上，从而可以在对象上使用，方法是由浏览名称和方法参数确定的，因此没有定义类型的必要。<br>如果使用一个概念，来解释对象类型和变量类型共同的特征，则会称之为类型定义(TypeDefinition)（个人理解，类型定义就是使用ObjectType或VariableType来定义对象或变量类型的总称）。</p>
+<p>###简单对象类型<br>对象类型分为简单的和复杂的。复杂对象类型暴露其下的一些节点结构，这些节点在类型的每一个实例中出现，而简单对象类型只定义对象的一些语义。<br>当使用NodeManagement(节点管理)服务创建一个新对象时，必须提供类型定义。新对象的一些属性没有必要被指定，可以用对象类型的默认值填充。另外对象类型支持继承。详细可以看书上的例子。</p>
+<p>###简单变量类型<br>像对象类型一样，变量类型也分为简单的和复杂的。</p>
+<p>###复杂对象类型<br>复杂对象类型暴露其下的一些节点的结构，这些节点在对象类型的每一个实例中出现。<br><img src="http://oxehqp0gf.bkt.clouddn.com/OPCUA%E5%A4%8D%E6%9D%82%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B.PNG" alt="OPCUA复杂对象类型"><br>对象类型MotorType使用的节点类别是对象类型。但它下面的所有节点的节点类别都是对象、变量或方法。这些节点都是实例而不是类型，然而它们通常不是真正的包含实际值的实例，因此它们被称为实例声明。<br>实例声明有一点需要注意，因为实例声明的一个主要特点是:</p>
+<blockquote>
+<p>可以相对该对象类型，唯一标识每个实例声明，而且同样的相对标识不仅适用于该实例声明，也适用于该对象类型实例的对应部分。</p>
+</blockquote>
+<p>只有保证这个特点才可以用对象信息类型来编程。<br>那么NodeId不能作为这个标识。因为实例声明与实例是不同的节点，因此NodeId肯定不同。为此，我们使用浏览路径(BrowsePath)。从对象类型开始，顺着层次化引用的前进方向标识实例声明。</p>
+<p>###复杂变量类型<br>复杂变量类型与复杂对象类型非常相似，但主要区别是她们只能用变量作为实例声明，而不能用对象或方法。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/16/单词重读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/16/单词重读/" itemprop="url">单词重读</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-16T00:00:00+08:00">
+                2018-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/英语/" itemprop="url" rel="index">
+                    <span itemprop="name">英语</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#单词重读#</p>
+<p>##基本音节重读##</p>
+<p>音节是语言的最小单位，有时包含元音，有时包含元音和辅音</p>
+<h2 id="动词和名词的音节"><a href="#动词和名词的音节" class="headerlink" title="动词和名词的音节"></a>动词和名词的音节</h2><p>1.两个音节时</p>
+<p>​    如果是名词，当存在第二个音节时，90%情况下是第一个音节重读。如果是动词大约60-70%情况下是第二个音节重读。</p>
+<p>​    例如record，当为名词时发/ˈrɛkərd/，重读在第一个音节，当为动词时候，发/rəˈkɔrd/重读在第二个音节。类似的词还有object,progress,insult,conflict,present,insert,recall等。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">I hope to proGRESS</td>
+<td style="text-align:center">aɪ hoʊp tu  prəˈgrɛs</td>
+</tr>
+<tr>
+<td style="text-align:center">You’re making  good PROgress</td>
+<td style="text-align:center">jʊrˈmeɪkɪŋ gʊd ˈprɑˌgrɛs</td>
+</tr>
+<tr>
+<td style="text-align:center">Did he inSULT him</td>
+<td style="text-align:center">dɪd hi ɪnˈsʌlt hɪm</td>
+</tr>
+<tr>
+<td style="text-align:center">Yes, I heard the INsult</td>
+<td style="text-align:center">jɛs, aɪ hɜrd ði ˈɪnˌsʌlt</td>
+</tr>
+<tr>
+<td style="text-align:center">Do you like that OBject?</td>
+<td style="text-align:center">du ju laɪk ðæt ˈɑbʤɛkt</td>
+</tr>
+<tr>
+<td style="text-align:center">No, I obJECT to it</td>
+<td style="text-align:center">noʊ, aɪ  əbˈʤɛkt  tu ɪt</td>
+</tr>
+<tr>
+<td style="text-align:center">Is there a CONflict between them?</td>
+<td style="text-align:center">ɪz ðɛr ə ˈkɑnflɪkt bɪˈtwin ðɛm?</td>
+</tr>
+<tr>
+<td style="text-align:center">Yes, those two always conFLICT.</td>
+<td style="text-align:center">jɛs, ðoʊz tu ˈɔlˌweɪz kənˈflɪkt</td>
+</tr>
+<tr>
+<td style="text-align:center">I want to presENT you to my family.</td>
+<td style="text-align:center">aɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">wɑnt</a> tu <a href="https://tophonetics.com/#" target="_blank" rel="external">priˈzɛnt</a> ju tu maɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈfæməli</a>.</td>
+</tr>
+<tr>
+<td style="text-align:center">I will bring them a nice PREsent</td>
+<td style="text-align:center">aɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">wɪl</a> brɪŋ ðɛm ə <a href="https://tophonetics.com/#" target="_blank" rel="external">naɪs</a> <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈprɛzənt</a></td>
+</tr>
+<tr>
+<td style="text-align:center">Do you have the INsert?</td>
+<td style="text-align:center"><a href="https://tophonetics.com/#" target="_blank" rel="external">du</a> ju hæv ði <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈɪnˌsɜrt</a></td>
+</tr>
+<tr>
+<td style="text-align:center">Where should I inSERT it?</td>
+<td style="text-align:center">wɛr ʃʊd aɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">ɪnˈsɜrt</a> ɪt?</td>
+</tr>
+<tr>
+<td style="text-align:center">Do you reCALL it?</td>
+<td style="text-align:center"><a href="https://tophonetics.com/#" target="_blank" rel="external">du</a> ju <a href="https://tophonetics.com/#" target="_blank" rel="external">rɪˈkɔl</a> ɪt?</td>
+</tr>
+<tr>
+<td style="text-align:center">No, I have no REcall of it</td>
+<td style="text-align:center">noʊ, aɪ hæv noʊ <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈriˌkɔl</a> ʌv ɪt</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="“ATE”组合的单词"><a href="#“ATE”组合的单词" class="headerlink" title="“ATE”组合的单词"></a>“ATE”组合的单词</h2><p>像graduate    estimate    articulate这样以“ate”结尾的单词，“ate”该怎么发音呢，还是取决于词性。当词性为动词时，发音像“ate”；如果是名词或形容词，发音要减弱有点像”it”或”et”.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">I would like to graduate from collage.</td>
+<td style="text-align:center">aɪ wʊd laɪk tu <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈgræʤuˌeɪt</a> <a href="https://tophonetics.com/#" target="_blank" rel="external">frʌm</a> kəˈlɑʒ.</td>
+</tr>
+<tr>
+<td style="text-align:center">He is a collage graduate(graduet).</td>
+<td style="text-align:center">hi ɪz ə kəˈlɑʒ <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈgræʤuɪt</a>.</td>
+</tr>
+<tr>
+<td style="text-align:center">I would like to estimate the cost of this.</td>
+<td style="text-align:center">aɪ wʊd laɪk tu <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈɛstəˌmeɪt</a> ðə <a href="https://tophonetics.com/#" target="_blank" rel="external">kɑst</a> ʌv ðɪs.</td>
+</tr>
+<tr>
+<td style="text-align:center">Please give me an estimate(estimet) of the cost.</td>
+<td style="text-align:center">pliz gɪv mi ən <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈɛstəmət</a> ʌv ðə <a href="https://tophonetics.com/#" target="_blank" rel="external">kɑst</a>.</td>
+</tr>
+<tr>
+<td style="text-align:center">I would like to articulate it.</td>
+<td style="text-align:center">aɪ wʊd laɪk tu <a href="https://tophonetics.com/#" target="_blank" rel="external">ɑrˈtɪkjəˌleɪt</a> ɪt.</td>
+</tr>
+<tr>
+<td style="text-align:center">He’s a very articulate(articulet)man.</td>
+<td style="text-align:center">hiz ə ˈvɛri <a href="https://tophonetics.com/#" target="_blank" rel="external">ɑrˈtɪkjələt</a>mən.</td>
+</tr>
+<tr>
+<td style="text-align:center">I will calculate it and give you an estimate.</td>
+<td style="text-align:center">aɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">wɪl</a> ˈkælkjəˌleɪt ɪt ænd gɪv ju  ən   <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈɛstəmət</a>.</td>
+</tr>
+<tr>
+<td style="text-align:center">I don’t think that number is accurate.</td>
+<td style="text-align:center">aɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">doʊnt</a> θɪŋk ðæt ˈnʌmbər ɪz ˈækjərət.</td>
+</tr>
+<tr>
+<td style="text-align:center">I think you’re exaggerating the amount.</td>
+<td style="text-align:center">aɪ θɪŋk <a href="https://tophonetics.com/#" target="_blank" rel="external">jʊr</a> ɪgˈzæʤəˌreɪtɪŋ ði əˈmaʊnt.</td>
+</tr>
+<tr>
+<td style="text-align:center">That’s just an approximate estimate.</td>
+<td style="text-align:center">ðæts ʤʌst ən <a href="https://tophonetics.com/#" target="_blank" rel="external">əˈprɑksəmət</a> <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈɛstəmət</a>.</td>
+</tr>
+<tr>
+<td style="text-align:center">Thanks for the chocolate.</td>
+<td style="text-align:center">θæŋks fɔr ðə ˈʧɔklət.</td>
+</tr>
+<tr>
+<td style="text-align:center">I really appreciate it.</td>
+<td style="text-align:center">aɪ <a href="https://tophonetics.com/#" target="_blank" rel="external">ˈrɪli</a> əˈpriʃiˌeɪt ɪt.</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="后缀的重读规则"><a href="#后缀的重读规则" class="headerlink" title="后缀的重读规则"></a>后缀的重读规则</h2><ol>
+<li>如果单词以ese结尾，我们重读后缀。Chinese，Japanese</li>
+<li>如果单词以eer结尾，我们重读后缀。pioneer，volunteer，engineer</li>
+<li>如果单词以ique结尾，我们重读后缀。antique，technique</li>
+<li>如果单词以ic结尾，我们重读后缀前一个音节。realistic,Elastic,electricity,electric,strategic,Optimistic</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">例子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Chinese，Japanese</td>
+<td style="text-align:center">ʧaɪˈniz，ˌʤæpəˈniz</td>
+</tr>
+<tr>
+<td style="text-align:center">pioneer，volunteer，engineer</td>
+<td style="text-align:center">paɪəˈnɪr，ˌvɑlənˈtɪr，ˈɛnʤəˈnɪr</td>
+</tr>
+<tr>
+<td style="text-align:center">antique，technique</td>
+<td style="text-align:center">ænˈtik，tɛkˈnik</td>
+</tr>
+<tr>
+<td style="text-align:center">realistic,strategic,Optimistic</td>
+<td style="text-align:center">ˌriəˈlɪstɪk, strəˈtiʤɪk,ˌɑptəˈmɪstɪk</td>
+</tr>
+<tr>
+<td style="text-align:center">Elastic,electricity,electric</td>
+<td style="text-align:center">ɪˈlæstɪk,ɪˌlɛkˈtrɪsəti,ɪˈlɛktrɪk</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<p>名词到形容词重读所发生的变化</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">单词</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">origin</td>
+<td style="text-align:center">ˈɔrəʤən</td>
+</tr>
+<tr>
+<td style="text-align:center">original</td>
+<td style="text-align:center">əˈrɪʤənəl</td>
+</tr>
+<tr>
+<td style="text-align:center">industry</td>
+<td style="text-align:center">ˈɪndəstri</td>
+</tr>
+<tr>
+<td style="text-align:center">industrial</td>
+<td style="text-align:center">ɪnˈdʌstriəl</td>
+</tr>
+<tr>
+<td style="text-align:center">memory</td>
+<td style="text-align:center">ˈmɛməri</td>
+</tr>
+<tr>
+<td style="text-align:center">memorial</td>
+<td style="text-align:center">məˈmɔriəl</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/16/Qt编译IFM的振动传感器例程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/16/Qt编译IFM的振动传感器例程/" itemprop="url">Qt编译IFM的振动传感器例程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-16T00:00:00+08:00">
+                2018-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index">
+                    <span itemprop="name">Qt</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#Qt编译IFM的振动传感器例程</p>
+<p>IFM的振动传感器的例程是用VS(C++)写的，写这篇文章的原因是因为我从来没有用过dll，也没有将VS的程序移植到Qt过。</p>
+<p>##新建工程<br>新建个Qt控制台工程，将源文件添加到项目工程中。<br><img src="http://oxehqp0gf.bkt.clouddn.com/IFM.PNG" alt="IFM振动程序结构"></p>
+<p>##隐式调用<br>在开始之前先分析一下dll在什么时候需要，我们写程序的时候两个地方需要，一个是编译的时候，一个是exe文件运行的时候，那么因此，我们需要在两份dll文件。</p>
+<p>首先，我们把dll相关的头文件拷贝出来，放到一个目录下，目录是随意的，然后用includepath来加载。</p>
+<p> 在IFM项目目录下放了一个dll，用来给头文件编译时候调用，然后在程序的输出目录下(Debug)也放了一个，来给程序运行时候调用。</p>
+<p>Pro文件加一行代码：</p>
+<pre><code>LIBS+=D:/QTDev/plus.dll
+</code></pre><p>也可以只使用一个dll文件放到输出目录下，这里路径改到该目录下即可。<br>总结，隐式调用就是：</p>
+<ol>
+<li>在pro文件用LIBS给它指定一下dll文件在哪里；</li>
+<li>在你的程序exe目录的位置，放一个dll文件。（如果不拷，会报During startup program exited with code 0x0000135）</li>
+</ol>
+<p>##总结<br>这里有两篇文章讲的不错，分别是<a href="http://blog.csdn.net/u012150179/article/details/12346555" target="_blank" rel="external">遇到Qt调用dll问题（整理版）</a>和<a href="http://blog.csdn.net/xlzhu87/article/details/39081181" target="_blank" rel="external">Qt DLL总结（全）</a><br>整理下精华信息：</p>
+<ol>
+<li>如果在没有导入库文件(.lib)，而只有头文件(.h)与动态链接库(.dll)时，我们才需要显示调用，如果这三个文件都全的话，我们就可以使用简单方便的隐式调用。</li>
+<li>通常Windows下程序显示调用dll的步骤分为三步(三个函数)：LoadLibrary()、GetProcAdress()、FreeLibrary()其中，</li>
+</ol>
+<ul>
+<li>LoadLibrary()函数用来载入指定的dll文件，加载到调用程序的内存中(DLL没有自己的内存！)</li>
+<li>GetProcAddress() 函数检索指定的动态链接库(DLL)中的输出库函数地址，以备调用</li>
+<li>FreeLibrary() 释放dll所占空间</li>
+</ul>
+<ol>
+<li>动态库一般会有对应的导入库，方便程序静态载入动态链接库。在预编译的开发包里包含一些.dll文件和一些.lib文件。其中这里的.lib就是导入库，而不要错以为是静态库导入库和静态库的区别很大，他们实质是不一样的东西。</li>
+<li>静态库本身就包含了实际执行代码、符号表等等，而对于导入库而言，其实际的执行代码位于动态库中，导入库只包含了地址符号表等，确保程序找到对应函数的一些基本地址信息。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/14/美语L的发音/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/14/美语L的发音/" itemprop="url">美语L的发音</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-14T00:00:00+08:00">
+                2018-01-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/英语/" itemprop="url" rel="index">
+                    <span itemprop="name">英语</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="美语L的发音"><a href="#美语L的发音" class="headerlink" title="美语L的发音"></a>美语L的发音</h1><table>
+<thead>
+<tr>
+<th>句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>feel ill</td>
+<td style="text-align:center">fil ɪl</td>
+</tr>
+<tr>
+<td>school</td>
+<td style="text-align:center">skul</td>
+</tr>
+<tr>
+<td>awful film</td>
+<td style="text-align:center">ˈɑfəl fɪlm</td>
+</tr>
+<tr>
+<td>little animal</td>
+<td style="text-align:center">ˈlɪtəl ˈænəməl</td>
+</tr>
+<tr>
+<td>I’ll call you tell to you about the film</td>
+<td style="text-align:center">aɪl kɔl jʊ tɛl tə jʊ əˈbaʊt ðə fɪlm</td>
+</tr>
+<tr>
+<td>I fell terrible about the political scandal</td>
+<td style="text-align:center">aɪ fɛl ˈtɛrəbəl əˈbaʊt ðə pəˈlɪtəkəlˈskændəl</td>
+</tr>
+<tr>
+<td>I think I’ll be able to handle it by myself</td>
+<td style="text-align:center">aɪ θɪŋk aɪl bi ˈeɪbəl tə ˈhændəl ɪt baɪ ˌmaɪˈsɛlf</td>
+</tr>
+<tr>
+<td>you do well at school</td>
+<td style="text-align:center">jʊ dʊ wɛl ət skul</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/07/连读(3)之元音结尾+首元音/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/07/连读(3)之元音结尾+首元音/" itemprop="url">连读(3)之元音结尾+首元音</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-07T00:00:00+08:00">
+                2018-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/每日总结/" itemprop="url" rel="index">
+                    <span itemprop="name">每日总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="连读-3-之元音结尾-首元音"><a href="#连读-3-之元音结尾-首元音" class="headerlink" title="连读(3)之元音结尾+首元音"></a>连读(3)之元音结尾+首元音</h1><h2 id="当元音要求你的嘴变平时"><a href="#当元音要求你的嘴变平时" class="headerlink" title="当元音要求你的嘴变平时"></a>当元音要求你的嘴变平时</h2><p>例如see it，这时，我们会放个y(“yuh”)在中间形成see yit.</p>
+<p>==当元音要求你的嘴变平如 /i/(/oi/,/ai/,/ɛi/)时，加y(“yuh”)==</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">see it(see yit)</td>
+<td style="text-align:center">si ɪt</td>
+</tr>
+<tr>
+<td style="text-align:center">very interesting(veryyinteresting)</td>
+<td style="text-align:center">ˈvɛri ˈɪntrəstɪŋ</td>
+</tr>
+<tr>
+<td style="text-align:center">carry on(carryon)</td>
+<td style="text-align:center">ˈkæri ɑn</td>
+</tr>
+<tr>
+<td style="text-align:center">we all(weyall)</td>
+<td style="text-align:center">wi ɔl</td>
+</tr>
+<tr>
+<td style="text-align:center">may I(meyay)</td>
+<td style="text-align:center">meɪ aɪ</td>
+</tr>
+<tr>
+<td style="text-align:center">enjoy it(enjoyit)</td>
+<td style="text-align:center">ɛnˈʤɔɪ ɪt</td>
+</tr>
+<tr>
+<td style="text-align:center">boy is(boyis)</td>
+<td style="text-align:center">bɔɪ ɪz</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="当原因要求你的嘴变圆时"><a href="#当原因要求你的嘴变圆时" class="headerlink" title="当原因要求你的嘴变圆时"></a>当原因要求你的嘴变圆时</h2><p>例如 who is,这时，我们放w(“wuh”)在中间形成whowis</p>
+<p>当元音要求你的嘴变圆如 /u/,/ou/时，加w(“wuh”)</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">no one(nowan)</td>
+<td style="text-align:center">noʊ wʌn</td>
+</tr>
+<tr>
+<td style="text-align:center">two hours(twowawers)</td>
+<td style="text-align:center">tu ˈaʊərz</td>
+</tr>
+<tr>
+<td style="text-align:center">blue ocean(bluwowcean)</td>
+<td style="text-align:center">blu ˈoʊʃən</td>
+</tr>
+<tr>
+<td style="text-align:center">do all(dowall)</td>
+<td style="text-align:center">dʊ ɔl</td>
+</tr>
+<tr>
+<td style="text-align:center">no answer(nowanswer)</td>
+<td style="text-align:center">noʊ ˈænsər</td>
+</tr>
+</tbody>
+</table>
+<h2 id="综合练习"><a href="#综合练习" class="headerlink" title="综合练习"></a>综合练习</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">I don’t do it very often</td>
+<td style="text-align:center">aɪ doʊnt dʊ ɪt ˈvɛri ˈɔfən</td>
+</tr>
+<tr>
+<td style="text-align:center">why is she so afraid of it</td>
+<td style="text-align:center">waɪ əz ʃi soʊ əˈfreɪd əv ɪt</td>
+</tr>
+<tr>
+<td style="text-align:center">I can see inside the open window</td>
+<td style="text-align:center">aɪ kən si ɪnˈsaɪd ði ˈoʊpən ˈwɪndoʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">This is the only one I know about it</td>
+<td style="text-align:center">ðɪs ɪz ði ˈoʊnli wʌn aɪ noʊ əˈbaʊt ɪt</td>
+</tr>
+<tr>
+<td style="text-align:center">Did you see any other ones</td>
+<td style="text-align:center">dɪd jʊ si ˈɛni ˈʌðər wʌnz</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/04/连读(1)之辅音结尾+首元音/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -499,7 +1696,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/28/可重入与线程安全/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/04/连读(2)之辅音结尾+首辅音/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -518,7 +1715,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/12/28/可重入与线程安全/" itemprop="url">可重入与线程安全</a></h1>
+                <a class="post-title-link" href="/2018/01/04/连读(2)之辅音结尾+首辅音/" itemprop="url">连读(2)之辅音结尾+首辅音</a></h1>
         
 
         <div class="post-meta">
@@ -530,8 +1727,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T00:00:00+08:00">
-                2017-12-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-04T00:00:00+08:00">
+                2018-01-04
               </time>
             
 
@@ -553,8 +1750,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT/" itemprop="url" rel="index">
-                    <span itemprop="name">IT</span>
+                  <a href="/categories/每日总结/" itemprop="url" rel="index">
+                    <span itemprop="name">每日总结</span>
                   </a>
                 </span>
 
@@ -592,29 +1789,158 @@
       
         
           
-            <h1 id="可重入与线程安全"><a href="#可重入与线程安全" class="headerlink" title="可重入与线程安全"></a>可重入与线程安全</h1><blockquote>
-<p>本文 摘自Qt官方文档</p>
-</blockquote>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
-<li>A thread-safe function can be called simultaneously from multiple threads, even when the invocations use shared data, because all references to the shared data are serialized.</li>
-<li>A reentrant function can also be called simultaneously from multiple threads, but only if each invocation uses its own data.</li>
-</ul>
-<p>Hence, a thread-safe function is always reentrant, but a reentrant function is not always thread-safe.</p>
-<p>By extension, a class is said to be reentrant if its member functions can be called safely from multiple threads, as long as each thread uses a different instance of the class. The class is thread-safe if its member functions can be called safely from multiple threads, even if all the threads use the same instance of the class.</p>
-<h2 id="可重入"><a href="#可重入" class="headerlink" title="可重入"></a>可重入</h2><p>C++ classes are often reentrant, simply because they only access their own member data. Any thread can call a member function on an instance of a reentrant class, as long as no other thread can call a member function on the same instance of the class at the same time. For example, the Counter class below is reentrant:</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class"> &#123;</span></div><div class="line"> <span class="keyword">public</span>:</div><div class="line">     Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; ++n; &#125;</div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; --n; &#125;</div><div class="line">     <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line"> <span class="keyword">private</span>:</div><div class="line">     <span class="keyword">int</span> n;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure>
-<p>The class isn’t thread-safe, because if multiple threads try to modify the data member n, the result is undefined. This is because the ++ and – operators aren’t always atomic. Indeed, they usually expand to three machine instructions:</p>
-<ol>
-<li>Load the variable’s value in a register.</li>
-<li>Increment or decrement the register’s value.</li>
-<li>Store the register’s value back into main memory.</li>
-</ol>
-<p>If thread A and thread B load the variable’s old value simultaneously, increment their register, and store it back, they end up overwriting each other, and the variable is incremented only once! </p>
-<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>Clearly, the access must be serialized: Thread A must perform steps 1, 2, 3 without interruption (atomically) before thread B can perform the same steps; or vice versa. An easy way to make the class thread-safe is to protect all access to the data members with a QMutex:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class">  &#123;</span></div><div class="line">  <span class="keyword">public</span>:</div><div class="line">      Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; ++n; &#125;</div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; --n; &#125;</div><div class="line">      <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line">  <span class="keyword">private</span>:</div><div class="line">      <span class="keyword">mutable</span> QMutex mutex;</div><div class="line">      <span class="keyword">int</span> n;</div><div class="line">  &#125;;</div></pre></td></tr></table></figure></p>
-<p>The QMutexLocker class automatically locks the mutex in its constructor and unlocks it when the destructor is invoked, at the end of the function. Locking the mutex ensures that access from different threads will be serialized. The mutex data member is declared with the mutable qualifier because we need to lock and unlock the mutex in value(), which is a const function. </p>
-<h2 id="个人简单概括"><a href="#个人简单概括" class="headerlink" title="个人简单概括"></a>个人简单概括</h2><p>我也上网看了很多博客，感觉网上关于这俩的说法都有些矛盾，这里就以Qt官方为准吧。</p>
-<p>可重入是针对类的两个实例，像全局变量这样的，会被调用两次因此结果不确定，对于两个实例自己的变量没事。</p>
-<p>线程安全是针对的类的一个实例，即即使是私有变量也可能被调两次，这样的需要“be serialized”.</p>
+            <h1 id="连读-2-之辅音结尾-首辅音"><a href="#连读-2-之辅音结尾-首辅音" class="headerlink" title="连读(2)之辅音结尾+首辅音"></a>连读(2)之辅音结尾+首辅音</h1><h2 id="当这两个辅音一样时"><a href="#当这两个辅音一样时" class="headerlink" title="当这两个辅音一样时"></a>当这两个辅音一样时</h2><p>当这两个辅音一样时（如同是“s”），我们只发一次音</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Bill likes swimming(Billlikesswimming)</td>
+<td style="text-align:center">bɪl laɪks ˈswɪmɪŋ</td>
+</tr>
+<tr>
+<td style="text-align:center">I’m gonna stop practicing(stoppracticing)</td>
+<td style="text-align:center">aɪm ˈgɑnə stɑp ˈpræktəsɪŋ</td>
+</tr>
+<tr>
+<td style="text-align:center">I’ll see you next time(nexttime)</td>
+<td style="text-align:center">aɪl si jʊ nɛkst taɪm</td>
+</tr>
+<tr>
+<td style="text-align:center">I wish she would call me(wishshe)</td>
+<td style="text-align:center">aɪ wɪʃ ʃi wəd kɔl mi</td>
+</tr>
+<tr>
+<td style="text-align:center">I had a bad day yesterday(badday)</td>
+<td style="text-align:center">aɪ həd ə bæd deɪ ˈjɛstərˌdeɪ</td>
+</tr>
+<tr>
+<td style="text-align:center">nine nails</td>
+<td style="text-align:center">naɪn neɪlz</td>
+</tr>
+<tr>
+<td style="text-align:center">His name is Bob barker(Bobbarker)</td>
+<td style="text-align:center">hɪz neɪm əz bɑb ˈbɑrkər</td>
+</tr>
+<tr>
+<td style="text-align:center">I love vegetables(lovevegetables)</td>
+<td style="text-align:center">aɪ lʌv ˈvɛʤtəbəlz</td>
+</tr>
+<tr>
+<td style="text-align:center">Everything  is going great(goinggreat)</td>
+<td style="text-align:center">ˈɛvriˌθɪŋ əz ˈgoʊɪŋ greɪt</td>
+</tr>
+</tbody>
+</table>
+<h2 id="具有两个相同发音点的辅音"><a href="#具有两个相同发音点的辅音" class="headerlink" title="具有两个相同发音点的辅音"></a>具有两个相同发音点的辅音</h2><p>“发音点”指的是发音的接触点，例如“p”和“b”,“t”和“d”等</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">used to=useto</td>
+<td style="text-align:center">juzd tʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">five friends</td>
+<td style="text-align:center">faɪv frɛndz</td>
+</tr>
+<tr>
+<td style="text-align:center">I have a big kitchen=I havea bigkitchen</td>
+<td style="text-align:center">aɪ həv ə bɪg ˈkɪʧən</td>
+</tr>
+<tr>
+<td style="text-align:center">supposed to</td>
+<td style="text-align:center">səˈpoʊzd tʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">need to</td>
+<td style="text-align:center">nid tʊ</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="当辅音的发音是停顿时"><a href="#当辅音的发音是停顿时" class="headerlink" title="当辅音的发音是停顿时"></a>当辅音的发音是停顿时</h2><p>当辅音的发音是停顿时例如“p、b、t、d”，而且后面跟着辅音，尽管发音点与前面的不同，我们仍保留第一个辅音连起来读。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">举例</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">a back door(backdoor)</td>
+<td style="text-align:center">ə bæk dɔr</td>
+</tr>
+<tr>
+<td style="text-align:center">help me/help him/help John</td>
+<td style="text-align:center">hɛlp mi/ hɛlp hɪm / hɛlp Jhon</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="综合练习"><a href="#综合练习" class="headerlink" title="综合练习"></a>综合练习</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">句子</th>
+<th style="text-align:center">音标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">I wish she would talk to me</td>
+<td style="text-align:center">aɪ wɪʃ ʃi wəd tɔk tə mi</td>
+</tr>
+<tr>
+<td style="text-align:center">Did that man know about the situation</td>
+<td style="text-align:center">dɪd ðət mæn noʊ əˈbaʊt ðə ˌsɪʧuˈeɪʃən</td>
+</tr>
+<tr>
+<td style="text-align:center">I could drive you there right now</td>
+<td style="text-align:center">aɪ kəd draɪv jʊ ðɛr raɪt naʊ</td>
+</tr>
+<tr>
+<td style="text-align:center">He always seem so happy</td>
+<td style="text-align:center">hi ˈɔlˌweɪz sim soʊ ˈhæpi</td>
+</tr>
+<tr>
+<td style="text-align:center">I used to work crazy hours but these days I’ve slowed down</td>
+<td style="text-align:center">aɪ juzd tə wɜrk ˈkreɪzi ˈaʊərz bət ðiz deɪz aɪv sloʊd daʊn</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
 
           
         
@@ -760,6 +2086,170 @@
 <p>She was found among the dead. 她死了</p>
 <p>amid表示在异类，异质的中间。</p>
 <p>She was found amid the dead.她还活着</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/28/可重入与线程安全/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/28/可重入与线程安全/" itemprop="url">可重入与线程安全</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T00:00:00+08:00">
+                2017-12-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="可重入与线程安全"><a href="#可重入与线程安全" class="headerlink" title="可重入与线程安全"></a>可重入与线程安全</h1><blockquote>
+<p>本文 摘自Qt官方文档</p>
+</blockquote>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li>A thread-safe function can be called simultaneously from multiple threads, even when the invocations use shared data, because all references to the shared data are serialized.</li>
+<li>A reentrant function can also be called simultaneously from multiple threads, but only if each invocation uses its own data.</li>
+</ul>
+<p>Hence, a thread-safe function is always reentrant, but a reentrant function is not always thread-safe.</p>
+<p>By extension, a class is said to be reentrant if its member functions can be called safely from multiple threads, as long as each thread uses a different instance of the class. The class is thread-safe if its member functions can be called safely from multiple threads, even if all the threads use the same instance of the class.</p>
+<h2 id="可重入"><a href="#可重入" class="headerlink" title="可重入"></a>可重入</h2><p>C++ classes are often reentrant, simply because they only access their own member data. Any thread can call a member function on an instance of a reentrant class, as long as no other thread can call a member function on the same instance of the class at the same time. For example, the Counter class below is reentrant:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class"> &#123;</span></div><div class="line"> <span class="keyword">public</span>:</div><div class="line">     Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; ++n; &#125;</div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; --n; &#125;</div><div class="line">     <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line"> <span class="keyword">private</span>:</div><div class="line">     <span class="keyword">int</span> n;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure>
+<p>The class isn’t thread-safe, because if multiple threads try to modify the data member n, the result is undefined. This is because the ++ and – operators aren’t always atomic. Indeed, they usually expand to three machine instructions:</p>
+<ol>
+<li>Load the variable’s value in a register.</li>
+<li>Increment or decrement the register’s value.</li>
+<li>Store the register’s value back into main memory.</li>
+</ol>
+<p>If thread A and thread B load the variable’s old value simultaneously, increment their register, and store it back, they end up overwriting each other, and the variable is incremented only once! </p>
+<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>Clearly, the access must be serialized: Thread A must perform steps 1, 2, 3 without interruption (atomically) before thread B can perform the same steps; or vice versa. An easy way to make the class thread-safe is to protect all access to the data members with a QMutex:<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span></span></div><div class="line"><span class="class">  &#123;</span></div><div class="line">  <span class="keyword">public</span>:</div><div class="line">      Counter() &#123; n = <span class="number">0</span>; &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; ++n; &#125;</div><div class="line">      <span class="function"><span class="keyword">void</span> <span class="title">decrement</span><span class="params">()</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; --n; &#125;</div><div class="line">      <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="function">QMutexLocker <span class="title">locker</span><span class="params">(&amp;mutex)</span></span>; <span class="keyword">return</span> n; &#125;</div><div class="line"></div><div class="line">  <span class="keyword">private</span>:</div><div class="line">      <span class="keyword">mutable</span> QMutex mutex;</div><div class="line">      <span class="keyword">int</span> n;</div><div class="line">  &#125;;</div></pre></td></tr></table></figure></p>
+<p>The QMutexLocker class automatically locks the mutex in its constructor and unlocks it when the destructor is invoked, at the end of the function. Locking the mutex ensures that access from different threads will be serialized. The mutex data member is declared with the mutable qualifier because we need to lock and unlock the mutex in value(), which is a const function. </p>
+<h2 id="个人简单概括"><a href="#个人简单概括" class="headerlink" title="个人简单概括"></a>个人简单概括</h2><p>我也上网看了很多博客，感觉网上关于这俩的说法都有些矛盾，这里就以Qt官方为准吧。</p>
+<p>可重入是针对类的两个实例，像全局变量这样的，会被调用两次因此结果不确定，对于两个实例自己的变量没事。</p>
+<p>线程安全是针对的类的一个实例，即即使是私有变量也可能被调两次，这样的需要“be serialized”.</p>
 
           
         
@@ -983,941 +2473,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/天分重要吗/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/天分重要吗/" itemprop="url">天分重要吗</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/杂谈/" itemprop="url" rel="index">
-                    <span itemprop="name">杂谈</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#天分重要吗</p>
-<blockquote>
-<p>本文摘自尹航的训练营理论课5：天分重要吗</p>
-</blockquote>
-<p>​    大家上学的时候有没有听老师或者父母或者其它同学的父母说过这样的话：”哎呀，这孩子特别聪明，就是不细心，不然他学习特别好。“（这里的不细心可以换成没有耐心，不过认真等等）</p>
-<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
-<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
-<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/什么叫真五轴？什么叫假五轴？与三轴有什么区别？/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/什么叫真五轴？什么叫假五轴？与三轴有什么区别？/" itemprop="url">什么叫真五轴？什么叫假五轴？与三轴有什么区别？</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="什么叫真五轴？什么叫假五轴？与三轴有什么区别？"><a href="#什么叫真五轴？什么叫假五轴？与三轴有什么区别？" class="headerlink" title="什么叫真五轴？什么叫假五轴？与三轴有什么区别？"></a>什么叫真五轴？什么叫假五轴？与三轴有什么区别？</h2><blockquote>
-<p>本文转自<a href="http://mp.weixin.qq.com/s/5fnLs8P4B_S3_Ub9H9smBg" target="_blank" rel="external">这里</a></p>
-</blockquote>
-<p>​    真五轴就是有RTCP功能。能根据主轴的摆长及旋转台的机械坐标进行自动换算。在编制程序时，只需要考虑工件的坐标，不需要考虑主轴的摆长及旋转台的位置。</p>
-<p>​    是否是真五轴，不是看五个轴是否联动，假五轴也可五轴联动。主轴要是有RTCP真五轴的算法。就是做分度加工，有ＲＴＣＰ功能的真五轴只要设置一个坐标系，只需要一次对刀设坐标。而假五轴则麻烦很多。</p>
-<p>​    拥有RTCP功能的数控系统，可以直接使用刀尖编程，无需考虑旋转轴中心距离。应用RTCP模式后，编程5坐标加工就可以直接针对刀具刀尖而不是旋转主轴头的中心，因此编程就会变得简单、高效很多。</p>
-<p>​    原文有图，满形象的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/26/However的用法/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/However的用法/" itemprop="url">However的用法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T00:00:00+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#However的用法</p>
-<blockquote>
-<p>本文摘自天天用英语</p>
-</blockquote>
-<h2 id="副词，-然而、不过、但是"><a href="#副词，-然而、不过、但是" class="headerlink" title="副词，  然而、不过、但是"></a>副词，  然而、不过、但是</h2><ul>
-<li>近义词nevertheless</li>
-<li>This is a cheap and simple process. However, there are dangers. 这是个花钱少而又简单的方法，不过有危险。</li>
-</ul>
-<h2 id="副词，-无论多大-好、严重等"><a href="#副词，-无论多大-好、严重等" class="headerlink" title="副词， 无论多大[好、严重等]"></a>副词， 无论多大[好、严重等]</h2><ul>
-<li>相当与No matter how</li>
-<li>You should report any incident, however minor it is. 任何事件你都应该汇报，不管它多小。</li>
-</ul>
-<h2 id="副词，-到底-如何？-表示惊讶"><a href="#副词，-到底-如何？-表示惊讶" class="headerlink" title="副词， (到底)如何？[表示惊讶]"></a>副词， (到底)如何？[表示惊讶]</h2><ul>
-<li>However did he get that job?他到底是怎样得到那份工作的？</li>
-</ul>
-<h2 id="conjunction-in-whatever-way-不管怎样，无论如何"><a href="#conjunction-in-whatever-way-不管怎样，无论如何" class="headerlink" title="conjunction.  in whatever way 不管怎样，无论如何"></a>conjunction.  in whatever way 不管怎样，无论如何</h2><ul>
-<li>You can do it however you like. 你可以按自己的意思去做。</li>
-</ul>
-<p>​    总之，在他们看来，这孩子是有天分的，但是没有用好，他只要善加利用了就肯定能做出不错的成绩。</p>
-<p>​    这个是个特别大的误区，本质上这是在表示天赋是最重要的，并且骨子里散发着一种特别高傲的情绪，在他们看来认真，细心，耐心都是特别容易得到的品质或者是你身上的固有属性，你有只是你不用。</p>
-<p>​    那你说这样的话让那些这么多年认真做事的人情何以堪呢，为什么没有人说只要你聪明一点就可以了呢。因为大家都觉得聪明是天生的，而认真和耐心是人人都有的，只要你调用出来就可以了</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/24/倒装句/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/24/倒装句/" itemprop="url">倒装句</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-24T00:00:00+08:00">
-                2017-12-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="倒装句"><a href="#倒装句" class="headerlink" title="倒装句"></a>倒装句</h1><h2 id="Only-状语或状语从句在句首，部分倒装"><a href="#Only-状语或状语从句在句首，部分倒装" class="headerlink" title="Only+状语或状语从句在句首，部分倒装"></a>Only+状语或状语从句在句首，部分倒装</h2><ul>
-<li>Only in this way can you solve the problem.</li>
-</ul>
-<h2 id="否定词在句首，部分倒装"><a href="#否定词在句首，部分倒装" class="headerlink" title="否定词在句首，部分倒装"></a>否定词在句首，部分倒装</h2><blockquote>
-<p>not, little, hardly, scarcely, no more, no longer, in no way, never, seldom, not only, no sooner</p>
-</blockquote>
-<ul>
-<li>No sooner had I got home than it began to rain.</li>
-<li>seldom do I stand up late after graduation.</li>
-</ul>
-<p>##SO/such…that在句首，部分倒装，强调so/such…that之间的部分</p>
-<ul>
-<li>So unreasonable was his price that nobody took the offer.</li>
-</ul>
-<h2 id="副词here-there开头，全部倒装"><a href="#副词here-there开头，全部倒装" class="headerlink" title="副词here,there开头，全部倒装"></a>副词here,there开头，全部倒装</h2><ul>
-<li>Here is the present you expected.</li>
-</ul>
-<h2 id="主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装"><a href="#主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装" class="headerlink" title="主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装"></a>主语或其所带的修饰语太长，把状语、表语放在句首，完全倒装</h2><ul>
-<li>(介词短语开头的状语)On the ground lay some air conditioners which are to be shipped to other cities.</li>
-<li>(表语)Such would be our home in the future.</li>
-</ul>
-<h2 id="为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装"><a href="#为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装" class="headerlink" title="为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装"></a>为了令语言生动，将表示方向的副词、拟声词放在句首，全部倒装</h2><blockquote>
-<p>表示方向的副词: down, up, in, off, on ,away, etc.</p>
-<p>拟声词: bang, crack, etc</p>
-</blockquote>
-<ul>
-<li>Up went the rocket into the air.</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/24/where从句的抽象含义/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/24/where从句的抽象含义/" itemprop="url">where从句的抽象含义</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-24T00:00:00+08:00">
-                2017-12-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="where从句的抽象含义"><a href="#where从句的抽象含义" class="headerlink" title="where从句的抽象含义"></a>where从句的抽象含义</h1><blockquote>
-<p>本文转自天天用英语第362期—到底是谁让你沦为铲屎官</p>
-</blockquote>
-<h2 id="where引导的地点状语从句"><a href="#where引导的地点状语从句" class="headerlink" title="where引导的地点状语从句"></a>where引导的地点状语从句</h2><ul>
-<li>where there is a will, there is a way.</li>
-<li>where we are met with cynicism, and doubt, and those who tell us that we can’t, we will respond with that timeless creed that sums up the spirit of a people:Yes, We Can.</li>
-</ul>
-<p>##where引导的定语从句</p>
-<ul>
-<li>So let us summon a new spirit of patriotism, of responsibility, where each of us resolves to pith in and work harder and look after not only ourselves, but each other.</li>
-</ul>
-<h2 id="where引导的名词性从句"><a href="#where引导的名词性从句" class="headerlink" title="where引导的名词性从句"></a>where引导的名词性从句</h2><ul>
-<li>You are saying that everyone should be equal, and this is where I disagree.</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/14/It做形式主语/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/14/It做形式主语/" itemprop="url">It做形式主语</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T00:00:00+08:00">
-                2017-12-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/英语/" itemprop="url" rel="index">
-                    <span itemprop="name">英语</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="It做形式主语"><a href="#It做形式主语" class="headerlink" title="It做形式主语"></a>It做形式主语</h1><h2 id="It-be-形容词-to-do-doing-that"><a href="#It-be-形容词-to-do-doing-that" class="headerlink" title="It+be+形容词+to do/doing/that"></a>It+be+形容词+to do/doing/that</h2><p>It is very important to learn a foreign language.</p>
-<h2 id="It-be-名词词组-doing-that"><a href="#It-be-名词词组-doing-that" class="headerlink" title="It+be+名词词组+doing/that"></a>It+be+名词词组+doing/that</h2><p>It is no good telling lies.</p>
-<p>It is a pity that you didn’t go to see the film yesterday.</p>
-<h2 id="It-be-过去分词-that"><a href="#It-be-过去分词-that" class="headerlink" title="It+be+过去分词+that"></a>It+be+过去分词+that</h2><p>It was reported that more than 170 thousand people died in the 2004 tsunami.</p>
-<h2 id="It-seems-appears-happens-that"><a href="#It-seems-appears-happens-that" class="headerlink" title="It+seems/appears/happens+that"></a>It+seems/appears/happens+that</h2><p>It is appears that Tom might change his mind.</p>
-<h2 id="若句子为疑问句，则只能用it当形式主语"><a href="#若句子为疑问句，则只能用it当形式主语" class="headerlink" title="若句子为疑问句，则只能用it当形式主语"></a>若句子为疑问句，则只能用it当形式主语</h2><p>Does it matter much that they won’t come tomorrow.</p>
-<h2 id="It-takes-sb-some-time-to-do"><a href="#It-takes-sb-some-time-to-do" class="headerlink" title="It+takes+sb+some time+to do"></a>It+takes+sb+some time+to do</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1963,7 +2523,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1974,7 +2534,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
