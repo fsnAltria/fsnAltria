@@ -273,646 +273,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/QModbusClient/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/QModbusClient/" itemprop="url">QModbusClient</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index">
-                    <span itemprop="name">Qt</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿#QModbusClient#</p>
-<p>以使用Modbus Tcp为例看看客户端怎么写程序</p>
-<p>##首先连接到服务端##</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">QModbusTcpClient *client = new QModbusTcpClient();</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter, &quot;192.168.0.1&quot;);</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);</div><div class="line">client-&gt;connectDevice();</div></pre></td></tr></table></figure>
-<p>这样就连接上服务端了，下面可以发送请求了</p>
-<p>##发送读或写请求到服务端##</p>
-<p>###写请求###<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 40003, 1); // write 1 value in address 40003</div><div class="line">writeUnit.setValue(0, 0x253); </div><div class="line">//这里先建好QModbusDataUnit</div><div class="line"></div><div class="line">if (auto *reply = client-&gt;sendWriteRequest(writeUnit, 1))</div><div class="line">//发送写请求</div><div class="line">&#123;</div><div class="line">	if (!reply-&gt;isFinished())</div><div class="line">	&#123;</div><div class="line">		connect(reply, &amp;QModbusReply::finished, this, [this, reply]() </div><div class="line">		&#123;</div><div class="line">			if (reply-&gt;error() != QModbusDevice::NoError) 				</div><div class="line">					// error in reply</div><div class="line">											</div><div class="line">				reply-&gt;deleteLater();</div><div class="line">			&#125;);</div><div class="line">	&#125;</div><div class="line">	else</div><div class="line">	&#123;</div><div class="line">		if (reply-&gt;error() != QModbusDevice::NoError)			</div><div class="line">			// error in reply</div><div class="line">			</div><div class="line">		// broadcast replies return immediately</div><div class="line">		reply-&gt;deleteLater();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">else</div><div class="line">&#123;</div><div class="line">	// error in request</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>先建个QModbusDataUnit，下面是Qt帮助文档中的介绍<br><strong>QModbusDataUnit is a container class representing single bit and 16 bit word entries in the Modbus register.QModbusDataUnit can be used for read and write operations</strong><br>给QModbusDataUnit赋好值后发送写请求sendWriteRequest，写到相应寄存器中的相应位置<br>如果没有发生错误的话sendWriteRequest将返回一个QModbusReply，否则返回空指针。<br>当reply完成或放弃后reply-&gt;isFinished()将返回true。</p>
-<p>###读请求###</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">QModbusDataUnit readUnit(QModbusDataUnit::InputRegisters, 40006, 1); // just read input register 40006 </div><div class="line"></div><div class="line">if (auto *reply = client-&gt;sendReadRequest(readUnit, 255)) // client id 255</div><div class="line">&#123;</div><div class="line">	if (!reply-&gt;isFinished())</div><div class="line">	&#123;</div><div class="line">        // connect the finished signal of the request to your read slot</div><div class="line">		connect(reply, &amp;QModbusReply::finished, this, &amp;YourClass::readReady);</div><div class="line">	&#125;</div><div class="line">	else</div><div class="line">	&#123;</div><div class="line">		delete reply; // broadcast replies return immediately</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">else</div><div class="line">&#123;</div><div class="line">	// request error</div><div class="line">&#125;</div><div class="line">YourClass::readReady</div><div class="line">&#123;</div><div class="line">	QModbusReply *reply = qobject_cast&lt;QModbusReply *&gt;(sender());</div><div class="line">	if (!reply)</div><div class="line">		return;</div><div class="line"></div><div class="line">	if (reply-&gt;error() == QModbusDevice::NoError)</div><div class="line">	&#123;</div><div class="line">		const QModbusDataUnit unit = reply-&gt;result();</div><div class="line">		int startAddress = unit.startAddress(); // the start address, here 40006</div><div class="line">		int value = unit.value(0); // value of the start address + 0</div><div class="line">		... </div><div class="line"></div><div class="line">	&#125;</div><div class="line">	else</div><div class="line">	&#123;</div><div class="line">		// reply error</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	reply-&gt;deleteLater(); // delete the reply </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>##应该注意的问题##<br>看看QModbusClient帮助文档中的一句话<br><strong>QModbusClient has an asynchronous API. When the finished slot is called, the parameter it takes is the QModbusReply object containing the PDU as well as meta-data (Addressing, etc.).</strong><br>这意味着</p>
-<blockquote>
-<p>The API of the QModbusDevice classes are asynchronous. That means when you callclient-&gt;connectDevice() your client is not “really” connected to your server. The function just send an event to the event loop. When the application enters the event loop the event will be executed.The QModbusDevice class has some signals to control your connection state and error message.</p>
-</blockquote>
-<p>所以我们应该</p>
-<blockquote>
-<p>Check the client state with yout slot. Before reading registers ensure that the client is in connected state.</p>
-</blockquote>
-<p>因此所有代码在一个函数中是不对的，像这样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">YourClass::connect()</div><div class="line">&#123;</div><div class="line">QModbusTcpClient *client=new QModbusTcpClient();</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter,&quot;192.168.0.201&quot;);</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter,502);</div><div class="line">client-&gt;connectDevice();</div><div class="line"></div><div class="line">QModbusDataUnit readUnit(QModbusDataUnit::Coils,00000,4);</div><div class="line">if (auto *reply=client-&gt;sendReadRequest(readUnit,255))&#123;</div><div class="line"></div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>应该</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">MyClass::connectToModbusServer()</div><div class="line">&#123;</div><div class="line">   QModbusTcpClient *client=new QModbusTcpClient();</div><div class="line">   client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter,&quot;192.168.0.201&quot;);</div><div class="line">   client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter,502);</div><div class="line"></div><div class="line">   if (client-&gt;connectDevice())</div><div class="line">   &#123;</div><div class="line">      connect(client, &amp;QModbusTcpClient::stateChanged, this, &amp;MyClass::onStateChanged); </div><div class="line">      connect(client, &amp;QModbusTcpClient::errorOccurred, this, &amp;MyClass::onErrorOccurred); </div><div class="line">   &#125;</div><div class="line">   else</div><div class="line">      qDebug() &lt;&lt; client-&gt;errorString();</div><div class="line">&#125;</div><div class="line"></div><div class="line">MyClass::readCoil()</div><div class="line">&#123;</div><div class="line">   QModbusDataUnit readUnit(QModbusDataUnit::Coils,00000,4);</div></pre></td></tr></table></figure>
-<p>本文内容摘自<a href="https://forum.qt.io/topic/67565/how-to-use-qmodbus-class-to-get-the-data-on-a-daq-card" target="_blank" rel="external">这里</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/QStandardItemModel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/QStandardItemModel/" itemprop="url">QStandardItemModel</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index">
-                    <span itemprop="name">Qt</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿#QStandardItemModel#</p>
-<p>以下内容摘自 《t中的C++技术》</p>
-<p>##基本知识##<br>类QabstractItemModel，QabstractListModel，QAbstractTableModel不保存数据，用户需要从这些类派生出子类，并在子类中定义某种数据结构来保存数据。与此不同，类QStandardItemModel负责保存数据，每个数据项被表示为类QStandardItem的对象。<br><strong>QStandardItem用来保存一个数据项，再使用QStandardItemModel将这些数据项组织起来，形成列表、表格或者树，以供其他视图类显示。</strong><br>一个数据项由若干个『角色，数据子项』对组成。类QStandardItem负责保存、访问这些数据。该类的内部定义了一个类型为QVector的容器，每个容器元素本质上存放一个『角色，数据子项』对。<br>由于各个角色对应的数据子项可能具有不同的类型，Qt使用QVariant来存放每个数据子项。当用户希望将一些数据存放在一个QStandardItem对象中时，可以调用其成员函数：<br>void setData ( const QVariant &amp; value, int role)<br>将『role, value』对存入。<br>当用户希望读取该对象中的数据时，可以调用另外一个成员函数：</p>
-<p>QVariant data ( int role = ) const</p>
-<p>读取角色role对应的数据子项。</p>
-<p>以上两个函数是QStandardItem的核心。<strong>有了这两个函数，我们就可以访问该类所表示数据项的任何一个『角色，数据子项』对。然而，对于一些常用角色，该类提供了更加简洁、容易记忆的成员函数。</strong>例如，当一个数据项被显示在视图中时，它往往包含一些文字、一个图标，还可能包含一个复选框。角色Qt::BackgroundRole控制显示背景，Qt::FontRole控制文字字体，Qt::ForegroundRole控制文字颜色，Qt::CheckStateRole控制复选框的状态。该类提供的一组成员函数可以方便地访问这些常用角色对应的数据子项。成员函数setBackground()、background()分别设置/返回背景刷子。函数setFont()、font()分别设置/返回文字字体。函数setForeground()、foreground()分别设置/返回字体颜色。函数setCheckState()、checkState()分别设置/返回复选框状态。</p>
-<p>##如果数据集被表示为一个列表##<br>如果数据集被表示为一个列表，我们可以调用类QStandardItemModel的成员函数<strong>appendRow()</strong>向列表中添加一个数据项，使用<strong>item()</strong>读取一个数据项,代码如下:</p>
-<figure class="highlight qt"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel listModel;</div><div class="line">QStandardItem *rootItem = listModel.invisibleRootItem(); <span class="comment">//获取模型最底层的根节点         </span></div><div class="line"><span class="keyword">for</span> (<span class="built_in">int</span> row = <span class="number">0</span>; row &lt; <span class="number">4</span>; ++row) &#123;</div><div class="line"> QStandardItem *item = <span class="keyword">new</span> QStandardItem(QString(<span class="string">"%0"</span>).arg(row) );<span class="comment">//表示一个数据项，构造函数在内部调用该类的setData()函数，将QString对象作为Qt::DisplayRole对应的数据子项存入新构造的对象</span></div><div class="line"> rootItem-&gt;appendRow( item );  <span class="comment">//将该数据项作为根节点的子节点添加到列表中。</span></div><div class="line">&#125; </div><div class="line">QListView listView;<span class="comment">//因为数据集本身是一个列表，所以使用QListView展示</span></div><div class="line">listView.setModel ( &amp; listModel );</div></pre></td></tr></table></figure>
-<p><strong>QStandardItem(QString(“%0”).arg(row) );这句话的构造函数在内部调用该类的setData()函数，将QString对象作为Qt::DisplayRole对应的数据子项存入新构造的对象（终于找到哪调用的setData()函数了）</strong></p>
-<p>##如果数据集被表示为一个表格##<br>如果数据集被表示为一个表格，可以调用类QStandardItemModel的成员函数<strong>setItem()</strong>设定表格中的某个数据项,代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel tableModel(4, 4);</div><div class="line"> for (int row = 0; row &lt; 4; ++row) &#123;</div><div class="line">   for (int column = 0; column &lt; 4; ++column) &#123;</div><div class="line">    QStandardItem *item = new QStandardItem(</div><div class="line">     QString(&quot;%0,%1&quot;).arg(row).arg(column));</div><div class="line">    tableModel.setItem(row, column, item);</div><div class="line">   &#125;</div><div class="line"> &#125; </div><div class="line"> QTableView tableView;//因为数据集是个表格，所以使用QTableView</div><div class="line"> tableView.setModel( &amp; tableModel );</div></pre></td></tr></table></figure>
-<p>##如果数据集被表示为一个树##<br>如果数据集被表示为一个树，可以调用类QStandardItemModel的成员函数appendRow()向某个树节点添加子节点。通过多次调用该函数，可以构建一棵复杂的树。代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">QStandardItemModel treeModel;</div><div class="line">QStandardItem *parentItem = treeModel.invisibleRootItem();</div><div class="line">for (int i = 0; i &lt; 4; ++i) &#123;</div><div class="line"> QStandardItem *item = new QStandardItem(QString(&quot;%0&quot;).arg(i));</div><div class="line"> parentItem-&gt;appendRow(item);</div><div class="line"> parentItem = item;</div><div class="line">&#125;</div><div class="line">QTreeView treeView;//由于数据集是一棵树，我们使用QTreeView显示它</div><div class="line">treeView.setModel( &amp; treeModel );</div></pre></td></tr></table></figure>
-<p>##总结##<br>类QStandardItemModel之所以能够表示列表、表格、树甚至更复杂的数据结构，得益于类QStandardItem在其内部定义了一个类型为QVector<code>&lt;</code>QStandardItem*<code>&gt;</code>的容器，可以将每个容器元素所指的QStandardItem对象设定为子对象。表现在如下图所示的类图上，类QStandardItem和自身具有“children”关系。一个类和自身发生关联，在UML中被称为自关联（self association）。类QStandardItemModel定义了一个名为root的数据成员，逻辑上是一个指向QStandardItem对象的指针。这个对象可以设定多个QStandardItem的对象作为自己的子对象，而其中每个子对象又可以包含其他的子对象。依此类推，这棵树可以具有任意深度，每个父对象可以包含任意多个子对象。<img src="http://img.blog.csdn.net/20170721213157481?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="类QStandardItem使用自关联以形成层次结构"><br>很自然地，QStandardItemModel可以使用QStandardItem表示具有树状数据结构的数据集，如图13 14所示。图中的每个小方框表示类QStandardItem的一个对象。如果小方框的边线为虚，相应的QStandardItem对象并不表示数据集中的任何数据，仅被用来表示某种数据结构。如果小方框的边线为实，相应的QStandardItem对象就表示数据集中的一个数据项。在右侧的图中，QStandardItemModel的数据成员root所指的对象表示一个不可见的根，而数据集的根（图中结点G）被表示为这个不可见根的一个子节点。<br><img src="http://img.blog.csdn.net/20170721213942624?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZnNuQWx0cmlh/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="类QStandardItem使用自关联形成列表、表格与树"><br>列表被看作一个特殊的树：不可见根具有若干个子节点，每个子节点表示列表中的一个数据项，不再包含任何子节点，如该图左侧所示。而表格的表示方式反而麻烦一些。不可见根含有若干子节点（图中A，B，C），这些子节点并不表示数据集中的任何数据项。第i个子节点会包含若干子节点（比如图中D，E，F），这些子节点才表示表格第i行的数据项。</p>
-<p>###优点###<br>使用QStandardItemModel表示数据集具有以下优点：该类使用QStandardItem存放数据项，用户不必定义任何数据结构来存放数据项；QStandardItem使用自关联关系，能够表达列表、表格、树甚至更复杂的数据结构，能够涵盖各种各样的数据集；QStandardItem本身存放着多个『角色，数据子项』，视图类、委托类或者其他用户定义的类能够方便地依据角色访问各个数据子项。</p>
-<p>###缺点###<br>然而，这种表示方法也有局限性：当数据集中的数据项很多时，施加在数据集上的某些操作的执行效率会很低。比如，设数据集是一个1万行、20列的表格，其中第10列存放的是浮点数。如果我们想计算这一列的平均值，按照图13 14，这需要遍历所有行，取得第10列的QStandardItem对象，再依据角色“Qt::DisplayRole”取得对应的数据子项。由于这个数据子项的类型为QString，还需要将其转换为浮点数，最后求所有浮点数的平均值。这些操作会耗费较长的时间。</p>
-<p>###结论###<br>因此，对于数据量不是很大、对性能要求不是很高的场合，我们可以使用类QStandardItemModel来表示一个数据集。否则，用户应该从QAbstractItemModel、QAbstractListModel或者QAbstractTableModel派生新类，自行管理数据集的存放与访问。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/CPU如何控制器件/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/CPU如何控制器件/" itemprop="url">CPU如何控制器件</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT/" itemprop="url" rel="index">
-                    <span itemprop="name">IT</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#CPU如何控制器件</p>
-<hr>
-<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
-<p>##总线##<br>CPU想要进行数据的读写，必须和外部器件进行以下3类信息的交互。</p>
-<blockquote>
-<ul>
-<li>存储单元的地址（地址信息）</li>
-<li>器件的选择，读或写的命令（控制信息）</li>
-<li>读或写的数据（数据信息）</li>
-</ul>
-</blockquote>
-<p>通常将连接CPU和其他芯片的导线，称为总线。因此，总线从逻辑上分为3类，地址总线、控制总线和数据总线。<br>我们知道了CPU是如何进行数据读写的。可是，如何命令计算机进行数据的读写呢？<br>要让一个计算机或微处理器工作，应向它输入能够驱动它进行工作的电平信息（汇编指令，机器码）</p>
-<p>##接口卡##<br>计算机系统中，所有可用程序控制其工作的设备，必须收到CPU的控制。CPU对外部设备都不能直接控制，如显示器、音响、打印机等。直接控制这些设备进行工作的是插在扩展插槽上的接口卡。扩展插槽通过总线和CPU相连，所以接口卡也通过总线同CPU相连。CPU可以直接控制这些接口卡，从而实现CPU对外设的间接控制。简单的讲<strong><em>，就是CPU通过总线向接口卡发送命令，接口卡根据CPU的命令控制外设进行工作</em></strong>。</p>
-<p>##各类存储器芯片##<br>主要有RAM和ROM</p>
-<p>###随机存储器###<br>主随机存储器一般由两个位置上的RAM组成，装在主板上的RAM和插在扩展槽上的RAM。</p>
-<p>###装有BIOS的ROM###<br>BIOS是由主板和各类接口卡（如显卡、网卡等）厂商提供的软件系统，可以通过它利用该硬件设备进行最基本的输入输出。在主板和某些接口卡上茶有存储相应BIOS的ROM，例如，主板上的ROM中存储着主板的BIOS；显卡上的ROM中存储着显卡的BIOS；如果网卡上装有ROM，那么其中就可以存储网卡的BIOS。</p>
-<p>###接口卡上的RAM###<br>某些接口卡需要对大批量输入输出数据进行暂时存储，在其上装有RAM。最典型的是显存。显卡随时将显存中的数据向显示器输出。换句话说，我们将需要显示的内容写入显存，就会出现在显示器上。</p>
-<p>###内存地址空间###<br>上述的那些存储器，在物理上是独立的器件，但是在以下两点上相同。</p>
-<blockquote>
-<ul>
-<li>都和CPU的总线相连。</li>
-<li>CPU对他们进行读写的时候都通过控制线发出内存读写命令。</li>
-</ul>
-</blockquote>
-<p>这就是说，<strong><em>CPU在操纵它们的时候，把它们都当作内存来对待</em></strong>。<br>所有的物理存储器被看作一个由若干存储单元组成的逻辑存储器，每个物理存储器在这个逻辑存储器中占有一个地址段，即一段地址空间。CPU在这段地址空间中读写数据，实际上就是在对相对应的物理存储器中读写数据。<br>例如：</p>
-<blockquote>
-<p>地址0~7FFFH的32KB空间为主村级存储器地址空间；<br>地址8000H~9FFFH的8KB空间为显存地址空间；<br>地址A000H~FFFFH的24KB空间为各个ROM的地址空间。</p>
-</blockquote>
-<p>这样，CPU向内存地址为1000H的内存单元中写入数据，这个数据就被写入主随机存储器；CPU向内存地址为8000H的内存单元中写入数据，这个数据就被写入显存中，然后会被显卡输出到显示器上；CPU向内存地址为C00H的内存单元中写入数据的操作是没有结果的，因为是ROM。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC基本知识（二）/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jiao Maojin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JMJ">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/24/PLC基本知识（二）/" itemprop="url">PLC基本知识（二）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
-                2018-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工控/" itemprop="url" rel="index">
-                    <span itemprop="name">工控</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>﻿##PLC基本知识（二）##</p>
-<ul>
-<li>RS232与RS485区别：RS485用双绞线传输，传的是差分信号，当A比B电压高时为“1”，低时为“0”，因此RS485抗干扰能力较强，通常能传输1000米以上，RS232至少3根线，一根是TxD，一根RxD，一根GND，传送时把TTL转换成+-12V电平。RS232传输距离较短，一般10米左右。因此RS485为半双工个，RS232为全双工。 还有RS485已经是网络技术了，一条总线上可以连接200多节点，而RS232只能在2点之间通信。485上跑，必然是主从模式。</li>
-<li>三种时基的刷新方式（1ms，10ms，100ms）：简单的说，1ms的定时器采用中断方式刷新当前值，每隔1ms系统自动刷新一次定时器和当前位，与扫描周期无关；10ms的定时器，定时器位和当前值总是在每个扫描周期开始时被刷新，之后在整个扫描周期内不变；100ms的定时器，是在该指令被执行时刷新，是在扫描过程中读到该定时器时才对定时器接点和当前值进行更新；因此确保每个扫描周期内，程序仅为100ms的定时器执行一次指令，以便使定时器保持正确计时。</li>
-<li>状态转移图或步进梯形图中输出继电器想多次使用，例如两个Q0.0，可以采用第一个Q0.0用立即输出线圈，后面一个用普通输出线圈。</li>
-<li>S7-300有4种电源模块，其中PS305是直流供电，PS307是交流供电，电源模块与S7-300PLC的背板之间没有连接，可以隔离安装，CPU不能对电源进行诊断。</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC展厅/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -944,7 +304,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
                 2018-01-24
               </time>
             
@@ -1105,7 +465,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
                 2018-01-24
               </time>
             
@@ -1264,7 +624,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
                 2018-01-24
               </time>
             
@@ -1376,6 +736,319 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/PLC基本知识（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/PLC基本知识（一）/" itemprop="url">PLC基本知识（一）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工控/" itemprop="url" rel="index">
+                    <span itemprop="name">工控</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#PLC基本知识（一）#</p>
+<p>##数字IO模块的源型与漏型##<br>源型（source），电流是从端子流出来的，具有PNP晶体管的输出特性.<br>漏极（sink），电流是从段子流进去的，具有NPN晶体管的输出特性.</p>
+<p>从使用上来说，NPN三极管工作时是集电极接高电压，发射极接低电压，基极输入电压升高时趋向导通，基极输入电压降低时趋向截止；而PNP三极管工作时则是集电极接低电压，发射极接高电压，基极输入电压升高时趋向截止，基极输入电压降低时趋向导通。</p>
+<p>所谓漏极输入，是一种有PLC内部提供输入信号源，全部输入信号的一端汇总到输入的公共连接端COM的输入形式，又称为汇点输入。输入传感器为接近开关时，只要接近开关的输出驱动力足够，漏型输入的PLC输入端就可以直接与NPN集电极开路型接近开关的输出进行连接。</p>
+<p>所谓源型输入，是一种由外部提供输入信号电源或使用PLC内部提供给输入回路的电源，全部输入信号为”有源”信号，并独立输入PLC的输入连接形式。输入传感器为接近开关时，只要接近开关的输出驱动力足够，源型输入的PLC输入端就可以直接与PNP集电极开路型接近开关的输出进行连接。</p>
+<p>欧美的PLC一般是源型，输入一般用PNP的开关，高电平输入,而日韩系列PLC偏好使用漏型，一般使用NPN型的开关也就是低电平输入。</p>
+<p>源型输出是指输出的是直流正极，漏型输出指的是直流负极。</p>
+<p>漏型输入，即NPN晶体管，当逻辑状态为1（真）时，信号为24V，当逻辑状态为0（假）时，信号为0V。<br>源型输入，即PNP晶体管，当逻辑状态为1（真）时，信号为0V，当逻辑状态为0（假）时，信号为24V。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/QModbusClient/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/QModbusClient/" itemprop="url">QModbusClient</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index">
+                    <span itemprop="name">Qt</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>﻿#QModbusClient#</p>
+<p>以使用Modbus Tcp为例看看客户端怎么写程序</p>
+<p>##首先连接到服务端##</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">QModbusTcpClient *client = new QModbusTcpClient();</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter, &quot;192.168.0.1&quot;);</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter, 502);</div><div class="line">client-&gt;connectDevice();</div></pre></td></tr></table></figure>
+<p>这样就连接上服务端了，下面可以发送请求了</p>
+<p>##发送读或写请求到服务端##</p>
+<p>###写请求###<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">QModbusDataUnit writeUnit(QModbusDataUnit::HoldingRegisters, 40003, 1); // write 1 value in address 40003</div><div class="line">writeUnit.setValue(0, 0x253); </div><div class="line">//这里先建好QModbusDataUnit</div><div class="line"></div><div class="line">if (auto *reply = client-&gt;sendWriteRequest(writeUnit, 1))</div><div class="line">//发送写请求</div><div class="line">&#123;</div><div class="line">	if (!reply-&gt;isFinished())</div><div class="line">	&#123;</div><div class="line">		connect(reply, &amp;QModbusReply::finished, this, [this, reply]() </div><div class="line">		&#123;</div><div class="line">			if (reply-&gt;error() != QModbusDevice::NoError) 				</div><div class="line">					// error in reply</div><div class="line">											</div><div class="line">				reply-&gt;deleteLater();</div><div class="line">			&#125;);</div><div class="line">	&#125;</div><div class="line">	else</div><div class="line">	&#123;</div><div class="line">		if (reply-&gt;error() != QModbusDevice::NoError)			</div><div class="line">			// error in reply</div><div class="line">			</div><div class="line">		// broadcast replies return immediately</div><div class="line">		reply-&gt;deleteLater();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">else</div><div class="line">&#123;</div><div class="line">	// error in request</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>先建个QModbusDataUnit，下面是Qt帮助文档中的介绍<br><strong>QModbusDataUnit is a container class representing single bit and 16 bit word entries in the Modbus register.QModbusDataUnit can be used for read and write operations</strong><br>给QModbusDataUnit赋好值后发送写请求sendWriteRequest，写到相应寄存器中的相应位置<br>如果没有发生错误的话sendWriteRequest将返回一个QModbusReply，否则返回空指针。<br>当reply完成或放弃后reply-&gt;isFinished()将返回true。</p>
+<p>###读请求###</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">QModbusDataUnit readUnit(QModbusDataUnit::InputRegisters, 40006, 1); // just read input register 40006 </div><div class="line"></div><div class="line">if (auto *reply = client-&gt;sendReadRequest(readUnit, 255)) // client id 255</div><div class="line">&#123;</div><div class="line">	if (!reply-&gt;isFinished())</div><div class="line">	&#123;</div><div class="line">        // connect the finished signal of the request to your read slot</div><div class="line">		connect(reply, &amp;QModbusReply::finished, this, &amp;YourClass::readReady);</div><div class="line">	&#125;</div><div class="line">	else</div><div class="line">	&#123;</div><div class="line">		delete reply; // broadcast replies return immediately</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">else</div><div class="line">&#123;</div><div class="line">	// request error</div><div class="line">&#125;</div><div class="line">YourClass::readReady</div><div class="line">&#123;</div><div class="line">	QModbusReply *reply = qobject_cast&lt;QModbusReply *&gt;(sender());</div><div class="line">	if (!reply)</div><div class="line">		return;</div><div class="line"></div><div class="line">	if (reply-&gt;error() == QModbusDevice::NoError)</div><div class="line">	&#123;</div><div class="line">		const QModbusDataUnit unit = reply-&gt;result();</div><div class="line">		int startAddress = unit.startAddress(); // the start address, here 40006</div><div class="line">		int value = unit.value(0); // value of the start address + 0</div><div class="line">		... </div><div class="line"></div><div class="line">	&#125;</div><div class="line">	else</div><div class="line">	&#123;</div><div class="line">		// reply error</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	reply-&gt;deleteLater(); // delete the reply </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>##应该注意的问题##<br>看看QModbusClient帮助文档中的一句话<br><strong>QModbusClient has an asynchronous API. When the finished slot is called, the parameter it takes is the QModbusReply object containing the PDU as well as meta-data (Addressing, etc.).</strong><br>这意味着</p>
+<blockquote>
+<p>The API of the QModbusDevice classes are asynchronous. That means when you callclient-&gt;connectDevice() your client is not “really” connected to your server. The function just send an event to the event loop. When the application enters the event loop the event will be executed.The QModbusDevice class has some signals to control your connection state and error message.</p>
+</blockquote>
+<p>所以我们应该</p>
+<blockquote>
+<p>Check the client state with yout slot. Before reading registers ensure that the client is in connected state.</p>
+</blockquote>
+<p>因此所有代码在一个函数中是不对的，像这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">YourClass::connect()</div><div class="line">&#123;</div><div class="line">QModbusTcpClient *client=new QModbusTcpClient();</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter,&quot;192.168.0.201&quot;);</div><div class="line">client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter,502);</div><div class="line">client-&gt;connectDevice();</div><div class="line"></div><div class="line">QModbusDataUnit readUnit(QModbusDataUnit::Coils,00000,4);</div><div class="line">if (auto *reply=client-&gt;sendReadRequest(readUnit,255))&#123;</div><div class="line"></div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>应该</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">MyClass::connectToModbusServer()</div><div class="line">&#123;</div><div class="line">   QModbusTcpClient *client=new QModbusTcpClient();</div><div class="line">   client-&gt;setConnectionParameter(QModbusDevice::NetworkAddressParameter,&quot;192.168.0.201&quot;);</div><div class="line">   client-&gt;setConnectionParameter(QModbusDevice::NetworkPortParameter,502);</div><div class="line"></div><div class="line">   if (client-&gt;connectDevice())</div><div class="line">   &#123;</div><div class="line">      connect(client, &amp;QModbusTcpClient::stateChanged, this, &amp;MyClass::onStateChanged); </div><div class="line">      connect(client, &amp;QModbusTcpClient::errorOccurred, this, &amp;MyClass::onErrorOccurred); </div><div class="line">   &#125;</div><div class="line">   else</div><div class="line">      qDebug() &lt;&lt; client-&gt;errorString();</div><div class="line">&#125;</div><div class="line"></div><div class="line">MyClass::readCoil()</div><div class="line">&#123;</div><div class="line">   QModbusDataUnit readUnit(QModbusDataUnit::Coils,00000,4);</div></pre></td></tr></table></figure>
+<p>本文内容摘自<a href="https://forum.qt.io/topic/67565/how-to-use-qmodbus-class-to-get-the-data-on-a-daq-card" target="_blank" rel="external">这里</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/Kepware与 smart200建立连接的方法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1407,7 +1080,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:17:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
                 2018-01-24
               </time>
             
@@ -1482,6 +1155,371 @@
 <li>输入smart 200PLC的地址</li>
 <li><strong>最重要的一步：修改参数，把两个4D57改成201</strong><br>##建变量<br>新建变量<br>运行测试</li>
 </ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/CPU寻址/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/CPU寻址/" itemprop="url">CPU寻址</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="CPU寻址"><a href="#CPU寻址" class="headerlink" title="#CPU寻址"></a>#CPU寻址</h2><p><strong>本文摘自《汇编原理（第二版）》，作者王爽</strong></p>
+<p>##CPU组成##<br>一个典型的CPU由运算器、控制器、寄存器等器件构成，这些器件靠内部总线相连。简单的讲，在CPU中：</p>
+<blockquote>
+<ul>
+<li>运算器进信息处理；</li>
+<li>寄存器进行信息存储；</li>
+<li>控制器控制各种器件进行工作；</li>
+<li>内部总线连接各种器件，在它们之间进行数据的传送。</li>
+</ul>
+</blockquote>
+<p>####通用寄存器####<br>8086CPU的所有寄存器都是16位的。AX、BX、CX、DX这4个寄存器通常用来存放一般性的数据，被称为通用寄存器。<br>8086CPU的上一代CPU中的寄存器都是8位的，为了保证兼容，使原来基于上代CPU编写的程序稍加修改就可以运行在8086之上，8086CPU的AX、BX、CX、DX这4个寄存器都可分为两个独立使用的8位寄存器来用：例如AX可分为AH和AL。<br>出于对兼容性的考虑，8086CPU可以一次性处理以下两种尺寸的数据：字节和字。</p>
+<blockquote>
+<p>将AX分为AH和AI使用时，CPU在执行指令的时候认为AH和AL是两个不相关的寄存器。不要错误的认为i，诸如add al,93H的指令产生的进位会存储在ah中，add al,93H进行的8位运算。</p>
+</blockquote>
+<p>##CPU如何在内部形成内存单元的物理地址<br>8086是16位结构的CPU，什么是16位结构的CPU呢？</p>
+<pre><code>1. 运算器一次最多可以处理16位的数据；
+2. 存储器的最大宽度为16位；
+3. 寄存器和运算器之间的通路为16位。
+</code></pre><p>这也就是说，在8086内部，能够一次性处理、传输、暂时存储的信息最大长度是16位的（是不是32位系统与64位系统也是这样，除了在内存上有差别还在性能上有差别？）。内存单元的地址在送上地址总线之前，必须在CPU中处理、传输、暂时存放，对于16位的CPU，能一次性处理、传输、暂存16位的地址。但是，8086有20位地址总线，怎么办？<br><strong><em>8086CPU采用一种在内部用两个16位地址合成（通过地址加法器）的方法来形成一个20位物理地址。</em></strong><br>当8086CPU要读写内存时：</p>
+<blockquote>
+<ol>
+<li>CPU中的相关部件提供两个16位的地址，一个成为段地址，另一个称为偏移地址；</li>
+<li>段地址和偏移地址通过内部总线送入一个成位地址加法器的部件；</li>
+<li>地址加法器将两个16位地址合成为一个20位的物理地址；</li>
+<li>地址加法器通过内部总线将20位物理地址送入输入输出控制电路；</li>
+<li>输入输出控制电路将20位物理地址送上地址总线；</li>
+<li>20位物理地址被地址总线传送到存储器。</li>
+</ol>
+</blockquote>
+<p>地址加法器采用<strong><em>物理地址=段地址×16+偏移地址</em></strong>的方式合成物理地址。<br>例如两个16位，1230和00C8，1230*16=12300（左移4位）。12300+00C8=123C8。</p>
+<p>##段的概念##<br>段地址包含着段的概念，其实不是内存分段，段的划分来自CPU，由于8086CPU用“<strong>基础地址（段地址*16）+偏移地址=物理地址</strong>”的方式给出的内存单元的物理地址，使得我们可以用分段的方式来管理内存。<br>对于同一地址比如10000H~100FFH的内存单元，可以有很多种表示方式</p>
+<ol>
+<li>基础地址为10000H，段地址为1000H，大小为100H；</li>
+<li>可以认为10000H~1007FH、10080H~100FFH内存单元组成两个段，它们的基础地址为：10000H和10080H，段地址为：1000H和1008H，大小都为80H。</li>
+</ol>
+<p>有两点需要注意：</p>
+<blockquote>
+<ul>
+<li>段地址*16必然是16的倍数，所以一个段的起始地址也一定是16的倍数；</li>
+<li>偏移地址为16位，16位地址的寻址能力为64KB，所以一个段的长度最大为64KB</li>
+</ul>
+</blockquote>
+<p>##段寄存器##<br>段地址在8086CPU的段寄存器中存放。8086CPU有4个段寄存器：CS、DS、SS、ES。<strong><em>其中CS用来存放指令的段地址。</em></strong></p>
+<p>##CS和IP##<br>CS和IP是8086CPU中最关键的寄存器，它们指示了CPU当前要读指令的地址。CS为代码段寄存器，IP为指令指针寄存器，即CS*16+IP。<br>8086CPU的工作过程：</p>
+<ol>
+<li>从CS：IP指向的内存单元读取指令，读取指令进入指令缓冲器；</li>
+<li>IP指向下一条指令；</li>
+<li>执行指令。（转到步骤1，重复这个过程）<blockquote>
+<p>8086机中，任意时刻，CPU将CS：IP指向的内容当作指令执行。<br>在内存中，指令和数据没有任何区别，都是二进制信息，CPU在工作的时候把有的信息看作指令，有的信息看作数据。现在，如果提出一个问题：CPU根据什么将内存中的信息看作指令？如何回答？我们可以说，CPU将CS：IP指向的内存单元中的内容看作指令。</p>
+</blockquote>
+</li>
+</ol>
+<p>注意move指令不能改变CS、IP寄存器中的内容。能够改变CS、IP的内容的指令被统称为转移指令。如jump指令。</p>
+<p>##这本书中的第二章实验1可以多看几遍##</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/24/CPU如何控制器件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiao Maojin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JMJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/CPU如何控制器件/" itemprop="url">CPU如何控制器件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T19:22:09+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IT/" itemprop="url" rel="index">
+                    <span itemprop="name">IT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#CPU如何控制器件</p>
+<hr>
+<p><strong>本文摘自《汇编语言》，作者王爽</strong></p>
+<p>##总线##<br>CPU想要进行数据的读写，必须和外部器件进行以下3类信息的交互。</p>
+<blockquote>
+<ul>
+<li>存储单元的地址（地址信息）</li>
+<li>器件的选择，读或写的命令（控制信息）</li>
+<li>读或写的数据（数据信息）</li>
+</ul>
+</blockquote>
+<p>通常将连接CPU和其他芯片的导线，称为总线。因此，总线从逻辑上分为3类，地址总线、控制总线和数据总线。<br>我们知道了CPU是如何进行数据读写的。可是，如何命令计算机进行数据的读写呢？<br>要让一个计算机或微处理器工作，应向它输入能够驱动它进行工作的电平信息（汇编指令，机器码）</p>
+<p>##接口卡##<br>计算机系统中，所有可用程序控制其工作的设备，必须收到CPU的控制。CPU对外部设备都不能直接控制，如显示器、音响、打印机等。直接控制这些设备进行工作的是插在扩展插槽上的接口卡。扩展插槽通过总线和CPU相连，所以接口卡也通过总线同CPU相连。CPU可以直接控制这些接口卡，从而实现CPU对外设的间接控制。简单的讲<strong><em>，就是CPU通过总线向接口卡发送命令，接口卡根据CPU的命令控制外设进行工作</em></strong>。</p>
+<p>##各类存储器芯片##<br>主要有RAM和ROM</p>
+<p>###随机存储器###<br>主随机存储器一般由两个位置上的RAM组成，装在主板上的RAM和插在扩展槽上的RAM。</p>
+<p>###装有BIOS的ROM###<br>BIOS是由主板和各类接口卡（如显卡、网卡等）厂商提供的软件系统，可以通过它利用该硬件设备进行最基本的输入输出。在主板和某些接口卡上茶有存储相应BIOS的ROM，例如，主板上的ROM中存储着主板的BIOS；显卡上的ROM中存储着显卡的BIOS；如果网卡上装有ROM，那么其中就可以存储网卡的BIOS。</p>
+<p>###接口卡上的RAM###<br>某些接口卡需要对大批量输入输出数据进行暂时存储，在其上装有RAM。最典型的是显存。显卡随时将显存中的数据向显示器输出。换句话说，我们将需要显示的内容写入显存，就会出现在显示器上。</p>
+<p>###内存地址空间###<br>上述的那些存储器，在物理上是独立的器件，但是在以下两点上相同。</p>
+<blockquote>
+<ul>
+<li>都和CPU的总线相连。</li>
+<li>CPU对他们进行读写的时候都通过控制线发出内存读写命令。</li>
+</ul>
+</blockquote>
+<p>这就是说，<strong><em>CPU在操纵它们的时候，把它们都当作内存来对待</em></strong>。<br>所有的物理存储器被看作一个由若干存储单元组成的逻辑存储器，每个物理存储器在这个逻辑存储器中占有一个地址段，即一段地址空间。CPU在这段地址空间中读写数据，实际上就是在对相对应的物理存储器中读写数据。<br>例如：</p>
+<blockquote>
+<p>地址0~7FFFH的32KB空间为主村级存储器地址空间；<br>地址8000H~9FFFH的8KB空间为显存地址空间；<br>地址A000H~FFFFH的24KB空间为各个ROM的地址空间。</p>
+</blockquote>
+<p>这样，CPU向内存地址为1000H的内存单元中写入数据，这个数据就被写入主随机存储器；CPU向内存地址为8000H的内存单元中写入数据，这个数据就被写入显存中，然后会被显卡输出到显示器上；CPU向内存地址为C00H的内存单元中写入数据的操作是没有结果的，因为是ROM。</p>
 
           
         
@@ -1727,7 +1765,7 @@ mingw32-make.exe install
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/23/make makefile cmake qmake都是什么，有什么区别？/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/23/OPC UA基本概念结构/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiao Maojin">
@@ -1746,7 +1784,7 @@ mingw32-make.exe install
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/23/make makefile cmake qmake都是什么，有什么区别？/" itemprop="url">make makefile cmake qmake都是什么，有什么区别？</a></h1>
+                <a class="post-title-link" href="/2018/01/23/OPC UA基本概念结构/" itemprop="url">OPC UA基本概念结构</a></h1>
         
 
         <div class="post-meta">
@@ -1781,8 +1819,8 @@ mingw32-make.exe install
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/IT-Qt/" itemprop="url" rel="index">
-                    <span itemprop="name">IT Qt</span>
+                  <a href="/categories/OPC-工控/" itemprop="url" rel="index">
+                    <span itemprop="name">OPC 工控</span>
                   </a>
                 </span>
 
@@ -1820,49 +1858,35 @@ mingw32-make.exe install
       
         
           
-            <p>﻿# make makefile cmake qmake都是什么，有什么区别？</p>
-<blockquote>
-<p>本题目转自知乎，两个答案写的挺好。<a href="https://www.zhihu.com/question/27455963" target="_blank" rel="external">make makefile cmake qmake都是什么，有什么区别？</a></p>
+            <h1 id="OPC-UA基本概念结构"><a href="#OPC-UA基本概念结构" class="headerlink" title="OPC UA基本概念结构"></a>OPC UA基本概念结构</h1><blockquote>
+<p>本文摘自《OPC统一架构》，作者：Wolfgang Mahnke • Stefan-Helmut Leitner•Matthias Damm</p>
 </blockquote>
-<p>##第一个</p>
-<blockquote>
-<p>作者：辉常哥 链接：<a href="https://www.zhihu.com/question/27455963/answer/89770919" target="_blank" rel="external">https://www.zhihu.com/question/27455963/answer/89770919</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处</p>
-</blockquote>
+<p>OPC UA建模的基本概念是节点以及节点之间的引用。节点可以根据不同的用途归属于不同的节点类别(NodeClass)，一些节点代表实例，另一些代表类型等等。<br>属性(Attritube)被用来描述节点，一个节点的属性取决于NodeClass，不过，每个节点也有一些通用属性，例如:NodeId,NodeClass,BrowseName,DisplayName,Description等。</p>
+<p>##引用<br>从理论上讲，引用描述了两个确定节点之间的关系。因此，源节点、目标节点、引用的语义(即RefenceTyoe)和引用的方向唯一确定一个引用。<br>我们可以把引用看作一个指向其他节点的指针，通过保存其他节点的Id来指向另一个节点。指针可引用不存在(或不再存在)于服务器的节点，也可以引用其他服务器上的节点。<br>引用是两个节点之间的连接，引用不能直接访问，只能间接的通过浏览节点访问。引用有引用类型，分为分层次化引用和非层次化引用两个子类型。<br><img src="http://oxehqp0gf.bkt.clouddn.com/OPCUA%E5%9F%BA%E6%9C%AC%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.PNG" alt="OPCUA基本引用类型层次结构"><br>例如:</p>
 <ol>
-<li>gcc是GNU Compiler Collection（就是GNU编译器套件），也可以简单认为是编译器，它可以编译很多种编程语言（括C、C++、Objective-C、Fortran、Java等等）。</li>
-<li>当你的程序只有一个源文件时，直接就可以用gcc命令编译它。</li>
-<li>但是当你的程序包含很多个源文件时，用gcc命令逐个去编译时，你就很容易混乱而且工作量大</li>
-<li>所以出现了make工具make工具可以看成是一个智能的批处理工具，它本身并没有编译和链接的功能，而是用类似于批处理的方式—通过调用makefile文件中用户指定的命令来进行编译和链接的。</li>
-<li>makefile是什么？简单的说就像一首歌的乐谱，make工具就像指挥家，指挥家根据乐谱指挥整个乐团怎么样演奏，make工具就根据makefile中的命令进行编译和链接的。</li>
-<li>makefile命令中就包含了调用gcc（也可以是别的编译器）去编译某个源文件的命令。</li>
-<li>makefile在一些简单的工程完全可以人工手下，但是当工程非常大的时候，手写makefile也是非常麻烦的，如果换了个平台makefile又要重新修改。</li>
-<li>这时候就出现了Cmake这个工具，cmake就可以更加简单的生成makefile文件给上面那个make用。当然cmake还有其他功能，就是可以跨平台生成对应平台能用的makefile，你不用再自己去修改了。</li>
-<li>可是cmake根据什么生成makefile呢？它又要根据一个叫CMakeLists.txt文件（学名：组态档）去生成makefile。</li>
-<li>到最后CMakeLists.txt文件谁写啊？亲，是你自己手写的。</li>
-<li>当然如果你用IDE，类似VS这些一般它都能帮你弄好了，你只需要按一下那个三角形</li>
-<li>接着是qmake，qmake是什么，先说一下Qt这个东西。Qt是跨平台C++图形用户界面应用程序开发框架。它既可以开发GUI程序，也可用于开发非GUI程序，比如控制台工具和服务器。简单的说就是C++的第三方库，使用这个库你可以很容易生成windows，Linux，MAC os等等平台的图形界面。现在的Qt还包含了开发各种软件一般需要用到的功能模块（网络，数据库，XML，多线程啊等等），比你直接用C++（只带标准内裤那种）要方便和简单。</li>
-<li>你可以用Qt简简单单就实现非常复杂的功能，是因为Qt对C++进行了扩展，你写一行代码，Qt在背后帮你写了几百上千行，而这些多出来的代码就是靠Qt专有的moc编译器（The Meta-Object Compiler）和uic编译器（User Interface Complier）来重新翻译你那一行代码。问题来了，你在进行程序编译前就必须先调用moc和uic对Qt源文件进行预处理，然后再调用编译器进行编译。上面说的那种普通makefile文件是不适用的，它没办法对qt源文件进行预处理。所以qmake就产生了。</li>
-<li>qmake工具就是Qt公司制造出来，用来生成Qt 专用makefile文件，这种makefile文件就能自动智能调用moc和uic对源程序进行预处理和编译。qmake当然必须也是跨平台的，跟cmake一样能对应各种平台生成对应makefile文件。</li>
-<li>qmake是根据Qt 工程文件（.pro）来生成对应的makefile的。工程文件（.pro）相对来说比较简单，一般工程你都可以自己手写，但是一般都是由Qt的开发环境 Qt Creator自动生成的，你还是只需要按下那个邪恶三角形就完事了。</li>
-<li>还没有完，由于qmake很简单很好用又支持跨平台，而且是可以独立于它的IDE，所以你也可以用在非Qt工程上面，照样可以生成普通的makefile，只要在pro文件中加入CONFIG -= qt  就可以了。</li>
-<li>这样qmake和cmake有什么区别？<br>不好意思，cmake也是同样支持Qt程序的，cmake也能生成针对qt 程序的那种特殊makefile，     只是cmake的CMakeLists.txt 写起来相对与qmake的pro文件复杂点。<br>qmake 是为 Qt 量身打造的，使用起来非常方便，但是cmake功能比qmake强大。一般的Qt工程你就直接使用qmake就可以了，cmake的强大功能一般人是用不到的。<br>当你的工程非常大的时候，又有qt部分的子工程，又有其他语言的部分子工程，据说用cmake会方便，我也没试过。</li>
+<li>当需要建立层次模型时，应当使用层次化引用；例如，组织(Organizes)引用类型表示两个节点需要通过层次方式连接起来，我们可以把文件系统映射到OPC UA，文件夹可以被当做节点，使用Organsizes引用来引用其子文件夹。</li>
+<li>其他一些情况应使用非层次化引用，如暴露不同层次结构间的关系，例如，非层次化的HasTypeDefinition从一个实例引用到类型层次中的类型。</li>
 </ol>
-<p>##第二个</p>
+<p>##对象、变量和方法<br>在OPC UA中，最重要的节点类别(NodeClass)是对象、变量和方法。对象可以拥有变量和方法，而且可以触发事件。</p>
+<ul>
+<li>节点类别为变量的节点代表一个值，客户端可以对这个值进行读取、写入和订阅其变化。</li>
+<li>节点类别为方法的节点代表服务器中一个由客户端调用并返回结果的方法。每个方法指定客户端应使用的输入参数和客户端希望得到的结果即输出参数。使用方法的目的是它执行的比较快。</li>
+<li>节点类别为对象的节点用于地址空间结构，对象使用变量对外提供值，对象不像变量一样拥有Value属性。对象可以用于分组管理变量，方法或其他对象。对象也可以是一个事件通知器，客户端可以订阅事件通知其来接收事件。<ul>
+<li>除了些通用属性，对象唯一的附加属性是用来识别对象是否可以作为事件通知器，即客户端是否可以订阅对象来接受事件，或者读取、更新事件的历史。</li>
+<li>变量的附加属性比较多。值得注意的一点是，变量的数据类型(DataType)这个附加属性。变量的数据类型表示为地址空间的节点，因此这个附加属性是NodeId类型的。</li>
+<li>方法的附加属性有Executable和UseExecutable，这两个是关于执行方面的。除了附加属性，方法还拥有特性(Property)，说白了就是属于方法的输入输出变量。方法的输入输出参数不是通过属性描述的，而是通过变量。</li>
+</ul>
+</li>
+</ul>
+<p>##对象类型和变量类型<br>OPC UA的地址空间定义了两种节点类别(NodeClass),ObjectType用来定义对象类型，而VariableType用来定义变量类型。方法没有对应的类型定义。方法可以绑定到一个对象类型上，从而可以在对象上使用，方法是由浏览名称和方法参数确定的，因此没有定义类型的必要。<br>如果使用一个概念，来解释对象类型和变量类型共同的特征，则会称之为类型定义(TypeDefinition)（个人理解，类型定义就是使用ObjectType或VariableType来定义对象或变量类型的总称）。</p>
+<p>###简单对象类型<br>对象类型分为简单的和复杂的。复杂对象类型暴露其下的一些节点结构，这些节点在类型的每一个实例中出现，而简单对象类型只定义对象的一些语义。<br>当使用NodeManagement(节点管理)服务创建一个新对象时，必须提供类型定义。新对象的一些属性没有必要被指定，可以用对象类型的默认值填充。另外对象类型支持继承。详细可以看书上的例子。</p>
+<p>###简单变量类型<br>像对象类型一样，变量类型也分为简单的和复杂的。</p>
+<p>###复杂对象类型<br>复杂对象类型暴露其下的一些节点的结构，这些节点在对象类型的每一个实例中出现。<br><img src="http://oxehqp0gf.bkt.clouddn.com/OPCUA%E5%A4%8D%E6%9D%82%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B.PNG" alt="OPCUA复杂对象类型"><br>对象类型MotorType使用的节点类别是对象类型。但它下面的所有节点的节点类别都是对象、变量或方法。这些节点都是实例而不是类型，然而它们通常不是真正的包含实际值的实例，因此它们被称为实例声明。<br>实例声明有一点需要注意，因为实例声明的一个主要特点是:</p>
 <blockquote>
-<p>作者：玟清 链接：<a href="https://www.zhihu.com/question/27455963/answer/36722992" target="_blank" rel="external">https://www.zhihu.com/question/27455963/answer/36722992</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处</p>
+<p>可以相对该对象类型，唯一标识每个实例声明，而且同样的相对标识不仅适用于该实例声明，也适用于该对象类型实例的对应部分。</p>
 </blockquote>
-<ol>
-<li>make 是用来执行Makefile的</li>
-<li>Makefile是类unix环境下(比如Linux)的类似于批处理的”脚本”文件。其基本语法是: 目标+依赖+命令，只有在目标文件不存在，或目标比依赖的文件更旧，命令才会被执行。由此可见，Makefile和make可适用于任意工作，不限于编程。比如，可以用来管理latex。</li>
-<li>Makefile+make可理解为类unix环境下的项目管理工具，但它太基础了，抽象程度不高，而且在windows下不太友好(针对visual studio用户)，于是就有了跨平台项目管理工具cmake</li>
-<li>cmake是跨平台项目管理工具，它用更抽象的语法来组织项目。虽然，仍然是目标，依赖之类的东西，但更为抽象和友好，比如你可用math表示数学库，而不需要再具体指定到底是math.dll还是libmath.so，在windows下它会支持生成visual studio的工程，在linux下它会生成Makefile，甚至它还能生成eclipse工程文件。也就是说，从同一个抽象规则出发，它为各个编译器定制工程文件。</li>
-<li>cmake是抽象层次更高的项目管理工具，cmake命令执行的CMakeLists.txt文件</li>
-<li>qmake是Qt专用的项目管理工具，对应的工程文件是<em>.pro，在Linux下面它也会生成Makefile，当然，在命令行下才会需要手动执行qmake，完全可以在qtcreator这个专用的IDE下面打开</em>.pro文件，使用qmake命令的繁琐细节不用你管了。</li>
-</ol>
-<p>总结一下，make用来执行Makefile，cmake用来执行CMakeLists.txt，qmake用来处理*.pro工程文件。Makefile的抽象层次最低，cmake和qmake在Linux等环境下最后还是会生成一个Makefile。cmake和qmake支持跨平台，cmake的做法是生成指定编译器的工程文件，而qmake完全自成体系。</p>
-<p>具体使用时，Linux下，小工程可手动写Makefile，大工程用automake来帮你生成Makefile，要想跨平台，就用cmake。如果GUI用了Qt，也可以用qmake+*.pro来管理工程，这也是跨平台的。当然，cmake中也有针对Qt的一些规则，并代替qmake帮你将qt相关的命令整理好了。</p>
-<p>另外，需要指出的是，make和cmake主要命令只有一条，make用于处理Makefile，cmake用来转译CMakeLists.txt，而qmake是一个体系，用于支撑一个编程环境，它还包含除qmake之外的其它多条命令(比如uic，rcc,moc)。</p>
-<p>上个简图，其中cl表示visual studio的编译器，gcc表示linux下的编译器<br><img src="http://oxehqp0gf.bkt.clouddn.com/%E5%90%84%E7%A7%8Dmake%E7%BB%93%E6%9E%84%E5%9B%BE.jpg" alt="此处输入图片的描述"></p>
+<p>只有保证这个特点才可以用对象信息类型来编程。<br>那么NodeId不能作为这个标识。因为实例声明与实例是不同的节点，因此NodeId肯定不同。为此，我们使用浏览路径(BrowsePath)。从对象类型开始，顺着层次化引用的前进方向标识实例声明。</p>
+<p>###复杂变量类型<br>复杂变量类型与复杂对象类型非常相似，但主要区别是她们只能用变量作为实例声明，而不能用对象或方法。</p>
 
           
         
